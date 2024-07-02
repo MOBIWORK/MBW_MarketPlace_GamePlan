@@ -6,6 +6,7 @@ import gameplan
 import frappe
 from frappe.utils import validate_email_address, split_emails, cstr
 from gameplan.utils import validate_type
+from frappe.translate import get_all_translations
 
 
 @frappe.whitelist(allow_guest=True)
@@ -391,3 +392,12 @@ def search(query, start=0):
 		"total": result.total,
 		"duration": result.duration,
 	}
+
+@frappe.whitelist(allow_guest=True)
+def get_translations():
+	if frappe.session.user != "Guest":
+		language = frappe.db.get_value("User", frappe.session.user, "language")
+	else:
+		language = frappe.db.get_single_value("System Settings", "language")
+
+	return get_all_translations(language)

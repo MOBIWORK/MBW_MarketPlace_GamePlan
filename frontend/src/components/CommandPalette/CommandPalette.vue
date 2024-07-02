@@ -16,7 +16,7 @@
               <LucideSearch class="h-4 w-4" />
             </div>
             <ComboboxInput
-              placeholder="Search"
+              :placeholder="__('Search')"
               class="w-full border-none bg-transparent py-3 pl-11.5 pr-4.5 text-base text-gray-800 placeholder-gray-500 focus:ring-0"
               @input="onInput"
               autocomplete="off"
@@ -282,22 +282,22 @@ export default {
     },
     navigationItems() {
       return {
-        title: 'Jump to',
+        title: __('Jump to'),
         component: 'Item',
         items: [
           {
-            title: 'Home',
+            title: __('Home'),
             icon: () => h(LucideHome),
             route: { name: 'Home' },
           },
           {
-            title: 'People',
+            title: __('People'),
             icon: () => h(LucideUsers),
             route: { name: 'People' },
             condition: () => this.$user().isNotGuest,
           },
           {
-            title: 'Notifications',
+            title: __('Notifications'),
             icon: () => h(LucideBell),
             route: { name: 'Notifications' },
             condition: () => this.$user().isNotGuest,
@@ -307,12 +307,12 @@ export default {
     },
     fullSearchItem() {
       return {
-        title: 'Search',
+        title: __('Search'),
         hideTitle: true,
         component: 'Item',
         items: [
           {
-            title: `Search for "${this.query}"`,
+            title: `${__('Search for')} "${this.query}"`,
             icon: () => h(LucideSearch),
             route: { name: 'Search', query: { q: this.query } },
           },
@@ -321,9 +321,9 @@ export default {
     },
     groupedSearchResults() {
       let groups = [
-        { title: 'Teams', component: 'ItemTeam' },
-        { title: 'Projects', component: 'ItemProject' },
-        { title: 'People', component: 'Item' },
+        { title: __('Teams'), component: 'ItemTeam' },
+        { title: __('Projects'), component: 'ItemProject' },
+        { title: __('People'), component: 'Item' },
       ]
       let itemsByGroup = {}
       for (const group of groups) {

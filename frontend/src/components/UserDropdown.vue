@@ -37,7 +37,7 @@ export default {
       return [
         {
           icon: 'user',
-          label: 'My Profile',
+          label: __('My Profile'),
           route: {
             name: 'PersonProfile',
             params: { personId: this.$user().user_profile },
@@ -45,13 +45,13 @@ export default {
         },
         {
           icon: 'settings',
-          label: 'Settings & Members',
+          label: __('Settings & Members'),
           onClick: () => showSettingsDialog(),
           condition: () => this.$user().isNotGuest,
         },
         {
           icon: () => h(LucideCreditCard),
-          label: 'Subscription',
+          label: __('Subscription'),
           condition: () =>
             this.$user().isNotGuest &&
             window.frappecloud_host &&
@@ -65,7 +65,7 @@ export default {
         },
         {
           icon: 'log-out',
-          label: 'Log out',
+          label: __('Log out'),
           onClick: () => this.$session.logout.submit(),
         },
       ]

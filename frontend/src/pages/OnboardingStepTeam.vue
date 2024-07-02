@@ -1,7 +1,6 @@
 <template>
   <FormControl
-    label="Team Name"
-    placeholder="Marketing"
+    :label="__('Team Name')"
     @update:modelValue="
       (team) => $emit('update:modelValue', { ...modelValue, team })
     "

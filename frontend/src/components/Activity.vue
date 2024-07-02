@@ -38,28 +38,28 @@
         </UserProfileLink>
       </UserInfo>
       <span class="text-gray-900" v-if="activity.action == 'Discussion Closed'">
-        closed this discussion
+        {{__('closed this discussion')}}
       </span>
       <span
         class="text-gray-900"
         v-if="activity.action == 'Discussion Reopened'"
       >
-        reopened this discussion
+        {{__('reopened this discussion')}}
       </span>
       <span class="text-gray-900" v-if="activity.action == 'Discussion Pinned'">
-        pinned this discussion
+        {{__('pinned this discussion')}}
       </span>
       <span
         class="text-gray-900"
         v-if="activity.action == 'Discussion Unpinned'"
       >
-        unpinned this discussion
+        {{__('unpinned this discussion')}}
       </span>
       <span
         class="text-gray-900"
         v-if="activity.action == 'Discussion Title Changed'"
       >
-        changed the title from "{{ activity.data.old_title }}" to "{{
+        {{__('changed the title from')}} "{{ activity.data.old_title }}" {{__('to')}} "{{
           activity.data.new_title
         }}"
       </span>
@@ -68,7 +68,7 @@
         v-if="activity.action == 'Task Value Changed'"
       >
         <template v-if="activity.data.field === 'assigned_to'">
-          assigned this to
+          {{__('assigned this to')}}
           <UserProfileLink
             class="font-medium text-gray-800 hover:text-gray-600"
             :user="$user(activity.data.new_value).name"
@@ -77,23 +77,23 @@
           </UserProfileLink>
         </template>
         <template v-else-if="activity.data.field === 'description'">
-          updated the description
+          {{__('updated the description')}}
         </template>
         <template v-else-if="activity.data.field === 'project'">
-          changed project
-          <span v-if="activity.data.old_value">from&nbsp;</span>
+          {{__('changed project')}}
+          <span v-if="activity.data.old_value">{{__('from')}}</span>&nbsp;
           <span class="text-gray-800">
             {{ projectTitle(activity.data.old_value) }}
           </span>
-          to
+          {{__('to')}}
           <span class="text-gray-800">
             {{ projectTitle(activity.data.new_value) }}
           </span>
         </template>
         <template v-else>
-          changed {{ activity.data.field_label }}
-          <span v-if="activity.data.old_value">from&nbsp;</span>
-          <span class="text-gray-800">{{ activity.data.old_value }}</span> to
+          {{__('changed')}} {{ activity.data.field_label }}
+          <span v-if="activity.data.old_value">{{__('from')}}</span>&nbsp;
+          <span class="text-gray-800">{{ activity.data.old_value }}</span> {{__('to')}}
           <span class="text-gray-800">{{ activity.data.new_value }}</span>
         </template> </span
       >&nbsp;<time

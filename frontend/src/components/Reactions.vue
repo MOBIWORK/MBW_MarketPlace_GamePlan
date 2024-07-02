@@ -3,7 +3,7 @@
     <Popover class="h-full">
       <template #target="{ togglePopover, isOpen }">
         <button
-          aria-label="Add a reaction"
+          :aria-label="__('Add a reaction')"
           :disabled="$resources.batch.loading"
           @click="togglePopover()"
           class="flex h-full items-center justify-center rounded-full bg-gray-100 px-2 py-1 text-gray-700 transition hover:bg-gray-200"

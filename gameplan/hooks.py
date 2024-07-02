@@ -1,4 +1,6 @@
 from . import __version__ as app_version
+import frappe
+import csv
 
 app_name = "gameplan"
 app_title = "Gameplan"
@@ -229,3 +231,13 @@ scheduler_events = {
 # Recommended only for DocTypes which have limited documents with untranslated names
 # For example: Role, Gender, etc.
 # translated_search_doctypes = []
+
+def load_custom_translations():
+    translation_file_path = frappe.get_app_path("gameplan", "translations", "vi.csv")
+    with open(translation_file_path, newline='', encoding='utf-8') as csvfile:
+        translation_reader = csv.DictReader(csvfile)
+        for row in translation_reader:
+            frappe._dict(row)
+
+def before_install():
+    load_custom_translations()

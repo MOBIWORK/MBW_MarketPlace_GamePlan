@@ -1,5 +1,5 @@
 <template>
-  <Dialog :options="{ title: 'Manage Guests' }" v-model="inviteGuestDialog">
+  <Dialog :options="{ title: __('Manage Guests') }" v-model="inviteGuestDialog">
     <template #body-content>
       <div class="my-4 space-y-2">
         <div
@@ -12,11 +12,11 @@
             <span class="text-gray-900">
               {{ user.pending ? user.email : $user(user.user).full_name }}
             </span>
-            <span class="text-gray-600" v-if="user.pending"> (Pending)</span>
+            <span class="text-gray-600" v-if="user.pending"> ({{__('Pending')}})</span>
           </div>
           <div class="ml-auto">
-            <Tooltip :text="user.pending ? 'Remove invite' : 'Remove user'">
-              <Button label="Remove" @click="remove(user)">
+            <Tooltip :text="user.pending ? __('Remove invite') : __('Remove user')">
+              <Button :label="__('Remove')" @click="remove(user)">
                 <template #icon><LucideX class="w-4" /></template>
               </Button>
             </Tooltip>
@@ -27,7 +27,6 @@
       <FormControl
         label="Email"
         v-model="email"
-        placeholder="jane@example.com"
         @keydown.enter="invite"
       />
       <ErrorMessage class="mt-2" :message="project.inviteGuest.error" />
@@ -39,7 +38,7 @@
         @click="invite"
         :loading="project.inviteGuest.loading"
       >
-        Invite
+        {{__('Invite')}}
       </Button>
     </template>
   </Dialog>
@@ -104,11 +103,11 @@ let removeDialog = reactive({
 function remove(user) {
   if (user.pending) {
     removeDialog.options = {
-      title: 'Delete Invitation',
-      message: 'Are you sure you want to delete this invitation?',
+      title: __('Delete Invitation'),
+      message: __('Are you sure you want to delete this invitation?'),
       actions: [
         {
-          label: 'Delete',
+          label: __('Delete'),
           variant: 'solid',
           theme: 'red',
           onClick: ({ close }) => {
@@ -119,11 +118,11 @@ function remove(user) {
     }
   } else {
     removeDialog.options = {
-      title: 'Remove Guest User',
-      message: 'Are you sure you want to remove this guest user?',
+      title: __('Remove Guest User'),
+      message: __('Are you sure you want to remove this guest user?'),
       actions: [
         {
-          label: 'Delete',
+          label: __('Delete'),
           variant: 'solid',
           theme: 'red',
           onClick: ({ close }) => {
@@ -139,7 +138,7 @@ function remove(user) {
           },
         },
         {
-          label: 'Cancel',
+          label: __('Cancel'),
         },
       ],
     }

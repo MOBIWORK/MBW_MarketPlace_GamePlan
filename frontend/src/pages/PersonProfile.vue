@@ -5,7 +5,7 @@
     >
       <Breadcrumbs
         :items="[
-          { label: 'People', route: { name: 'People' } },
+          { label: __('People'), route: { name: 'People' } },
           {
             label: profile?.full_name,
             route: { name: 'PersonProfile', params: { personId } },
@@ -58,7 +58,7 @@
             :class="{ 'hover:bg-gray-300': $isSessionUser(profile.user) }"
             :disabled="!$isSessionUser(profile.user)"
           >
-            <span v-if="$isSessionUser(profile.user)"> Upload Image </span>
+            <span v-if="$isSessionUser(profile.user)"> {{ __('Upload Image') }} </span>
           </button>
         </div>
         <div class="ml-6">
@@ -75,7 +75,7 @@
           class="ml-auto"
         >
           <template #prefix><LucideEdit class="w-4" /></template>
-          Edit Profile
+          {{ __('Edit Profile') }}
         </Button>
       </div>
 
@@ -83,9 +83,9 @@
         <TabButtons
           class="inline-block"
           :buttons="[
-            { label: 'About' },
-            { label: 'Posts' },
-            { label: 'Replies' },
+            { label: __('About') },
+            { label: __('Posts') },
+            { label: __('Replies') },
           ]"
           v-model="activeTab"
         />
@@ -95,7 +95,7 @@
     </div>
     <Dialog
       v-if="$isSessionUser(profile.user)"
-      :options="{ title: 'Edit Profile' }"
+      :options="{ title: __('Edit Profile') }"
       v-model="editDialog.show"
       @after-leave="discard"
     >
@@ -109,11 +109,11 @@
             <div class="flex items-center gap-4">
               <UserAvatar size="lg" :user="profile.user" />
               <Button @click="editDialog.editingProfilePhoto = true">
-                Edit Profile Photo
+                {{ __('Edit Profile Photo') }}
               </Button>
             </div>
-            <FormControl label="First Name" v-model="user.first_name" />
-            <FormControl label="Last Name" v-model="user.last_name" />
+            <FormControl :label="__('First Name')" v-model="user.first_name" />
+            <FormControl :label="__('Last Name')" v-model="user.last_name" />
             <FormControl
               label="Bio"
               v-model="profile.bio"
@@ -133,7 +133,7 @@
             $resources.profile.setValue.loading
           "
         >
-          Save
+          {{ __('Save') }}
         </Button>
       </template>
     </Dialog>

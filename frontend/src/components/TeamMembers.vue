@@ -6,7 +6,7 @@
         @click="inviteMemberDialog = true"
       >
         <template #prefix><LucideUserPlus class="w-4" /></template>
-        Add Members
+        {{__('Add Members')}}
       </Button>
       <template v-else>
         <button

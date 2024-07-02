@@ -52,7 +52,7 @@
                     v-if="filteredOptions.length === 0"
                     class="relative cursor-default select-none px-4 py-2 text-gray-700"
                   >
-                    No user found.
+                    {{__('No user found.')}}
                   </div>
                   <ComboboxOption
                     v-for="option in filteredOptions"

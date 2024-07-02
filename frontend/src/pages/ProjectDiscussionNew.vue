@@ -46,13 +46,13 @@
           </div>
         </div>
         <div class="hidden shrink-0 space-x-2 sm:block">
-          <Button @click="discard">Discard</Button>
+          <Button @click="discard">{{ __('Discard') }}</Button>
           <Button
             variant="solid"
             :loading="$resources.newDiscussion.loading"
             @click="publish"
           >
-            Publish
+            {{ __('Publish') }}
           </Button>
         </div>
       </div>
@@ -60,7 +60,7 @@
       <textarea
         class="mt-1 w-full resize-none border-0 px-0 py-0.5 text-3xl font-bold placeholder-gray-400 focus:ring-0"
         v-model="title"
-        placeholder="Title"
+        :placeholder="__('Title')"
         rows="1"
         wrap="soft"
         maxlength="140"
@@ -79,7 +79,7 @@
         editor-class="rounded-b-lg max-w-[unset] prose-sm h-[calc(100vh-340px)] sm:h-[calc(100vh-250px)] overflow-auto"
         :content="content"
         @change="onNewPostChange"
-        placeholder="Write something..."
+        :placeholder="__('Write something...')"
       >
         <template v-slot:bottom>
           <div
@@ -90,13 +90,13 @@
               :buttons="textEditorMenuButtons"
             />
             <div class="mt-2 shrink-0 space-x-2 text-right sm:hidden">
-              <Button @click="discard">Discard</Button>
+              <Button @click="discard">{{ __('Discard') }}</Button>
               <Button
                 variant="solid"
                 :loading="$resources.newDiscussion.loading"
                 @click="publish"
               >
-                Publish
+                {{ __('Publish') }}
               </Button>
             </div>
           </div>
@@ -139,7 +139,7 @@ export default {
         },
         validate(params) {
           if (!params.doc.title) {
-            return `Please enter title before publishing.`
+            return __('Please enter title before publishing.')
           }
         },
         onSuccess(doc) {
@@ -178,11 +178,11 @@ export default {
     discard() {
       if (!this.$refs.textEditor.editor.isEmpty || this.title) {
         this.$dialog({
-          title: 'Discard post',
-          message: 'Are you sure you want to discard your post?',
+          title: __('Discard post'),
+          message: __('Are you sure you want to discard your post?'),
           actions: [
             {
-              label: 'Discard post',
+              label: __('Discard post'),
               onClick: ({ close }) => {
                 localStorage.removeItem(this.draftPostKey())
                 this.$router.push({ name: 'ProjectDiscussions' })
@@ -191,7 +191,7 @@ export default {
               variant: 'solid',
             },
             {
-              label: 'Keep post',
+              label: __('Keep post'),
             },
           ],
         })

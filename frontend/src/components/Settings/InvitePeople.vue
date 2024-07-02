@@ -2,13 +2,13 @@
   <div class="flex min-h-0 flex-col">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <h2 class="text-xl font-semibold leading-none">Invite People</h2>
+        <h2 class="text-xl font-semibold leading-none">{{__('Invite People')}}</h2>
       </div>
     </div>
     <div class="mt-4 space-y-4">
       <FormControl
         type="textarea"
-        label="Invite by email"
+        :label="__('Invite by email')"
         placeholder="user1@example.com, user2@example.com, ..."
         @input="emails = $event.target.value"
         :debounce="100"
@@ -17,12 +17,12 @@
       <template v-if="emails">
         <div>
           <FormControl
-            label="Role"
+            :label="__('Role')"
             type="select"
             :options="[
-              { label: 'Admin', value: 'Gameplan Admin' },
-              { label: 'Member', value: 'Gameplan Member' },
-              { label: 'Guest', value: 'Gameplan Guest' },
+              { label: __('Admin'), value: 'Gameplan Admin' },
+              { label: __('Member'), value: 'Gameplan Member' },
+              { label: __('Guest'), value: 'Gameplan Guest' },
             ]"
             v-model="role"
           />
@@ -30,7 +30,7 @@
         </div>
         <div v-if="role === 'Gameplan Guest'">
           <label class="text-sm leading-4 text-gray-700">
-            Invite Guest to Projects
+            {{__('Invite Guest to Projects')}}
           </label>
           <div class="mt-1 flex flex-wrap gap-2">
             <Button
@@ -45,7 +45,7 @@
           <Autocomplete
             class="mt-2"
             :options="projectOptions"
-            placeholder="Select projects"
+            :placeholder="__('Select projects')"
             v-model="selectedProject"
           />
         </div>
@@ -55,7 +55,7 @@
           @click="$resources.inviteByEmail.submit({ emails, role })"
           :loading="$resources.inviteByEmail.loading"
         >
-          Send invitation
+          {{__('Send invitation')}}
         </Button>
       </template>
     </div>
@@ -63,7 +63,7 @@
       <div
         class="mt-4 flex items-center justify-between border-b py-2 text-base text-gray-600"
       >
-        <div class="w-4/5">Pending Invites</div>
+        <div class="w-4/5">{{__('Pending Invites')}}</div>
       </div>
       <ul class="divide-y overflow-auto">
         <li
@@ -80,14 +80,14 @@
             </span>
           </div>
           <div>
-            <Tooltip text="Delete Invitation">
+            <Tooltip :text="__('Delete Invitation')">
               <Button
                 @click="$resources.pendingInvitations.delete.submit(user.name)"
                 :loading="
                   $resources.pendingInvitations.delete.loading &&
                   $resources.pendingInvitations.delete.params.name === user.name
                 "
-                label="Delete invitation"
+                :label="__('Delete invitation')"
               >
                 <template #icon><LucideX class="w-4" /></template>
               </Button>
@@ -153,11 +153,11 @@ export default {
     description() {
       return {
         'Gameplan Admin':
-          'Can create new teams and projects, invite admins and members, browse and create discussions.',
+          __('Can create new teams and projects, invite admins and members, browse and create discussions.'),
         'Gameplan Member':
-          'Can create projects, invite members, browse and create discussions.',
+          __('Can create projects, invite members, browse and create discussions.'),
         'Gameplan Guest':
-          'Can browse and participate in invited teams or projects.',
+          __('Can browse and participate in invited teams or projects.'),
       }[this.role]
     },
     projectOptions() {

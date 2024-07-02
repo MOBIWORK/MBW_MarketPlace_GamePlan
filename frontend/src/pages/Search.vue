@@ -1,14 +1,14 @@
 <template>
   <header class="sticky top-0 z-10 border-b bg-white px-4 py-2.5 sm:px-5">
     <div class="flex items-center justify-between">
-      <Breadcrumbs :items="[{ label: 'Search', route: { name: 'Search' } }]" />
+      <Breadcrumbs :items="[{ label: __('Search'), route: { name: 'Search' } }]" />
     </div>
   </header>
   <div class="mx-auto mt-6 max-w-4xl px-4 sm:px-5">
     <div class="flex items-center space-x-2">
       <TextInput
         class="w-full"
-        placeholder="Type a keyword and hit enter to search"
+        :placeholder="__('Type a keyword and hit enter to search')"
         autocomplete="off"
         v-model="query"
         @keydown.enter="(e) => search(e.target.value)"
@@ -18,14 +18,14 @@
         </template>
       </TextInput>
       <Button @click="search(query)" :loading="$resources.search.loading">
-        Search
+        {{ __('Search') }}
       </Button>
     </div>
     <div
       v-if="$resources.search.params && $resources.search.data"
       class="mt-4 text-base font-semibold text-gray-800"
     >
-      About {{ $resources.search.data.total }} results for "{{
+      {{ __('About') }} {{ $resources.search.data.total }} {{ __('results for') }} "{{
         $resources.search.params?.query
       }}" ({{ $resources.search.data.duration.toFixed(2) }}
       ms)
@@ -179,7 +179,7 @@ export default {
   },
   pageMeta() {
     return {
-      title: 'Search',
+      title: __('Search'),
       emoji: '🔍',
     }
   },

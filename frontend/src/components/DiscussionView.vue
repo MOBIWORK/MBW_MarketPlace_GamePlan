@@ -11,7 +11,7 @@
                 class="w-full rounded border-0 bg-gray-100 px-2 py-1 text-xl font-semibold focus:ring-0"
                 ref="title"
                 v-model="discussion.title"
-                placeholder="Title"
+                :placeholder="__('Title')"
                 @keydown.enter="
                   () => {
                     $resources.discussion.setValue
@@ -29,14 +29,14 @@
                 v-focus
               />
               <p class="mt-1 text-sm text-gray-600">
-                Edit title and press enter. Press escape to cancel.
+                {{__('Edit title and press enter. Press escape to cancel.')}}
               </p>
             </div>
           </div>
           <h1 v-else class="flex items-center text-2xl font-semibold">
             <Tooltip
               v-if="discussion.closed_at"
-              text="This discussion is closed"
+              :text="__('This discussion is closed')"
             >
               <LucideLock
                 class="mr-2 h-4 w-4 text-gray-700"
@@ -54,7 +54,7 @@
             :button="{
               icon: 'more-horizontal',
               variant: 'ghost',
-              label: 'Discussion Options',
+              label: __('Discussion Options')
             }"
             :options="actions"
           />
@@ -65,8 +65,8 @@
           <span class="text-gray-600">
             {{
               discussion.participants_count == 1
-                ? `1 participant`
-                : `${discussion.participants_count} participants`
+                ? __('1 participant')
+                : `${discussion.participants_count} ${__('participants')}`
             }}
           </span>
         </div>
@@ -95,7 +95,7 @@
               v-if="!readOnlyMode && !editingContent"
               variant="ghost"
               @click="editingContent = true"
-              label="Edit Post"
+              :label="__('Edit Post')"
             >
               <template #icon><LucideEdit class="w-4" /></template>
             </Button>
@@ -147,7 +147,7 @@
       />
       <Dialog
         :options="{
-          title: 'Move discussion to another project',
+          title: __('Move discussion to another project'),
         }"
         @close="
           () => {
@@ -161,7 +161,7 @@
           <Autocomplete
             :options="projectOptions"
             v-model="discussionMoveDialog.project"
-            placeholder="Select a project"
+            :placeholder="__('Select a project')"
           />
           <ErrorMessage
             class="mt-2"
@@ -181,8 +181,8 @@
           >
             {{
               discussionMoveDialog.project
-                ? `Move to ${discussionMoveDialog.project.label}`
-                : 'Move'
+                ? `${__('Move to')} ${discussionMoveDialog.project.label}`
+                : __('Move')
             }}
           </Button>
         </template>
@@ -349,35 +349,37 @@ export default {
     actions() {
       return [
         {
-          label: 'Edit Title',
+          label: __('Edit Title'),
           icon: 'edit',
           onClick: () => {
             this.editingTitle = true
           },
         },
         {
-          label: 'Revisions',
+          label: __('Revisions'),
           icon: 'rotate-ccw',
           onClick: () => (this.showRevisionsDialog = true),
         },
         {
-          label: 'Copy link',
+          label: __('Copy link'),
           icon: 'link',
           onClick: this.copyLink,
         },
         {
-          label: 'Pin discussion...',
+          label: __('Pin discussion...'),
           icon: 'arrow-up-left',
           condition: () => !this.discussion.pinned_at,
           onClick: () => {
             let project = this.$getDoc('GP Project', this.discussion.project)
             this.$dialog({
-              title: 'Pin discussion',
-              message: `When a discussion is pinned, it shows up on top of the discussion list in ${project.title}. Do you want to pin this discussion?`,
+              title: __('Pin discussion'),
+              message: __('When a discussion is pinned, it shows up on top of the discussion list in {0}. Do you want to pin this discussion?', [
+                project.title
+              ]),
               icon: { name: 'arrow-up-left' },
               actions: [
                 {
-                  label: 'Pin',
+                  label: __('Pin'),
                   onClick: ({ close }) =>
                     this.$resources.discussion.pinDiscussion
                       .submit()
@@ -389,17 +391,17 @@ export default {
           },
         },
         {
-          label: 'Unpin discussion...',
+          label: __('Unpin discussion...'),
           icon: 'arrow-down-left',
           condition: () => this.discussion.pinned_at,
           onClick: () => {
             this.$dialog({
-              title: 'Unpin discussion',
-              message: `Do you want to unpin this discussion?`,
+              title: __('Unpin discussion'),
+              message: __(`Do you want to unpin this discussion?`),
               icon: { name: 'arrow-down-left' },
               actions: [
                 {
-                  label: 'Unpin',
+                  label: __('Unpin'),
                   onClick: ({ close }) =>
                     this.$resources.discussion.unpinDiscussion
                       .submit()
@@ -411,18 +413,17 @@ export default {
           },
         },
         {
-          label: 'Close discussion...',
+          label: __('Close discussion...'),
           icon: 'lock',
           condition: () => !this.discussion.closed_at,
           onClick: () => {
             this.$dialog({
-              title: 'Close discussion',
-              message:
-                'When a discussion is closed, commenting is disabled. Anyone can re-open the discussion later. Do you want to close this discussion?',
+              title: __('Close discussion'),
+              message: __('When a discussion is closed, commenting is disabled. Anyone can re-open the discussion later. Do you want to close this discussion?'),
               icon: { name: 'lock' },
               actions: [
                 {
-                  label: 'Close',
+                  label: __('Close'),
                   onClick: ({ close }) =>
                     this.$resources.discussion.closeDiscussion
                       .submit()
@@ -434,18 +435,17 @@ export default {
           },
         },
         {
-          label: 'Re-open discussion...',
+          label: __('Re-open discussion...'),
           icon: 'unlock',
           condition: () => this.discussion.closed_at,
           onClick: () => {
             this.$dialog({
-              title: 'Re-open discussion',
-              message:
-                'Do you want to re-open this discussion? Anyone can comment on it again.',
+              title: __('Re-open discussion'),
+              message: __('Do you want to re-open this discussion? Anyone can comment on it again.'),
               icon: { name: 'unlock' },
               actions: [
                 {
-                  label: 'Re-open',
+                  label: __('Re-open'),
                   onClick: ({ close }) =>
                     this.$resources.discussion.reopenDiscussion
                       .submit()
@@ -457,7 +457,7 @@ export default {
           },
         },
         {
-          label: 'Move to...',
+          label: __('Move to...'),
           icon: 'log-out',
           onClick: () => {
             this.discussionMoveDialog.show = true

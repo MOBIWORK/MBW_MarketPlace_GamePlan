@@ -15,7 +15,7 @@
       >
         <div class="text-center">
           <div class="rounded-md py-1 text-lg text-white">
-            Drag up/down to reposition image
+            {{__('Drag up/down to reposition image')}}
           </div>
           <Button
             class="mt-2"
@@ -28,9 +28,9 @@
               }
             "
           >
-            Save position
+            {{__('Save position')}}
           </Button>
-          <Button class="ml-2 mt-2" @click="reposition = false">Cancel</Button>
+          <Button class="ml-2 mt-2" @click="reposition = false">{{__('Cancel')}}</Button>
         </div>
       </div>
       <div
@@ -50,7 +50,7 @@
         >
           <template v-slot="{ togglePopover }">
             <Button variant="outline" @click="togglePopover()">
-              Change Image
+              {{__('Change Image')}}
             </Button>
           </template>
         </UnsplashImageBrowser>
@@ -64,7 +64,7 @@
             }
           "
         >
-          Reposition
+          {{__('Reposition')}}
         </Button>
       </div>
     </div>
@@ -85,7 +85,7 @@
       >
         <template v-slot="{ togglePopover }">
           <Button variant="outline" @click="togglePopover()">
-            Click to set cover image
+            {{__('Click to set cover image')}}
           </Button>
         </template>
       </UnsplashImageBrowser>

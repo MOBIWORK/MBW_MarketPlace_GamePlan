@@ -4,11 +4,11 @@
   >
     <Breadcrumbs
       class="h-7"
-      :items="[{ label: 'Discussions', route: { name: 'Discussions' } }]"
+      :items="[{ label: __('Discussions'), route: { name: 'Discussions' } }]"
     />
     <Button variant="solid" @click="newDiscussionDialog.show = true">
       <template #prefix><LucidePlus class="h-4 w-4" /></template>
-      Add new
+      {{__('Add new')}}
     </Button>
   </header>
   <div
@@ -29,7 +29,7 @@
         <template #prefix><LucideBellPlus class="w-4" /></template>
         {{ $resources.followedProjects.data.length }}
         {{
-          $resources.followedProjects.data.length === 1 ? 'Project' : 'Projects'
+          $resources.followedProjects.data.length === 1 ? __('Project') : __('Projects')
         }}
       </Button>
       <Select
@@ -108,10 +108,10 @@
   </Dialog>
   <Dialog
     :options="{
-      title: 'New Discussion',
+      title: __('New Discussion'),
       actions: [
         {
-          label: 'Add new discussion',
+          label: __('Add new discussion'),
           variant: 'solid',
           disabled: !newDiscussionDialog.project,
           onClick() {
@@ -131,12 +131,12 @@
   >
     <template #body-content>
       <p class="mb-4 text-base text-gray-700">
-        Select a project to start a new discussion
+        {{ __('Select a project to start a new discussion') }}
       </p>
       <Autocomplete
         :options="projectOptions"
         v-model="newDiscussionDialog.project"
-        placeholder="Select a project"
+        :placeholder="__('Select a project')"
       />
     </template>
   </Dialog>
@@ -179,31 +179,31 @@ export default {
       swipeLoading: false,
       feedOptions: [
         {
-          label: 'Recent',
+          label: __('Recent'),
           value: 'recent',
         },
         {
-          label: 'Unread',
+          label: __('Unread'),
           value: 'unread',
         },
         {
-          label: 'Following',
+          label: __('Following'),
           value: 'following',
         },
       ],
       feedType: 'recent',
       orderOptions: [
         {
-          label: 'Sort by',
+          label: __('Sort by'),
           value: '',
           disabled: true,
         },
         {
-          label: 'Last post',
+          label: __('Last post'),
           value: 'last_post_at desc',
         },
         {
-          label: 'Created',
+          label: __('Created'),
           value: 'creation desc',
         },
       ],
@@ -291,7 +291,7 @@ export default {
   },
   pageMeta() {
     return {
-      title: 'Discussions',
+      title: __('Discussions'),
     }
   },
 }

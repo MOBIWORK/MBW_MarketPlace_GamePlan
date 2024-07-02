@@ -1,7 +1,6 @@
 <template>
   <FormControl
-    label="Project Name"
-    placeholder="Product Launch"
+    :label="__('Project Name')"
     @update:modelValue="
       (project) => $emit('update:modelValue', { ...modelValue, project })
     "

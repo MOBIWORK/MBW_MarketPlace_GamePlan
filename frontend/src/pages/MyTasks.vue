@@ -5,13 +5,13 @@
     >
       <Breadcrumbs
         class="h-7"
-        :items="[{ label: 'My Tasks', route: { name: 'MyTasks' } }]"
+        :items="[{ label: __('My Tasks'), route: { name: 'MyTasks' } }]"
       />
       <Button variant="solid" @click="showNewTaskDialog">
         <template #prefix>
           <LucidePlus class="h-4 w-4" />
         </template>
-        Add new
+        {{ __('Add new') }}
       </Button>
     </header>
 
@@ -50,7 +50,7 @@ function showNewTaskDialog() {
 
 usePageMeta(() => {
   return {
-    title: 'My Tasks',
+    title: __('My Tasks'),
   }
 })
 </script>

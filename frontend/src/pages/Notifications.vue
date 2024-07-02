@@ -13,10 +13,10 @@
             $resources.unreadNotifications.data?.length > 0
           "
         >
-          Mark all as read
+          {{__('Mark all as read')}}
         </Button>
         <TabButtons
-          :buttons="[{ label: 'Unread', active: true }, { label: 'Read' }]"
+          :buttons="[{ label: __('Unread'), active: true }, { label: __('Read') }]"
           v-model="activeTab"
         />
       </div>
@@ -70,9 +70,9 @@
             "
             @click="markAsRead(d.name)"
           >
-            {{ d.discussion ? 'View Discussion' : d.task ? 'View Task' : '' }}
+            {{ d.discussion ? __('View Discussion') : d.task ? __('View Task') : '' }}
           </router-link>
-          <Tooltip text="Mark as read">
+          <Tooltip :text="__('Mark as read')">
             <Button v-if="!d.read" variant="ghost" @click="markAsRead(d.name)">
               <template #icon>
                 <LucideX class="w-4" />
@@ -83,7 +83,7 @@
       </div>
     </div>
     <div v-if="!notifications?.length" class="text-base text-gray-600">
-      Nothing to see here
+      {{__('Nothing to see here')}}
     </div>
   </div>
 </template>

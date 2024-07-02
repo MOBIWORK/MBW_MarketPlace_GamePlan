@@ -41,5 +41,6 @@ export function getUser(email) {
 }
 
 export let activeUsers = computed(() => {
+  console.log(users.data);
   return users.data.filter((user) => user.enabled)
 })

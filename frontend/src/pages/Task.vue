@@ -27,7 +27,7 @@ let breadcrumbs = computed(() => {
   let task = getCachedDocumentResource('GP Task', route.params.taskId)
   let items = [
     {
-      label: 'My Tasks',
+      label: __('My Tasks'),
       route: { name: 'MyTasks' },
     },
     {

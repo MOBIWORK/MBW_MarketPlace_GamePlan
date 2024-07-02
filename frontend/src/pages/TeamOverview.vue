@@ -10,10 +10,10 @@
 
     <div class="mt-8">
       <div class="mb-5 flex items-center justify-between space-x-2">
-        <h2 class="text-2xl font-semibold text-gray-900">Projects</h2>
+        <h2 class="text-2xl font-semibold text-gray-900">{{ __('Projects') }}</h2>
         <div class="flex items-stretch space-x-2">
           <TabButtons
-            :buttons="[{ label: 'Active' }, { label: 'Archived' }]"
+            :buttons="[{ label: __('Active') }, { label: __('Archived') }]"
             v-model="activeTab"
           />
           <Button
@@ -24,7 +24,7 @@
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
             </template>
-            Add Project
+            {{ __('Add Project') }}
           </Button>
         </div>
       </div>
@@ -62,7 +62,7 @@
                     {{ project.tasks_count }}
                   </span>
                   <span class="text-gray-700"
-                    >&nbsp;{{ project.tasks_count === 1 ? 'task' : 'tasks' }}
+                    >&nbsp;{{ project.tasks_count === 1 ? __('task') : __('tasks') }}
                   </span>
                   &middot;
                 </template>
@@ -73,8 +73,8 @@
                   <span class="text-gray-700"
                     >&nbsp;{{
                       project.discussions_count === 1
-                        ? 'discussion'
-                        : 'discussions'
+                        ? __('discussion')
+                        : __('discussions')
                     }}
                   </span>
                 </template>
@@ -99,12 +99,12 @@
             <LucidePlus class="w-5 text-gray-600" />
           </div>
           <div>
-            <h3 class="text-lg font-medium text-gray-900">Add Project</h3>
+            <h3 class="text-lg font-medium text-gray-900">{{ __('Add Project') }}</h3>
           </div>
         </button>
       </ul>
       <Dialog
-        :options="{ title: 'Create project' }"
+        :options="{ title: __('Create project') }"
         v-model="createNewProjectDialog"
       >
         <template #body-content>
@@ -117,10 +117,10 @@
             <FormControl
               v-if="!team.doc.is_private"
               type="select"
-              label="Visibility"
+              :label="__('Visibility')"
               :options="[
-                { label: 'Visible to everyone', value: 0 },
-                { label: 'Visible to team members (Private)', value: 1 },
+                { label: __('Visible to everyone'), value: 0 },
+                { label: __('Visible to team members (Private)'), value: 1 },
               ]"
               v-model="newProject.is_private"
             />

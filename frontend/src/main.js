@@ -24,6 +24,7 @@ import { getUser, users } from './data/users'
 import { session } from './data/session'
 import { initSocket } from './socket'
 import resetDataMixin from './utils/resetDataMixin'
+import translationPlugin from './translation'
 
 let globalComponents = {
   Button,
@@ -41,6 +42,7 @@ setConfig('defaultListUrl', 'gameplan.extends.client.get_list')
 app.use(resourcesPlugin)
 app.use(pageMetaPlugin)
 app.use(router)
+app.use(translationPlugin)
 app.mixin(resetDataMixin)
 for (let key in globalComponents) {
   app.component(key, globalComponents[key])

@@ -3,7 +3,7 @@
     <div class="mt-32 w-full px-4">
       <GameplanLogo class="mx-auto h-8 w-8" />
       <div class="mt-6 flex items-center justify-center space-x-1.5">
-        <span class="text-3xl font-semibold text-gray-900">Login to</span>
+        <span class="text-3xl font-semibold text-gray-900">{{ __('Login to') }}</span>
         <GameplanLogoType class="h-6 text-gray-900" />
       </div>
       <div class="mx-auto mt-6 w-full px-4 sm:w-96">
@@ -24,7 +24,6 @@
               "
               label="Email"
               v-model="email"
-              placeholder="jane@example.com"
               :disabled="session.login.loading"
             />
           </div>
@@ -45,14 +44,14 @@
             class="mt-6 w-full"
             :loading="session.login.loading"
           >
-            Login
+            {{ __('Login') }}
           </Button>
           <button
             v-if="authProviders.data.length"
             class="mt-2 w-full py-2 text-base text-gray-600"
             @click="showEmailLogin = false"
           >
-            Login using other methods
+            {{ __('Login using other methods') }}
           </button>
         </form>
         <div
@@ -60,7 +59,7 @@
           v-if="authProviders.data && !showEmailLogin"
         >
           <Button @click="showEmailLogin = true" variant="solid" class="w-full">
-            Login via email
+            {{ __('Login via email') }}
           </Button>
           <a
             class="block w-full rounded border bg-gray-900 px-3 py-1 text-center text-base h-7 focus:outline-none focus:ring-2 focus:ring-gray-400 text-white transition-colors hover:bg-gray-700"
@@ -68,7 +67,7 @@
             :key="provider.name"
             :href="provider.auth_url"
           >
-            Login via {{ provider.provider_name }}
+            {{ __('Login via {0}', [provider.provider_name]) }}
           </a>
         </div>
       </div>

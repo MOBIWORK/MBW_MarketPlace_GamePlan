@@ -32,7 +32,7 @@
               <span class="grid h-5 w-6 place-items-center">
                 <component :is="link.icon" class="h-4 w-4 text-gray-700" />
               </span>
-              <span class="text-sm">{{ link.name }}</span>
+              <span class="text-sm">{{ __(link.name) }}</span>
               <span
                 v-if="link.count"
                 class="!ml-auto block text-xs text-gray-600"
@@ -56,7 +56,7 @@
             <span class="grid h-5 w-6 place-items-center">
               <LucideSearch class="h-4 w-4 text-gray-700" />
             </span>
-            <span class="ml-2 text-sm">Search</span>
+            <span class="ml-2 text-sm">{{__('Search')}}</span>
             <span class="ml-auto text-sm text-gray-500">
               <template v-if="$platform === 'mac'">⌘K</template>
               <template v-else>Ctrl+K</template>
@@ -65,9 +65,9 @@
         </button>
       </nav>
       <div class="mt-6 flex items-center justify-between px-3">
-        <h3 class="text-sm font-medium text-gray-600">Teams</h3>
+        <h3 class="text-sm font-medium text-gray-600">{{__('Teams')}}</h3>
         <Button
-          label="Create Team"
+          :label="__('Create Team')"
           variant="ghost"
           @click="showAddTeamDialog = true"
         >
@@ -130,7 +130,7 @@
               class="flex h-7 items-center px-2 text-sm text-gray-600"
               v-if="teamProjects(team.name).length === 0"
             >
-              No projects
+              {{__('No projects')}}
             </div>
           </div>
         </div>
@@ -139,7 +139,7 @@
         v-if="teams.fetched && !activeTeams.length"
         class="px-3 py-2 text-sm text-gray-500"
       >
-        No teams
+        {{__('No teams')}}
       </div>
     </div>
     <AddTeamDialog
