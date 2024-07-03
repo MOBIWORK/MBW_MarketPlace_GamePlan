@@ -12,8 +12,8 @@
         }"
         class="flex h-15 items-start rounded-md p-2.5 hover:bg-gray-100"
       >
-        <div>
-          <div class="text-base font-medium leading-4">
+        <div class="min-w-0">
+          <div class="text-base font-medium leading-4 truncate">
             {{ page.title }}
           </div>
           <div class="mt-1.5 flex items-center">

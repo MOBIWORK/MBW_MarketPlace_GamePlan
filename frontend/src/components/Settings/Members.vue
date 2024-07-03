@@ -45,10 +45,18 @@
       </li>
     </ul>
   </div>
+  <Dialog
+    :options="changeRoleDialogOptions"
+    v-model="showChangeUserRoleDialog"
+  />
+  <Dialog
+    :options="removeUserDialogOption"
+    v-model="showRemoveUserDialog"
+  />
 </template>
 <script>
 import { h, computed } from 'vue'
-import { Dropdown } from 'frappe-ui'
+import { Dropdown, Dialog } from 'frappe-ui'
 import { users, activeUsers } from '@/data/users'
 import LucideCheck from '~icons/lucide/check'
 
@@ -83,6 +91,11 @@ export default {
   data() {
     return {
       search: '',
+      userChange: {},
+      roleChange: "",
+      showChangeUserRoleDialog: false,
+      userRemove: {},
+      showRemoveUserDialog: false
     }
   },
   computed: {
@@ -98,35 +111,35 @@ export default {
         )
       })
     },
-  },
-  methods: {
-    changeUserRole({ user, role }) {
-      this.$dialog({
+    changeRoleDialogOptions() {
+      const error = this.$resources.changeUserRole.error;
+      return {
         title: __('Change Role'),
-        message: __('Are you sure you want to change role of {0} to {1}?', [user.full_name, role]),
-        error: computed(() => this.$resources.changeUserRole.error),
+        message: __('Are you sure you want to change role of {0} to {1}?', [this.userChange.full_name, this.roleChange]),
+        error: error,
         actions: [
           {
             label: __('Change Role'),
             variant: 'solid',
             onClick: ({ close }) => {
               return this.$resources.changeUserRole.submit(
-                { user: user.name, role },
-                { onSuccess: close }
+                { user: this.userChange.name, role: this.roleChange },
+                { onSuccess: () => { this.showChangeUserRoleDialog = false } }
               )
             },
           },
           {
             label: __('Cancel'),
-          },
+          }
         ],
-      })
+      };
     },
-    removeUser(user) {
-      this.$dialog({
+    removeUserDialogOption() {
+      const errorRemoveUser = this.$resources.removeUser.error;
+      return{
         title: __('Remove User'),
-        message: __('Are you sure you want to remove {0} ({1})?', [user.full_name, user.email]),
-        error: computed(() => this.$resources.removeUser.error),
+        message: __('Are you sure you want to remove {0} ({1})?', [this.userRemove.full_name, this.userRemove.email]),
+        error: errorRemoveUser,
         actions: [
           {
             label: __('Remove User'),
@@ -134,8 +147,8 @@ export default {
             theme: 'red',
             onClick: ({ close }) => {
               return this.$resources.removeUser.submit(
-                { user: user.name },
-                { onSuccess: close }
+                { user: this.userRemove.name },
+                { onSuccess: () => { this.showRemoveUserDialog = false } }
               )
             },
           },
@@ -143,7 +156,18 @@ export default {
             label: __('Cancel'),
           },
         ],
-      })
+      }
+    }
+  },
+  methods: {
+    changeUserRole({ user, role }) {
+      this.userChange = user;
+      this.roleChange = role;
+      this.showChangeUserRoleDialog = true;
+    },
+    removeUser(user) {
+      this.userRemove = user;
+      this.showRemoveUserDialog = true;
     },
     getUserRole(user) {
       return (user.role || '').replace('Gameplan', '')

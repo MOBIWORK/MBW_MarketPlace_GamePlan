@@ -122,10 +122,30 @@
       </div>
     </div>
   </div>
+  <Dialog
+    :options="{
+      title: __('Discard comment'),
+      message: __('Are you sure you want to discard your comment?'),
+      actions: [
+        {
+          label: __('Discard comment'),
+          onClick: ({ close }) => {
+            this.resetCommentState();
+            showDiscardComment = false;
+          },
+          variant: 'solid',
+        },
+        {
+          label: __('Keep comment'),
+        },
+      ],
+    }"
+    v-model="showDiscardComment"
+  />
 </template>
 <script>
 import { nextTick } from 'vue'
-import { TabButtons } from 'frappe-ui'
+import { TabButtons, Dialog } from 'frappe-ui'
 import CommentEditor from '@/components/CommentEditor.vue'
 import Comment from './Comment.vue'
 import Activity from './Activity.vue'
@@ -169,6 +189,7 @@ export default {
       newMessagesFrom: this.newCommentsFrom,
       highlightedItem: null,
       addCommentHeight: 0,
+      showDiscardComment: false
     }
   },
   watch: {
@@ -369,23 +390,7 @@ export default {
     },
     discardComment() {
       if (!this.editorObject.isEmpty) {
-        this.$dialog({
-          title: __('Discard comment'),
-          message: __('Are you sure you want to discard your comment?'),
-          actions: [
-            {
-              label: __('Discard comment'),
-              onClick: ({ close }) => {
-                this.resetCommentState()
-                close()
-              },
-              variant: 'solid',
-            },
-            {
-              label: __('Keep comment'),
-            },
-          ],
-        })
+        this.showDiscardComment = true;
       } else {
         this.resetCommentState()
       }

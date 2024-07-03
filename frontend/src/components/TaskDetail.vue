@@ -30,25 +30,7 @@
               {
                 label: __('Delete'),
                 onClick: () => {
-                  $dialog({
-                    title: __('Delete task'),
-                    message: __('Are you sure you want to delete this task?'),
-                    actions: [
-                      {
-                        label: __('Delete'),
-                        theme: 'red',
-                        variant: 'solid',
-                        onClick({ close }) {
-                          return $resources.task.delete.submit(null, {
-                            onSuccess() {
-                              close()
-                              $router.back()
-                            },
-                          })
-                        },
-                      },
-                    ],
-                  })
+                  showDeleteTaskDialog = true;
                 },
               },
             ]"
@@ -190,6 +172,28 @@
       </div>
     </div>
   </div>
+  <Dialog
+    :options="{
+      title: __('Delete task'),
+      message: __('Are you sure you want to delete this task?'),
+      actions: [
+        {
+          label: __('Delete'),
+          theme: 'red',
+          variant: 'solid',
+          onClick({ close }) {
+            return $resources.task.delete.submit(null, {
+              onSuccess() {
+                showDeleteTaskDialog = false;
+                $router.back();
+              },
+            })
+          },
+        },
+      ],
+    }"
+    v-model="showDeleteTaskDialog"
+  />
 </template>
 <script>
 import { h } from 'vue'
@@ -197,7 +201,7 @@ import TextEditor from '@/components/TextEditor.vue'
 import ReadmeEditor from '@/components/ReadmeEditor.vue'
 import CommentsArea from '@/components/CommentsArea.vue'
 import { focus } from '@/directives'
-import { Autocomplete, Dropdown, LoadingText, TextInput } from 'frappe-ui'
+import { Autocomplete, Dropdown, LoadingText, TextInput, Dialog } from 'frappe-ui'
 import CommentsList from '@/components/CommentsList.vue'
 import TaskStatusIcon from '@/components/icons/TaskStatusIcon.vue'
 import TaskPriorityIcon from '@/components/icons/TaskPriorityIcon.vue'
@@ -209,6 +213,11 @@ export default {
   name: 'TaskDetail',
   props: ['taskId'],
   directives: { focus },
+  data() {
+    return {
+      showDeleteTaskDialog: false
+    }
+  },
   resources: {
     task() {
       return {

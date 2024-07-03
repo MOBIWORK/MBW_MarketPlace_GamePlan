@@ -131,6 +131,72 @@
         </div>
       </template>
     </Dialog>
+    <Dialog 
+      :options="{
+        title: __('Anonymous poll'),
+        message: __('This poll is anonymous. Once you vote, you cannot retract your vote. You are voting for {0}. Continue?', [optionVote.title]),
+        actions: [
+          {
+            label: __('Vote for {0}', [optionVote.title]),
+            variant: 'solid',
+            onClick: ({ close }) => {
+              this.$resources.poll.submitVote
+                  .submit({ option: optionVote.title })
+                  .then(() => { showAnonymousPollDialog = false })
+            },
+          },
+        ],
+      }"
+      v-model="showAnonymousPollDialog"
+    />
+    <Dialog 
+      :options="{
+        title: __('Stop poll'),
+        message: __('After the poll is stopped, no one will be able to vote on it. Continue?'),
+        actions: [
+          {
+            label: __('Stop'),
+            variant: 'solid',
+            theme: 'red',
+            onClick: ({ close }) =>
+              this.$resources.poll.stopPoll.submit().then(() => { showStopPollDialog = false }),
+          },
+        ],
+      }"
+      v-model="showStopPollDialog"
+    />
+    <Dialog 
+      :options="{
+        title: __('Retract vote'),
+        message: __('Are you sure you want to retract your vote?'),
+        actions: [
+          {
+            label: __('Retract vote'),
+            variant: 'solid',
+            theme: 'red',
+            onClick: ({ close }) =>
+              this.$resources.poll.retractVote.submit().then(() => { showRetractVoteDialog = false }),
+            },
+        ],
+      }"
+      v-model="showRetractVoteDialog"
+    />
+    <Dialog 
+      :options="{
+        title: __('Delete poll'),
+        message: __('Are you sure you want to delete this poll?'),
+        actions: [
+          {
+            label: __('Delete'),
+            variant: 'solid',
+            theme: 'red',
+            onClick: ({ close }) =>
+              this.$resources.poll.delete.submit().then(() => { showDeletePollDialog = false }),
+          },
+        ],
+      }"
+      v-model="showDeletePollDialog"
+    />
   </div>
 </template>
 <script>
@@ -164,6 +230,11 @@ export default {
   data() {
     return {
       showDialog: false,
+      showAnonymousPollDialog: false,
+      optionVote: {},
+      showStopPollDialog: false,
+      showRetractVoteDialog: false,
+      showDeletePollDialog: false
     }
   },
   resources: {
@@ -185,21 +256,8 @@ export default {
   methods: {
     submitVote(option) {
       if (this._poll.anonymous) {
-        this.$dialog({
-          title: __('Anonymous poll'),
-          message: __('This poll is anonymous. Once you vote, you cannot retract your vote. You are voting for "{0}". Continue?', [option.title]),
-          actions: [
-            {
-              label: __('Vote for "{0}"', [option.title]),
-              variant: 'solid',
-              onClick: ({ close }) => {
-                this.$resources.poll.submitVote
-                  .submit({ option: option.title })
-                  .then(close)
-              },
-            },
-          ],
-        })
+        this.optionVote = option;
+        this.showAnonymousPollDialog = true;
       } else {
         if (this.$resources.poll.doc) {
           this.$resources.poll.submitVote.submit({ option: option.title })
@@ -211,19 +269,7 @@ export default {
       }
     },
     stopPoll() {
-      this.$dialog({
-        title: __('Stop poll'),
-        message: __('After the poll is stopped, no one will be able to vote on it. Continue?'),
-        actions: [
-          {
-            label: __('Stop'),
-            variant: 'solid',
-            theme: 'red',
-            onClick: ({ close }) =>
-              this.$resources.poll.stopPoll.submit().then(close),
-          },
-        ],
-      })
+      this.showStopPollDialog = true;
     },
     isVotedByUser(option) {
       return this._poll.votes.find(
@@ -272,19 +318,7 @@ export default {
             (!this._poll.stopped_at ||
               this.$dayjs().isBefore(this._poll.stopped_at)),
           onClick: () => {
-            this.$dialog({
-              title: __('Retract vote'),
-              message: __('Are you sure you want to retract your vote?'),
-              actions: [
-                {
-                  label: __('Retract vote'),
-                  variant: 'solid',
-                  theme: 'red',
-                  onClick: ({ close }) =>
-                    this.$resources.poll.retractVote.submit().then(close),
-                },
-              ],
-            })
+            this.showRetractVoteDialog = true;
           },
         },
         {
@@ -297,19 +331,7 @@ export default {
           icon: 'trash',
           condition: () => this.$isSessionUser(this._poll.owner),
           onClick: () => {
-            this.$dialog({
-              title: __('Delete poll'),
-              message: __('Are you sure you want to delete this poll?'),
-              actions: [
-                {
-                  label: __('Delete'),
-                  variant: 'solid',
-                  theme: 'red',
-                  onClick: ({ close }) =>
-                    this.$resources.poll.delete.submit().then(close),
-                },
-              ],
-            })
+            this.showDeletePollDialog = true;
           },
         },
       ]

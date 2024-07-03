@@ -117,7 +117,7 @@
                       title: project.doc.title,
                       is_private: project.doc.is_private,
                     })
-                    .then(close)
+                    .then(() => { projectEditDialog.show = false })
                 },
               },
             ],
@@ -204,6 +204,47 @@
           v-model="inviteGuestDialog.show"
           :project="project"
         />
+
+        <Dialog
+          :options="{
+            title: __('Archive project'),
+            message: __('Are you sure you want to archive this project?'),
+            actions: [
+              {
+                label: __('Archive'),
+                variant: 'solid',
+                onClick: ({ close }) => {
+                  return this.project.archive.submit(null, {
+                    onSuccess: () => { showArchiveProjectDialog = false },
+                  })
+                },
+              }
+            ],
+          }"
+          v-model="showArchiveProjectDialog"
+        />
+        <Dialog
+          :options="{
+            title: __('Unarchive Project'),
+            message: __('Are you sure you want to unarchive this project?'),
+            actions: [
+              {
+                label: __('Unarchive'),
+                variant: 'solid',
+                onClick: ({ close }) => {
+                  return this.project.unarchive.submit(null, {
+                    onSuccess: ()=>{ showUnArchiveProjectDialog = false },
+                  })
+                },
+              },
+              {
+                label: __('Cancel'),
+              }
+            ],
+          }"
+          v-model="showUnArchiveProjectDialog"
+        />
+
       </header>
 
       <component
@@ -228,6 +269,7 @@ import {
   Tooltip,
   Select,
   Textarea,
+  Dialog
 } from 'frappe-ui'
 import Pie from '@/components/Pie.vue'
 import IconPicker from '@/components/IconPicker.vue'
@@ -270,6 +312,8 @@ export default {
       projectMoveDialog: { show: false, team: null },
       projectEditDialog: { show: false },
       inviteGuestDialog: { show: false },
+      showArchiveProjectDialog: false,
+      showUnArchiveProjectDialog: false
     }
   },
   computed: {
@@ -422,41 +466,10 @@ export default {
   },
   methods: {
     archiveProject() {
-      this.$dialog({
-        title: __('Archive project'),
-        message: __('Are you sure you want to archive this project?'),
-        actions: [
-          {
-            label: __('Archive'),
-            variant: 'solid',
-            onClick: ({ close }) => {
-              return this.project.archive.submit(null, {
-                onSuccess: close,
-              })
-            },
-          },
-        ],
-      })
+      this.showArchiveProjectDialog = true;
     },
     unarchiveProject() {
-      this.$dialog({
-        title: __('Unarchive Project'),
-        message: __('Are you sure you want to unarchive this project?'),
-        actions: [
-          {
-            label: __('Unarchive'),
-            variant: 'solid',
-            onClick: ({ close }) => {
-              return this.project.unarchive.submit(null, {
-                onSuccess: close,
-              })
-            },
-          },
-          {
-            label: __('Cancel'),
-          },
-        ],
-      })
+      this.showUnArchiveProjectDialog = true;
     },
     onProjectMove() {
       this.projectMoveDialog.show = false

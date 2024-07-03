@@ -104,12 +104,34 @@
       </TextEditor>
     </div>
   </div>
+  <Dialog
+    :options="{
+      title: __('Discard post'),
+      message: __('Are you sure you want to discard your post?'),
+      actions: [
+        {
+          label: __('Discard post'),
+          onClick: ({ close }) => {
+            localStorage.removeItem(this.draftPostKey())
+            this.$router.push({ name: 'ProjectDiscussions' })
+            showDiscardPostDialog = false
+          },
+          variant: 'solid',
+        },
+        {
+          label: __('Keep post'),
+        },
+      ],
+    }"
+    v-model="showDiscardPostDialog"
+  />
 </template>
 <script>
 import TextEditor from '@/components/TextEditor.vue'
 import { focus } from '@/directives'
 import UserProfileLink from '@/components/UserProfileLink.vue'
 import TextEditorFixedMenu from 'frappe-ui/src/components/TextEditor/TextEditorFixedMenu.vue'
+import { Dialog } from 'frappe-ui'
 
 export default {
   name: 'ProjectDiscussionNew',
@@ -121,6 +143,7 @@ export default {
     return {
       title: draftPost?.title || '',
       content: draftPost?.content || '',
+      showDiscardPostDialog: false
     }
   },
   resources: {
@@ -177,24 +200,7 @@ export default {
     },
     discard() {
       if (!this.$refs.textEditor.editor.isEmpty || this.title) {
-        this.$dialog({
-          title: __('Discard post'),
-          message: __('Are you sure you want to discard your post?'),
-          actions: [
-            {
-              label: __('Discard post'),
-              onClick: ({ close }) => {
-                localStorage.removeItem(this.draftPostKey())
-                this.$router.push({ name: 'ProjectDiscussions' })
-                close()
-              },
-              variant: 'solid',
-            },
-            {
-              label: __('Keep post'),
-            },
-          ],
-        })
+        this.showDiscardPostDialog = true;
       } else {
         localStorage.removeItem(this.draftPostKey())
         this.$router.push({ name: 'ProjectDiscussions' })

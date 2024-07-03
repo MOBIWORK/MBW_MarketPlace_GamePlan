@@ -70,11 +70,32 @@
         }
       "
     />
+    <Dialog
+      :options="{
+        title: __('Archive Team'),
+        message: __('Are you sure you want to archive the team?'),
+        actions: [
+          {
+            label: __('Archive'),
+            variant: 'solid',
+            onClick: ({ close }) => {
+              return this.team.archive.submit(null, {
+                onSuccess: () => {
+                  this.$router.replace({ name: 'Home' })
+                  showArchiveDialog = false
+                },
+              })
+            },
+          },
+        ],
+      }"
+      v-model="showArchiveDialog"
+    />
     <router-view class="mx-auto max-w-4xl px-5" :team="team" />
   </div>
 </template>
 <script>
-import { Breadcrumbs, Dropdown, Badge, Tooltip } from 'frappe-ui'
+import { Breadcrumbs, Dropdown, Badge, Tooltip,Dialog } from 'frappe-ui'
 import IconPicker from '@/components/IconPicker.vue'
 import Tabs from '@/components/Tabs.vue'
 
@@ -92,6 +113,7 @@ export default {
   data() {
     return {
       showCoverImage: Boolean(this.team.doc.cover_image),
+      showArchiveDialog: false
     }
   },
   methods: {
@@ -99,24 +121,7 @@ export default {
       this.team.setValue.submit({ icon })
     },
     archiveTeam() {
-      this.$dialog({
-        title: __('Archive Team'),
-        message: __('Are you sure you want to archive the team?'),
-        actions: [
-          {
-            label: __('Archive'),
-            variant: 'solid',
-            onClick: ({ close }) => {
-              return this.team.archive.submit(null, {
-                onSuccess: () => {
-                  this.$router.replace({ name: 'Home' })
-                  close()
-                },
-              })
-            },
-          },
-        ],
-      })
+      this.showArchiveDialog = true
     },
   },
 }

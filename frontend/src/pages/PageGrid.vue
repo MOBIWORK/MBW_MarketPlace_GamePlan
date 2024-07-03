@@ -16,30 +16,35 @@
               label: __('Delete'),
               icon: 'trash',
               onClick: () => {
-                $dialog({
-                  title: __('Delete Page'),
-                  message: __('Are you sure you want to delete this page?'),
-                  actions: [
-                    {
-                      label: __('Delete'),
-                      onClick: ({ close }) => {
-                        close()
-                        return $resources.pages.delete.submit(d.name)
-                      },
-                      variant: 'solid',
-                      theme: 'red',
-                    },
-                    {
-                      label: __('Cancel'),
-                    },
-                  ],
-                })
+                pageSource = d;
+                showDeleteDialog = true;
               },
             },
           ]"
           placement="right"
         />
       </div>
+      <Dialog
+        :options="{
+          title: __('Delete Page'),
+          message: __('Are you sure you want to delete this page?'),
+          actions: [
+            {
+              label: __('Delete'),
+              onClick: ({ close }) => {
+                showDeleteDialog = false
+                return $resources.pages.delete.submit(pageSource.name)
+              },
+              variant: 'solid',
+              theme: 'red',
+            },
+            {
+              label: __('Cancel'),
+            },
+          ],
+        }"
+        v-model="showDeleteDialog"
+      />
       <router-link
         :to="{
           name: d.project ? 'ProjectPage' : 'Page',
@@ -84,6 +89,12 @@ import { Dropdown } from 'frappe-ui'
 export default {
   name: 'PageGrid',
   props: ['listOptions'],
+  data(){
+    return{
+      showDeleteDialog: false,
+      pageSource: {}
+    }
+  },
   resources: {
     pages() {
       return {

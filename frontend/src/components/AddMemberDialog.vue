@@ -30,9 +30,9 @@
           v-model="selectedUser"
           :placeholder="__('Add member by name or email')"
         >
-          <template #prefix="{ option }">
+          <!-- <template #prefix="{ option }">
             <UserAvatar class="mr-2" :user="option.email" size="sm" />
-          </template>
+          </template> -->
         </Autocomplete>
         <ErrorMessage class="mt-2" :message="resource.addMembers.error" />
       </div>
@@ -144,6 +144,17 @@ export default {
       memberEmails = memberEmails.concat(
         this.membersToAdd.map((user) => user.email)
       )
+
+      console.log(activeUsers.value
+        .filter((user) => !memberEmails.includes(user.email))
+        .sort((a, b) => a.full_name - b.full_name)
+        .map((user) => {
+          return {
+            label: user.full_name,
+            value: user.email,
+            ...user,
+          }
+        }))
 
       return activeUsers.value
         .filter((user) => !memberEmails.includes(user.email))

@@ -193,6 +193,82 @@
         :name="discussion.name"
         fieldname="content"
       />
+
+      <Dialog
+        :options="{
+          title: __('Pin discussion'),
+          message: __('When a discussion is pinned, it shows up on top of the discussion list in {0}. Do you want to pin this discussion?', [
+            projectDiscussion.title
+          ]),
+          icon: { name: 'arrow-up-left' },
+          actions: [
+            {
+              label: __('Pin'),
+              onClick: ({ close }) =>
+                this.$resources.discussion.pinDiscussion.submit().then(() => {
+                  showPinDiscussionDialog = false;
+                }),
+                variant: 'solid',
+            },
+          ],
+        }"
+        v-model="showPinDiscussionDialog"
+      />
+      <Dialog
+        :options="{
+          title: __('Unpin discussion'),
+          message: __(`Do you want to unpin this discussion?`),
+          icon: { name: 'arrow-down-left' },
+          actions: [
+            {
+              label: __('Unpin'),
+              onClick: ({ close }) =>
+                    this.$resources.discussion.unpinDiscussion
+                      .submit()
+                      .then(() => {showUnPinDiscussionDialog = false;}),
+                  variant: 'solid',
+            },
+          ],
+        }"
+        v-model="showUnPinDiscussionDialog"
+      />
+      <Dialog
+        :options="{
+          title: __('Close discussion'),
+          message: __('When a discussion is closed, commenting is disabled. Anyone can re-open the discussion later. Do you want to close this discussion?'),
+          icon: { name: 'lock' },
+          actions: [
+            {
+              label: __('Close'),
+              onClick: ({ close }) =>
+                this.$resources.discussion.closeDiscussion
+                    .submit()
+                    .then(() => {showCloseDiscussionDialog = false }),
+              variant: 'solid',
+            }
+          ],
+        }"
+        v-model="showCloseDiscussionDialog"
+      />
+      <Dialog
+        :options="{
+          title: __('Re-open discussion'),
+          message: __('Do you want to re-open this discussion? Anyone can comment on it again.'),
+          icon: { name: 'unlock' },
+          actions: [
+            {
+              label: __('Re-open'),
+              onClick: ({ close }) =>
+                this.$resources.discussion.reopenDiscussion
+                      .submit()
+                      .then(() => {showReopenDiscussionDialog = false}),
+              variant: 'solid',
+            },
+          ],
+        }"
+        v-model="showReopenDiscussionDialog"
+      />
+      
     </div>
   </div>
 </template>
@@ -295,6 +371,11 @@ export default {
       },
       showRevisionsDialog: false,
       showNavbar: false,
+      showPinDiscussionDialog: false,
+      projectDiscussion: {},
+      showUnPinDiscussionDialog: false,
+      showCloseDiscussionDialog: false,
+      showReopenDiscussionDialog: false
     }
   },
   methods: {
@@ -332,6 +413,10 @@ export default {
         })
       }
     },
+    onPinDiscussion(){
+      this.projectDiscussion = this.$getDoc('GP Project', this.discussion.project);
+      this.showPinDiscussionDialog = true;
+    }
   },
   computed: {
     discussion() {
@@ -369,47 +454,14 @@ export default {
           label: __('Pin discussion...'),
           icon: 'arrow-up-left',
           condition: () => !this.discussion.pinned_at,
-          onClick: () => {
-            let project = this.$getDoc('GP Project', this.discussion.project)
-            this.$dialog({
-              title: __('Pin discussion'),
-              message: __('When a discussion is pinned, it shows up on top of the discussion list in {0}. Do you want to pin this discussion?', [
-                project.title
-              ]),
-              icon: { name: 'arrow-up-left' },
-              actions: [
-                {
-                  label: __('Pin'),
-                  onClick: ({ close }) =>
-                    this.$resources.discussion.pinDiscussion
-                      .submit()
-                      .then(close),
-                  variant: 'solid',
-                },
-              ],
-            })
-          },
+          onClick: this.onPinDiscussion
         },
         {
           label: __('Unpin discussion...'),
           icon: 'arrow-down-left',
           condition: () => this.discussion.pinned_at,
           onClick: () => {
-            this.$dialog({
-              title: __('Unpin discussion'),
-              message: __(`Do you want to unpin this discussion?`),
-              icon: { name: 'arrow-down-left' },
-              actions: [
-                {
-                  label: __('Unpin'),
-                  onClick: ({ close }) =>
-                    this.$resources.discussion.unpinDiscussion
-                      .submit()
-                      .then(close),
-                  variant: 'solid',
-                },
-              ],
-            })
+            this.showUnPinDiscussionDialog = true;
           },
         },
         {
@@ -417,21 +469,7 @@ export default {
           icon: 'lock',
           condition: () => !this.discussion.closed_at,
           onClick: () => {
-            this.$dialog({
-              title: __('Close discussion'),
-              message: __('When a discussion is closed, commenting is disabled. Anyone can re-open the discussion later. Do you want to close this discussion?'),
-              icon: { name: 'lock' },
-              actions: [
-                {
-                  label: __('Close'),
-                  onClick: ({ close }) =>
-                    this.$resources.discussion.closeDiscussion
-                      .submit()
-                      .then(close),
-                  variant: 'solid',
-                },
-              ],
-            })
+            this.showCloseDiscussionDialog = true;
           },
         },
         {
@@ -439,21 +477,7 @@ export default {
           icon: 'unlock',
           condition: () => this.discussion.closed_at,
           onClick: () => {
-            this.$dialog({
-              title: __('Re-open discussion'),
-              message: __('Do you want to re-open this discussion? Anyone can comment on it again.'),
-              icon: { name: 'unlock' },
-              actions: [
-                {
-                  label: __('Re-open'),
-                  onClick: ({ close }) =>
-                    this.$resources.discussion.reopenDiscussion
-                      .submit()
-                      .then(close),
-                  variant: 'solid',
-                },
-              ],
-            })
+            this.showReopenDiscussionDialog = true;
           },
         },
         {

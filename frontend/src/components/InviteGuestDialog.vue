@@ -42,6 +42,7 @@
       </Button>
     </template>
   </Dialog>
+
 </template>
 <script setup>
 import { createListResource, Tooltip } from 'frappe-ui'
@@ -111,7 +112,7 @@ function remove(user) {
           variant: 'solid',
           theme: 'red',
           onClick: ({ close }) => {
-            return pending.delete.submit(user.name).then(close)
+            return pending.delete.submit(user.name).then(()=> {removeDialog.open = false})
           },
         },
       ],
@@ -131,7 +132,7 @@ function remove(user) {
               {
                 onSuccess() {
                   guests.reload()
-                  close()
+                  removeDialog.open = false
                 },
               }
             )
