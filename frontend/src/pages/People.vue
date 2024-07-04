@@ -10,7 +10,7 @@
             <div class="h-7"></div>
           </div>
         </header>
-        <div class="mx-auto w-full max-w-4xl px-5 pt-6">
+        <div class="mx-auto w-full px-5 pt-6">
           <div class="flex items-center justify-between">
             <h2 class="text-xl font-semibold">{{ people.length }} {{ __('members') }}</h2>
             <div class="flex items-center gap-2">

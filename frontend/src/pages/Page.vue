@@ -27,7 +27,7 @@
         </Button>
       </div>
     </header>
-    <div class="mx-auto w-full max-w-4xl px-5">
+    <div class="mx-auto w-full px-5">
       <div class="py-6" v-if="page.doc">
         <span class="text-sm text-gray-600 sm:hidden">
           {{__('Last updated')}} {{ $dayjs(page.doc.modified).format('LLL') }}

@@ -29,7 +29,7 @@
         "
       />
     </div>
-    <div class="mx-auto -mt-4 max-w-4xl translate-x-0 sm:px-5">
+    <div class="mx-auto -mt-4 translate-x-0 sm:px-5">
       <div class="flex items-center">
         <div class="-mx-1 inline-flex translate-y-0">
           <ImagePreview

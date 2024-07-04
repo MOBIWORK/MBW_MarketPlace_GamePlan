@@ -4,7 +4,7 @@
       <Breadcrumbs :items="[{ label: __('Search'), route: { name: 'Search' } }]" />
     </div>
   </header>
-  <div class="mx-auto mt-6 max-w-4xl px-4 sm:px-5">
+  <div class="mx-auto mt-6 px-4 sm:px-5">
     <div class="flex items-center space-x-2">
       <TextInput
         class="w-full"

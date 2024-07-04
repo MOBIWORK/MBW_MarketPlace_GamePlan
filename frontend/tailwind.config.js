@@ -27,6 +27,9 @@ module.exports = {
           raw: '(display-mode: standalone)',
         },
       },
+      width: {
+        'mbw-fit': 'calc(100% - 250px)'
+      }
     },
   },
   plugins: [require('@tailwindcss/container-queries')],

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col w-full">
     <div
       v-if="$resources.comments.data == null"
       class="flex animate-pulse items-start space-x-3 px-2 py-4 text-base"
@@ -19,7 +19,7 @@
         </div>
       </div>
     </div>
-    <div class="px-1" :style="{ paddingBottom: `${addCommentHeight + 80}px` }">
+    <div class="px-1 w-full" :style="{ paddingBottom: `${addCommentHeight + 80}px` }">
       <template v-for="item in timelineItems" :key="item.doctype + item.name">
         <div
           v-if="newMessagesFrom && newMessagesFrom == item.name"
@@ -62,7 +62,7 @@
 
     <div
       v-if="!readOnlyMode && !disableNewComment"
-      class="fixed bottom-12 mb-px mt-2 w-full max-w-3xl bg-white py-4 pr-12 sm:bottom-0 standalone:bottom-16"
+      class="fixed bottom-12 mb-px mt-2 w-full bg-white py-4 pr-12 sm:w-mbw-fit sm:bottom-0 standalone:bottom-16"
       ref="addComment"
     >
       <button

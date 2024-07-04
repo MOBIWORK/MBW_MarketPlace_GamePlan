@@ -22,7 +22,7 @@
       </div>
     </div>
   </header>
-  <div class="mx-auto w-full max-w-4xl px-5 pt-6">
+  <div class="mx-auto w-full px-5 pt-6">
     <div class="divide-y">
       <div
         class="flex items-center justify-between py-2"

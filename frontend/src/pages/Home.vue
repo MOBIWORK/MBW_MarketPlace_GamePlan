@@ -7,7 +7,7 @@
     </header>
 
     <router-view v-slot="{ Component, route }">
-      <div :class="{ 'mx-auto w-full max-w-4xl px-5': !route.meta?.fullWidth }">
+      <div :class="{ 'mx-auto w-full px-5': !route.meta?.fullWidth }">
         <component :is="Component" />
       </div>
     </router-view>

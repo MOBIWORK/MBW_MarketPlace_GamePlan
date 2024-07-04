@@ -38,7 +38,7 @@
       </Button>
     </div>
   </header>
-  <div class="mx-auto w-full max-w-4xl px-5">
+  <div class="mx-auto w-full px-5">
     <div class="py-6">
       <PageGrid
         :listOptions="{

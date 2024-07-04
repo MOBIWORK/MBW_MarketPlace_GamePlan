@@ -1,4 +1,12 @@
 export { default as dayjs } from './dayjs'
+import { toast } from 'frappe-ui'
+
+export function createToast(options) {
+  toast({
+    position: 'bottom-right',
+    ...options,
+  })
+}
 
 export function getImgDimensions(imgSrc) {
   return new Promise((resolve) => {
