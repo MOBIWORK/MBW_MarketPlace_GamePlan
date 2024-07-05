@@ -61,14 +61,8 @@
           <Autocomplete
             :placeholder="__('Assign a user')"
             :options="assignableUsers"
-            :value="$resources.task.doc.assigned_to"
-            @change="
-              (option) => {
-                $resources.task.setValue.submit({
-                  assigned_to: option?.value || '',
-                })
-              }
-            "
+            v-model="$resources.task.doc.assigned_to"
+            @update:modelValue="changeUserAssign"
           />
           <TextInput
             type="date"
@@ -115,14 +109,8 @@
           <Autocomplete
             :placeholder="__('Assign a user')"
             :options="assignableUsers"
-            :value="$resources.task.doc.assigned_to"
-            @change="
-              (option) => {
-                $resources.task.setValue.submit({
-                  assigned_to: option?.value || '',
-                })
-              }
-            "
+            v-model="$resources.task.doc.assigned_to"
+            @update:modelValue="changeUserAssign"
           />
         </div>
         <div>{{__('Due Date')}}</div>
@@ -275,11 +263,23 @@ export default {
         })
       }
     },
+    changeUserAssign(option){
+      this.$resources.task.setValue.submit(
+        {
+          assigned_to: option?.value || '',
+        },
+        {
+          onSuccess() {
+            this.updateRoute()
+          },
+        }
+      )
+    }
   },
   computed: {
     assignableUsers() {
       return activeUsers.value
-        .filter((user) => user.name != this.$resources.task.doc.assigned_to)
+        //.filter((user) => user.name != this.$resources.task.doc.assigned_to)
         .map((user) => ({
           label: user.full_name,
           value: user.name,
@@ -326,6 +326,6 @@ export default {
     TaskStatusIcon,
     LoadingText,
     TaskPriorityIcon,
-  },
+  }
 }
 </script>

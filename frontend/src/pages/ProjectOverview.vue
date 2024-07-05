@@ -59,7 +59,7 @@ import { createResource, getCachedListResource } from 'frappe-ui'
 import { getUser } from '@/data/users'
 
 export default {
-  name: 'ProjectOverview',
+  name: 'ProjectOverview',  
   props: ['project'],
   components: {
     ProjectOverviewReadme,

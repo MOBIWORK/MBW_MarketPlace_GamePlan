@@ -48,12 +48,12 @@
               />
             </button>
           </div>
-          <!-- <div class="mt-2 text-center text-sm text-gray-500">
+          <div class="mt-2 text-center text-sm text-gray-500">
             Image search powered by
             <a class="underline" target="_blank" href="https://unsplash.com">
               Unsplash
             </a>
-          </div> -->
+          </div>
         </div>
       </div>
     </template>

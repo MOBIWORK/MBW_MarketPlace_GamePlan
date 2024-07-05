@@ -5,3 +5,5 @@ Team name is not empty or null,Tên nhóm không để trống
 Add discussion,Thêm thảo luận
 Add task,Thêm nhiệm vụ
 Add page,Thêm trang
+Delete discussion,Xóa thảo luận
+This action can not be undone,Hành động này không thể được hoàn tác

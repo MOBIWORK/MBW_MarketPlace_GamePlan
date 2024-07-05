@@ -2,7 +2,7 @@
   <div class="relative flex h-full flex-col" v-if="postId && discussion">
     <div class="mx-auto w-full">
       <div class="py-6">
-        <div class="flex items-start justify-between space-x-1">
+        <div class="flex items-start justify-between space-x-1 min-w-0">
           <div v-if="editingTitle" class="w-full">
             <div class="mb-2">
               <input
@@ -33,7 +33,7 @@
               </p>
             </div>
           </div>
-          <h1 v-else class="flex items-center text-2xl font-semibold">
+          <h1 v-else class="flex items-center text-2xl font-semibold truncate">
             <Tooltip
               v-if="discussion.closed_at"
               :text="__('This discussion is closed')"
@@ -268,7 +268,24 @@
         }"
         v-model="showReopenDiscussionDialog"
       />
-      
+      <Dialog
+        :options="{
+          title: __('Delete discussion'),
+          message: __('This action can not be undone'),
+          actions: [
+          {
+              label: __('Delete'),
+              onClick: () => onDeleteDiscussion(),
+              variant: 'solid',
+              theme: 'red',
+            },
+            {
+              label: __('Cancel'),
+            },
+          ],
+        }"
+        v-model="showDeleteDiscussionDialog"
+      />
     </div>
   </div>
 </template>
@@ -286,6 +303,7 @@ import { focus } from '@/directives'
 import { copyToClipboard } from '@/utils'
 import { activeTeams } from '@/data/teams'
 import { getTeamProjects } from '@/data/projects'
+import { getUser } from '@/data/users'
 
 export default {
   name: 'DiscussionView',
@@ -320,6 +338,7 @@ export default {
           reopenDiscussion: 'reopen_discussion',
           pinDiscussion: 'pin_discussion',
           unpinDiscussion: 'unpin_discussion',
+          deleteDiscussion: 'delete_discussion',
           moveToProject: {
             method: 'move_to_project',
             validate(params) {
@@ -333,7 +352,7 @@ export default {
             onSuccess() {
               this.onDiscussionMove()
             },
-          },
+          }
         },
         onSuccess(doc) {
           this.updateUrlSlug()
@@ -375,7 +394,8 @@ export default {
       projectDiscussion: {},
       showUnPinDiscussionDialog: false,
       showCloseDiscussionDialog: false,
-      showReopenDiscussionDialog: false
+      showReopenDiscussionDialog: false,
+      showDeleteDiscussionDialog: false
     }
   },
   methods: {
@@ -416,6 +436,14 @@ export default {
     onPinDiscussion(){
       this.projectDiscussion = this.$getDoc('GP Project', this.discussion.project);
       this.showPinDiscussionDialog = true;
+    },
+    onDeleteDiscussion(){
+      let me = this;
+      this.$resources.discussion.deleteDiscussion
+                    .submit()
+                    .then(() => {
+                      me.$router.push({ name: 'ProjectDiscussions' })
+                    })
     }
   },
   computed: {
@@ -487,6 +515,14 @@ export default {
             this.discussionMoveDialog.show = true
           },
         },
+        {
+          label: __('Delete'),
+          icon: 'trash-2',
+          condition: () => this.discussion.owner == getUser('sessionUser').name,
+          onClick: () => {
+            this.showDeleteDiscussionDialog = true;
+          }
+        }
       ]
     },
   },

@@ -157,6 +157,10 @@ class GPDiscussion(HasActivity, HasMentions, HasReactions, Document):
 		self.pinned_by = None
 		self.log_activity('Discussion Unpinned')
 		self.save()
+	
+	@frappe.whitelist()
+	def delete_discussion(self):
+		frappe.delete_doc('GP Discussion', self.name)
 
 	def update_discussions_count(self, delta=1):
 		project = frappe.get_doc("GP Project", self.project)

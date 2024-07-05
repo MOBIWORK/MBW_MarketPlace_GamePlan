@@ -44,8 +44,9 @@
           <Autocomplete
             :placeholder="__('Assign a user')"
             :options="assignableUsers"
-            :value="newTask.assigned_to"
-            @change="(option) => (newTask.assigned_to = option?.value || '')"
+            v-model="newTask.assigned_to"
+            @update:modelValue="onChangeUserAssign"
+
           />
         </div>
         <ErrorMessage class="mt-2" :message="createTask.error" />
@@ -102,9 +103,13 @@ function statusOptions({ onClick }) {
   )
 }
 
+function onChangeUserAssign(option){
+  newTask.value.assigned_to = option?.value || '';
+}
+
 const assignableUsers = computed(() => {
   return activeUsers.value
-    .filter((user) => user.name != newTask.value.assigned_to)
+    //.filter((user) => user.name != newTask.value.assigned_to)
     .map((user) => ({
       label: user.full_name,
       value: user.name,
