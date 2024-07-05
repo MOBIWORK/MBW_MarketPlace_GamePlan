@@ -5,7 +5,7 @@
       <div class="sm:rounded sm:border sm:px-4 sm:py-3">
         <div class="mb-3 flex items-center justify-between">
           <h2 class="text-xl font-semibold">{{ __('Discussions') }}</h2>
-          <div class="flex items-center">
+          <div class="flex items-center" v-if="displayControlDiscussion">
             <Button :variant="'outline'" theme="gray" :route="{ name: 'ProjectDiscussionNew' }" >{{ __('Add discussion') }}</Button>
             <Button class="ml-3" :variant="'solid'" theme="gray" :route="{ name: 'ProjectDiscussions' }">{{ __('View all') }}</Button>
           </div>
@@ -16,26 +16,28 @@
             pageLength: 4,
           }"
           :hideLoadMore="true"
+          @load_data="onLoadDataDiscussion"
         />
       </div>
       <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div class="sm:rounded sm:border sm:px-4 sm:py-3">
           <div class="mb-3 flex items-center justify-between">
             <h2 class="text-xl font-semibold">{{ __('Tasks') }}</h2>
-            <div class="flex items-center">
+            <div class="flex items-center" v-if="displayControlTask">
               <Button :variant="'outline'" theme="gray" @click="() => onAddTask()" >{{ __('Add task') }}</Button>
               <Button class="ml-3" :variant="'solid'" theme="gray" :route="{ name: 'ProjectTasks' }">{{ __('View all') }}</Button>
             </div>
           </div>
           <TaskList
             :listOptions="optionTask"
+            @load_data="onLoadDataTask"
           />
           <NewTaskDialog ref="newTaskDialog" />
         </div>
         <div class="sm:rounded sm:border sm:px-4 sm:py-3">
           <div class="mb-3 flex items-center justify-between">
             <h2 class="text-xl font-semibold">{{ __('Pages') }}</h2>
-            <div class="flex items-center">
+            <div class="flex items-center" v-if="displayControlPage">
               <Button :variant="'outline'" theme="gray" @click="() => onAddPage()">{{ __('Add page') }}</Button>
               <Button class="ml-3" :variant="'solid'" theme="gray" :route="{ name: 'ProjectPages' }">{{ __('View all') }}</Button>
             </div>
@@ -47,6 +49,7 @@
               },
               pageLength: 4,
             }"
+            @load_data="onLoadPage"
           />
         </div>
       </div>
@@ -73,7 +76,10 @@ export default {
           status: ['in', ['Backlog', 'Todo', 'In Progress']],
         },
         pageLength: 4,
-      }
+      },
+      displayControlDiscussion: false,
+      displayControlTask: false,
+      displayControlPage: false
     }
   },
   methods:{
@@ -113,6 +119,15 @@ export default {
         }
       })
       newPage.submit();
+    },
+    onLoadDataDiscussion(data){
+      if(data.length > 0) this.displayControlDiscussion = true;
+    },
+    onLoadDataTask(data){
+      if(data.length > 0) this.displayControlTask = true;
+    },
+    onLoadPage(data){
+      if(data.length > 0) this.displayControlPage = true;
     }
   }
 }

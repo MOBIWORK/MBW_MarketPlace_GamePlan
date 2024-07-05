@@ -153,6 +153,7 @@ export default {
     },
   },
   expose: ['discussions'],
+  emits: ['load_data'],
   components: {
     TextEditor,
     Tooltip,
@@ -172,6 +173,7 @@ export default {
           for (let d of data) {
             d.unread = !d.last_visit || d.last_post_at > d.last_visit
           }
+          this.$emit('load_data', data)
           return data
         },
       }

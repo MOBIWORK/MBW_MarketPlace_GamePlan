@@ -47,6 +47,8 @@ let props = defineProps({
     default: () => ({}),
   },
 })
+let emits = defineEmits(['load_data'])
+
 
 let pages = createListResource({
   type: 'list',
@@ -58,5 +60,9 @@ let pages = createListResource({
   auto: true,
   realtime: true,
   orderBy: props.listOptions.orderBy || 'modified desc',
+  transform(data) {
+    emits('load_data', data)
+    return data
+  },
 })
 </script>

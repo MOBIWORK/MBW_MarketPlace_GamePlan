@@ -157,6 +157,7 @@ export default {
       default: () => ({}),
     },
   },
+  emits: ['load_data'],
   data() {
     return {
       isOpen: {
@@ -191,6 +192,10 @@ export default {
         pageLength: this.listOptions.pageLength || 20,
         auto: true,
         realtime: true,
+        transform(data) {
+          this.$emit('load_data', data)
+          return data
+        },
       }
     },
   },
