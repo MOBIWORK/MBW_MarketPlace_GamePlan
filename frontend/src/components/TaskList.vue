@@ -134,16 +134,19 @@
     </div>
   </div>
   <div
-    class="flex flex-col items-center rounded-lg border-2 border-dashed py-8 text-base text-gray-600"
+    class="flex flex-col items-center rounded-lg border-2 border-dashed py-8"
     v-else
   >
-    {{__('No tasks')}}
+    <div class="text-base text-gray-600">{{__('No tasks')}}</div>
+    <Button v-if="showAddTask" class="mt-1" :variant="'solid'" theme="gray" @click="() => onAddTask()" >{{ __('Add task') }}</Button>
   </div>
+  <NewTaskDialog ref="newTaskDialog" />
 </template>
 <script>
-import { h } from 'vue'
-import { LoadingIndicator, Dropdown, Tooltip } from 'frappe-ui'
+import { h, watch } from 'vue'
+import { LoadingIndicator, Dropdown, Tooltip, getCachedListResource } from 'frappe-ui'
 import TaskStatusIcon from './icons/TaskStatusIcon.vue'
+import { getUser } from '@/data/users'
 
 export default {
   name: 'TaskList',
@@ -156,10 +159,15 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    showAddTask: {
+      type: Boolean,
+      default: false
+    }
   },
   emits: ['load_data'],
   data() {
     return {
+      newTaskDialog: null,
       isOpen: {
         Backlog: true,
         Todo: true,
@@ -191,11 +199,7 @@ export default {
         orderBy: this.listOptions.orderBy || 'creation desc',
         pageLength: this.listOptions.pageLength || 20,
         auto: true,
-        realtime: true,
-        transform(data) {
-          this.$emit('load_data', data)
-          return data
-        },
+        realtime: true
       }
     },
   },
@@ -211,6 +215,21 @@ export default {
         }
       )
     },
+    onAddTask(){
+      let me = this;
+      this.$refs.newTaskDialog.show({
+        defaults: {
+          project: this.listOptions.filters.project,
+          assigned_to: getUser('sessionUser').name,
+        },
+        onSuccess: () => {
+          let tasks = getCachedListResource(['Tasks', this.listOptions])
+          if (tasks) {
+            tasks.reload()
+          }
+        },
+      })
+    }
   },
   computed: {
     tasks() {
@@ -246,6 +265,15 @@ export default {
       })
       return tasksByStatus
     },
+  },
+  mounted() {
+    watch(
+      () => this.tasks.data,
+      (newData) => {
+        this.$emit('load_data', newData);
+      },
+      { deep: true }
+    );
   },
 }
 </script>

@@ -16,6 +16,7 @@
             pageLength: 4,
           }"
           :hideLoadMore="true"
+          :showDiscussion="true"
           @load_data="onLoadDataDiscussion"
         />
       </div>
@@ -30,6 +31,7 @@
           </div>
           <TaskList
             :listOptions="optionTask"
+            :showAddTask="true"
             @load_data="onLoadDataTask"
           />
           <NewTaskDialog ref="newTaskDialog" />
@@ -111,7 +113,6 @@ export default {
           },
         },
         onSuccess(doc) {
-          console.log(me);
           me.$router.push({
             name: 'ProjectPage',
             params: { pageId: doc.name },

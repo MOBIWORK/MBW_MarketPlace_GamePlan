@@ -115,10 +115,13 @@
           !$resources.discussions.list.loading &&
           $resources.discussions.data.length === 0
         "
-        class="flex flex-col items-center rounded-lg border-2 border-dashed py-8 text-base text-gray-600"
+        class="flex flex-col items-center rounded-lg border-2 border-dashed py-8"
       >
-        <LucideCoffee class="h-7 w-7 text-gray-500" />
-        {{ __('No discussions') }}
+        <div class="text-base text-gray-600 flex flex-col items-center">
+          <LucideCoffee class="h-7 w-7 text-gray-500" />
+          {{ __('No discussions') }}
+        </div>
+        <Button v-if="showDiscussion" class="mt-1" :variant="'solid'" theme="gray" :route="{ name: 'ProjectDiscussionNew' }" >{{ __('Add discussion') }}</Button>
       </div>
       <div
         class="flex items-center justify-center p-3"
@@ -139,6 +142,7 @@
 </template>
 <script>
 import { TextEditor, Tooltip } from 'frappe-ui'
+import { watch } from 'vue';
 
 export default {
   name: 'DiscussionList',
@@ -151,6 +155,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    showDiscussion: {
+      type: Boolean,
+      default: false,
+    }
   },
   expose: ['discussions'],
   emits: ['load_data'],
@@ -210,6 +218,16 @@ export default {
   },
   activated() {
     this.$resources.discussions.reload()
+  },
+  mounted() {
+    watch(
+      () => this.$resources.discussions.data,
+      (newData) => {
+        console.log(newData);
+        this.$emit('load_data', newData);
+      },
+      { deep: true }
+    );
   },
 }
 </script>

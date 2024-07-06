@@ -70,7 +70,24 @@
             }}
           </span>
         </div>
-        <div class="mb-2 mt-8 flex w-full items-center">
+        <template v-if="discussion.conclusion != '' && discussion.conclusion != null">
+          <div class="flex mt-4 mb-2">
+            <div class="text-2xl font-semibold">Conclusion</div>
+            <div class="ml-auto flex space-x-2">
+            <Button
+              variant="ghost"
+              @click="onEditConclusion"
+              :label="__('Edit conclusion')"
+            >
+              <template #icon><LucidePencil class="w-4" /></template>
+            </Button>
+          </div>
+          </div>
+          <div class="mb-4" v-html="discussion.conclusion"></div>
+        </template>
+
+        <div v-if="discussion.conclusion != '' && discussion.conclusion != null" class="text-2xl font-semibold mb-4">Discussion</div>
+        <div class="mb-2 flex w-full items-center mt-2">
           <UserProfileLink class="mr-3" :user="discussion.owner">
             <UserAvatar :user="discussion.owner" />
           </UserProfileLink>
@@ -232,24 +249,53 @@
         }"
         v-model="showUnPinDiscussionDialog"
       />
-      <Dialog
-        :options="{
-          title: __('Close discussion'),
-          message: __('When a discussion is closed, commenting is disabled. Anyone can re-open the discussion later. Do you want to close this discussion?'),
-          icon: { name: 'lock' },
-          actions: [
-            {
-              label: __('Close'),
-              onClick: ({ close }) =>
-                this.$resources.discussion.closeDiscussion
-                    .submit()
-                    .then(() => {showCloseDiscussionDialog = false }),
-              variant: 'solid',
-            }
-          ],
-        }"
-        v-model="showCloseDiscussionDialog"
-      />
+      <Dialog v-model="showCloseDiscussionDialog" :options="{
+        size: '2xl',
+      }">
+        <template #body-title>
+          <div class="flex w-full items-center">
+            <UserProfileLink class="mr-2" :user="idSessionUser">
+              <UserAvatar :user="idSessionUser" />
+            </UserProfileLink>
+            <UserProfileLink
+              class="text-base font-medium hover:text-blue-600"
+              :user="idSessionUser"
+            >
+              {{ fullNameSessionUser }}
+            </UserProfileLink>
+          </div>
+        </template>
+        <template #body-content>
+          <TextEditor
+            class="mt-1"
+            editor-class="rounded-b-lg max-w-[unset] prose-sm h-60 overflow-auto w-100"
+            :content="content"
+            @change="onNewPostChange"
+            :placeholder="__('Add a conclusion')"
+          >
+            <template v-slot:bottom>
+              <div
+                class="mt-2 flex flex-col justify-between sm:flex-row sm:items-center"
+              >
+                <TextEditorFixedMenu
+                  class="overflow-x-auto"
+                  :buttons="textEditorMenuButtons"
+                />
+              </div>
+            </template>
+          </TextEditor>
+        </template>
+        <template #actions>
+          <div class="flex justify-end">
+            <Button @click="showCloseDiscussionDialog = false">
+              Discard
+            </Button>
+            <Button class="ml-2" variant="solid" @click="onSubmitConclusion">
+              Submit
+            </Button>
+          </div>
+        </template>
+      </Dialog>
       <Dialog
         :options="{
           title: __('Re-open discussion'),
@@ -304,6 +350,7 @@ import { copyToClipboard } from '@/utils'
 import { activeTeams } from '@/data/teams'
 import { getTeamProjects } from '@/data/projects'
 import { getUser } from '@/data/users'
+import TextEditorFixedMenu from 'frappe-ui/src/components/TextEditor/TextEditorFixedMenu.vue'
 
 export default {
   name: 'DiscussionView',
@@ -324,6 +371,7 @@ export default {
     DiscussionMeta,
     DiscussionBreadcrumbs,
     RevisionsDialog,
+    TextEditorFixedMenu
   },
   resources: {
     discussion() {
@@ -339,6 +387,7 @@ export default {
           pinDiscussion: 'pin_discussion',
           unpinDiscussion: 'unpin_discussion',
           deleteDiscussion: 'delete_discussion',
+          updateConclusion: 'update_conclusion',
           moveToProject: {
             method: 'move_to_project',
             validate(params) {
@@ -395,7 +444,10 @@ export default {
       showUnPinDiscussionDialog: false,
       showCloseDiscussionDialog: false,
       showReopenDiscussionDialog: false,
-      showDeleteDiscussionDialog: false
+      showDeleteDiscussionDialog: false,
+      idSessionUser: getUser('sessionUser').name,
+      fullNameSessionUser: getUser('sessionUser').full_name,
+      content: ''
     }
   },
   methods: {
@@ -444,10 +496,26 @@ export default {
                     .then(() => {
                       me.$router.push({ name: 'ProjectDiscussions' })
                     })
+    },
+    onSubmitConclusion(){
+      let me = this;
+      this.$resources.discussion.updateConclusion.submit({
+        conclusion: this.content
+      }).then(() => {
+        me.showCloseDiscussionDialog = false;
+      })
+    },
+    onNewPostChange(value) {
+      this.content = value
+    },
+    onEditConclusion(){
+      this.content = this.discussion.conclusion;
+      this.showCloseDiscussionDialog = true;
     }
   },
   computed: {
     discussion() {
+      console.log(this.$resources.discussion.doc)
       return this.$resources.discussion.doc
     },
     projectOptions() {
@@ -497,6 +565,8 @@ export default {
           icon: 'lock',
           condition: () => !this.discussion.closed_at,
           onClick: () => {
+            this.$resources.discussion.closeDiscussion.submit();
+            this.content = this.discussion.conclusion;
             this.showCloseDiscussionDialog = true;
           },
         },
@@ -523,6 +593,48 @@ export default {
             this.showDeleteDiscussionDialog = true;
           }
         }
+      ]
+    },
+    textEditorMenuButtons() {
+      return [
+        'Paragraph',
+        ['Heading 2', 'Heading 3', 'Heading 4', 'Heading 5', 'Heading 6'],
+        'Separator',
+        'Bold',
+        'Italic',
+        'Separator',
+        'Bullet List',
+        'Numbered List',
+        'Separator',
+        'Align Left',
+        'Align Center',
+        'Align Right',
+        'FontColor',
+        'Separator',
+        'Image',
+        'Video',
+        'Link',
+        'Blockquote',
+        'Code',
+        'Horizontal Rule',
+        [
+          'InsertTable',
+          'AddColumnBefore',
+          'AddColumnAfter',
+          'DeleteColumn',
+          'AddRowBefore',
+          'AddRowAfter',
+          'DeleteRow',
+          'MergeCells',
+          'SplitCell',
+          'ToggleHeaderColumn',
+          'ToggleHeaderRow',
+          'ToggleHeaderCell',
+          'DeleteTable',
+        ],
+        'Separator',
+        'Undo',
+        'Redo',
       ]
     },
   },

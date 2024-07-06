@@ -20,7 +20,8 @@
   "pinned_at",
   "pinned_by",
   "comments_count",
-  "participants_count"
+  "participants_count",
+  "conclusion"
  ],
  "fields": [
   {
@@ -115,11 +116,16 @@
    "fieldtype": "Link",
    "label": "Pinned By",
    "options": "User"
+  },
+  {
+   "fieldname": "conclusion",
+   "fieldtype": "Text Editor",
+   "label": "Conclusion"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-02-06 12:11:11.919002",
+ "modified": "2024-07-06 09:35:13.824969",
  "modified_by": "Administrator",
  "module": "Gameplan",
  "name": "GP Discussion",

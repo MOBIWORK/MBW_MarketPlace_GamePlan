@@ -32,14 +32,17 @@
     </div>
   </div>
   <div
-    class="flex flex-col items-center rounded-lg border-2 border-dashed py-8 text-base text-gray-600"
+    class="flex flex-col items-center rounded-lg border-2 border-dashed py-8"
     v-else
   >
-    {{__('No pages')}}
+    <div class="text-base text-gray-600">{{__('No pages')}}</div>
+    <Button class="mt-1" :variant="'solid'" theme="gray" @click="() => onAddPage()">{{ __('Add page') }}</Button>
   </div>
 </template>
 <script setup>
-import { createListResource } from 'frappe-ui'
+import { createListResource, createResource } from 'frappe-ui'
+import router from '@/router'
+import { watch } from 'vue';
 
 let props = defineProps({
   listOptions: {
@@ -49,6 +52,28 @@ let props = defineProps({
 })
 let emits = defineEmits(['load_data'])
 
+function onAddPage(){
+  let me = this;
+  console.log(props.listOptions.filters.project)
+  let newPage = createResource({
+    url: 'frappe.client.insert',
+    params: {
+      doc: {
+        doctype: 'GP Page',
+        project: props.listOptions.filters.project,
+        title: __('Untitled'),
+        content: '',
+      },
+    },
+    onSuccess(doc) {
+      router.push({
+        name: 'ProjectPage',
+        params: { pageId: doc.name },
+      })
+    }
+  })
+  newPage.submit();
+}
 
 let pages = createListResource({
   type: 'list',
@@ -59,10 +84,9 @@ let pages = createListResource({
   pageLength: props.listOptions.pageLength || 20,
   auto: true,
   realtime: true,
-  orderBy: props.listOptions.orderBy || 'modified desc',
-  transform(data) {
-    emits('load_data', data)
-    return data
-  },
+  orderBy: props.listOptions.orderBy || 'modified desc'
 })
+watch(pages, (newData) => {
+  emits('load_data', newData.data);
+}, { deep: true });
 </script>

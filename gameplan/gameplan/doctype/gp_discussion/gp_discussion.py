@@ -161,6 +161,11 @@ class GPDiscussion(HasActivity, HasMentions, HasReactions, Document):
 	@frappe.whitelist()
 	def delete_discussion(self):
 		frappe.delete_doc('GP Discussion', self.name)
+	
+	@frappe.whitelist()
+	def update_conclusion(self, conclusion):
+		self.conclusion = conclusion
+		self.save()
 
 	def update_discussions_count(self, delta=1):
 		project = frappe.get_doc("GP Project", self.project)
