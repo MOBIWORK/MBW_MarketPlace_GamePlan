@@ -42,21 +42,49 @@
             </Button>
           </Dropdown>
         </div>
-        <TextEditor
-          ref="description"
-          editor-class="prose-sm max-w-none focus-within:ring-2 focus-within:ring-gray-400 rounded-sm p-0.5 -ml-0.5 min-h-[4rem]"
-          :placeholder="__('Description')"
-          :content="$resources.task.doc.description"
-          :bubbleMenu="true"
-          :floatingMenu="true"
-          @blur="
-            !$refs.description.editor.isEmpty
-              ? $resources.task.setValueDebounced.submit({
-                  description: $refs.description.editor.getHTML(),
-                })
-              : null
-          "
-        />
+        <div class="w-full flex">
+          <div
+            :class="{
+              'rounded-lg border p-4 focus-within:border-gray-400 w-full':
+              editingDescription,
+            }"
+          >
+            <CommentEditor
+              ref="description"
+              class
+              :value="$resources.task.doc.description"
+              @change="$resources.task.doc.description = $event"
+              @focus="editingDescription = true"
+              :submitButtonProps="{
+                variant: 'solid',
+                onClick: () => {
+                  $resources.task.setValue.submit({
+                    description: $resources.task.doc.description,
+                  })
+                  editingDescription = false
+                }
+              }"
+              :discardButtonProps="{
+                onClick: () => {
+                  editingDescription = false
+                  $resources.task.reload()
+                },
+              }"
+              :editable="editingDescription"
+            />
+          </div>
+          <div class="ml-auto flex space-x-2" v-if="!readOnlyMode && !editingDescription">
+            <Button
+              variant="ghost"
+              @click="editingDescription = true"
+              :label="__('Edit Description')"
+            >
+              <template #icon><LucideEdit class="w-4" /></template>
+            </Button>
+          </div>
+        </div>
+        
+        
         <div class="mt-8 flex flex-wrap items-center gap-2 sm:hidden">
           <Autocomplete
             :placeholder="__('Assign a user')"
@@ -196,6 +224,7 @@ import TaskPriorityIcon from '@/components/icons/TaskPriorityIcon.vue'
 import { activeUsers } from '@/data/users'
 import { activeTeams } from '@/data/teams'
 import { getTeamProjects } from '@/data/projects'
+import { getUser } from '@/data/users'
 
 export default {
   name: 'TaskDetail',
@@ -203,7 +232,8 @@ export default {
   directives: { focus },
   data() {
     return {
-      showDeleteTaskDialog: false
+      showDeleteTaskDialog: false,
+      editingDescription: false
     }
   },
   resources: {

@@ -3,7 +3,7 @@
     <DiscussionView
       class="w-full"
       :postId="postId"
-      :read-only-mode="Boolean(project.doc.archived_at) || $readOnlyMode"
+      :read-only-mode="isReadOnlyMode(project) || $readOnlyMode"
     />
   </div>
 </template>
@@ -14,6 +14,7 @@ import Reactions from '@/components/Reactions.vue'
 import DiscussionList from '@/components/DiscussionList.vue'
 import DiscussionView from '@/components/DiscussionView.vue'
 import { teams } from '@/data/teams'
+import { getUser } from '@/data/users'
 
 export default {
   name: 'ProjectDiscussion',
@@ -42,6 +43,11 @@ export default {
     isActive(update) {
       return Number(this.$route.params.postId) === update.name
     },
+    isReadOnlyMode(project){
+      //Boolean(project.doc.archived_at)
+      if(project.doc.owner == getUser('sessionUser').name) return false;
+      return true;
+    }
   },
 }
 </script>

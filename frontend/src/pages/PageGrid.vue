@@ -4,7 +4,7 @@
       {{ __('No pages') }}
     </div>
     <div class="relative" v-for="d in $resources.pages.data" :key="d.name">
-      <div class="absolute right-0 top-0 p-3">
+      <div class="absolute right-0 top-0 p-3" v-if="onShowAction(d)">
         <Dropdown
           :button="{
             icon: 'more-horizontal',
@@ -85,6 +85,7 @@
 <script>
 import { projectTitle } from '@/utils/formatters'
 import { Dropdown } from 'frappe-ui'
+import { getUser } from '@/data/users'
 
 export default {
   name: 'PageGrid',
@@ -110,6 +111,7 @@ export default {
           'project',
           'team',
           'modified',
+          'owner'
         ],
         filters: this.listOptions.filters,
         orderBy: this.listOptions.orderBy,
@@ -119,6 +121,10 @@ export default {
   },
   methods: {
     projectTitle,
+    onShowAction(page){
+      if(page.owner == getUser('sessionUser').name) return true;
+      return false;
+    }
   },
   components: { Dropdown },
 }

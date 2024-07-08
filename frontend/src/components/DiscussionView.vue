@@ -48,7 +48,6 @@
             </span>
           </h1>
           <Dropdown
-            v-if="!readOnlyMode"
             class="ml-auto"
             placement="right"
             :button="{
@@ -72,21 +71,36 @@
         </div>
         <template v-if="discussion.conclusion != '' && discussion.conclusion != null">
           <div class="flex mt-4 mb-2">
-            <div class="text-2xl font-semibold">Conclusion</div>
+            <div class="text-1xl font-semibold">Conclusion</div>
             <div class="ml-auto flex space-x-2">
             <Button
+              v-if="!readOnlyMode"
               variant="ghost"
               @click="onEditConclusion"
               :label="__('Edit conclusion')"
             >
-              <template #icon><LucidePencil class="w-4" /></template>
+              <template #icon><LucideEdit class="w-4" /></template>
+            </Button>
+            <Button
+              v-if="!readOnlyMode"
+              variant="ghost"
+              class="ml-0"
+              @click="onDeleteConclusion"
+              :label="__('Delete conclusion')"
+            >
+              <template #icon><LucideTrash2 class="w-4 " style="color: red;" /></template>
             </Button>
           </div>
           </div>
-          <div class="mb-4" v-html="discussion.conclusion"></div>
+          <TextEditor
+            class="mt-1 mb-4 border-b"
+            editor-class="rounded-b-lg max-w-[unset] prose-sm overflow-auto w-100"
+            :content="discussion.conclusion"
+            :editable="false"
+          ></TextEditor>
         </template>
 
-        <div v-if="discussion.conclusion != '' && discussion.conclusion != null" class="text-2xl font-semibold mb-4">Discussion</div>
+        <div v-if="discussion.conclusion != '' && discussion.conclusion != null" class="text-1xl font-semibold mb-4">Content</div>
         <div class="mb-2 flex w-full items-center mt-2">
           <UserProfileLink class="mr-3" :user="discussion.owner">
             <UserAvatar :user="discussion.owner" />
@@ -286,7 +300,7 @@
           </TextEditor>
         </template>
         <template #actions>
-          <div class="flex justify-end">
+          <div class="flex justify-end -pt-6">
             <Button @click="showCloseDiscussionDialog = false">
               Discard
             </Button>
@@ -331,6 +345,24 @@
           ],
         }"
         v-model="showDeleteDiscussionDialog"
+      />
+      <Dialog
+        :options="{
+          title: __('Delete conclusion'),
+          message: __('This action can not be undone'),
+          actions: [
+          {
+              label: __('Delete'),
+              onClick: () => onAcceptDeleteConclusion(),
+              variant: 'solid',
+              theme: 'red',
+            },
+            {
+              label: __('Cancel'),
+            },
+          ],
+        }"
+        v-model="showDeleteConclusionDialog"
       />
     </div>
   </div>
@@ -447,7 +479,8 @@ export default {
       showDeleteDiscussionDialog: false,
       idSessionUser: getUser('sessionUser').name,
       fullNameSessionUser: getUser('sessionUser').full_name,
-      content: ''
+      content: '',
+      showDeleteConclusionDialog: false
     }
   },
   methods: {
@@ -511,11 +544,21 @@ export default {
     onEditConclusion(){
       this.content = this.discussion.conclusion;
       this.showCloseDiscussionDialog = true;
+    },
+    onDeleteConclusion(){
+      this.showDeleteConclusionDialog = true;
+    },
+    onAcceptDeleteConclusion(){
+      let me = this;
+      this.$resources.discussion.updateConclusion.submit({
+        conclusion: ""
+      }).then(() => {
+        me.showDeleteConclusionDialog = false;
+      })
     }
   },
   computed: {
     discussion() {
-      console.log(this.$resources.discussion.doc)
       return this.$resources.discussion.doc
     },
     projectOptions() {
@@ -532,6 +575,7 @@ export default {
         {
           label: __('Edit Title'),
           icon: 'edit',
+          condition: () => !this.readOnlyMode,
           onClick: () => {
             this.editingTitle = true
           },
@@ -549,13 +593,13 @@ export default {
         {
           label: __('Pin discussion...'),
           icon: 'arrow-up-left',
-          condition: () => !this.discussion.pinned_at,
+          condition: () => !this.discussion.pinned_at && !this.readOnlyMode,
           onClick: this.onPinDiscussion
         },
         {
           label: __('Unpin discussion...'),
           icon: 'arrow-down-left',
-          condition: () => this.discussion.pinned_at,
+          condition: () => this.discussion.pinned_at && !this.readOnlyMode,
           onClick: () => {
             this.showUnPinDiscussionDialog = true;
           },
@@ -563,7 +607,7 @@ export default {
         {
           label: __('Close discussion...'),
           icon: 'lock',
-          condition: () => !this.discussion.closed_at,
+          condition: () => !this.discussion.closed_at && !this.readOnlyMode,
           onClick: () => {
             this.$resources.discussion.closeDiscussion.submit();
             this.content = this.discussion.conclusion;
@@ -573,7 +617,7 @@ export default {
         {
           label: __('Re-open discussion...'),
           icon: 'unlock',
-          condition: () => this.discussion.closed_at,
+          condition: () => this.discussion.closed_at && !this.readOnlyMode,
           onClick: () => {
             this.showReopenDiscussionDialog = true;
           },
@@ -581,6 +625,7 @@ export default {
         {
           label: __('Move to...'),
           icon: 'log-out',
+          condition: () => !this.readOnlyMode,
           onClick: () => {
             this.discussionMoveDialog.show = true
           },
@@ -588,9 +633,18 @@ export default {
         {
           label: __('Delete'),
           icon: 'trash-2',
-          condition: () => this.discussion.owner == getUser('sessionUser').name,
+          condition: () => !this.readOnlyMode,
           onClick: () => {
             this.showDeleteDiscussionDialog = true;
+          }
+        },
+        {
+          label: __('Add conclusion'),
+          icon: 'plus',
+          condition: () => !this.readOnlyMode,
+          onClick: () => {
+            this.content = this.discussion.conclusion;
+            this.showCloseDiscussionDialog = true;
           }
         }
       ]

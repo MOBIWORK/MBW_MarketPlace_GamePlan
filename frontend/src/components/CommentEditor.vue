@@ -7,6 +7,7 @@
     :starterkit-options="{ heading: { levels: [2, 3, 4, 5, 6] } }"
     :placeholder="placeholder"
     :editable="editable"
+    @focus="onFocusEditor"
   >
     <template v-slot:editor="{ editor }">
       <EditorContent
@@ -67,9 +68,14 @@ export default {
       default: () => ({}),
     },
   },
-  emits: ['change'],
+  emits: ['change','focus'],
   expose: ['editor'],
   components: { TextEditor, TextEditorFixedMenu, EditorContent },
+  methods: {
+    onFocusEditor(){
+      console.log("Dòng 76");
+    }
+  },
   computed: {
     editor() {
       return this.$refs.textEditor.editor

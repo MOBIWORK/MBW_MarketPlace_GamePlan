@@ -32,7 +32,7 @@
         <span class="text-sm text-gray-600 sm:hidden">
           {{__('Last updated')}} {{ $dayjs(page.doc.modified).format('LLL') }}
         </span>
-        <div class="mb-3 md:px-[70px]">
+        <div class="mb-2">
           <input
             class="w-full border-0 p-0 pt-4 text-3xl font-semibold focus:outline-none focus:ring-0"
             type="text"
@@ -40,29 +40,45 @@
             @input="page.doc.title = $event.target.value"
             @keydown.enter="$refs.content.editor.commands.focus()"
             ref="titleInput"
+            :readonly="disnableEditContent(page)"
           />
         </div>
+
         <TextEditor
-          editor-class="rounded-b-lg max-w-[unset] prose-sm pb-[50vh] md:px-[70px]"
-          :content="page.doc.content"
-          @change="page.doc.content = $event"
-          :placeholder="__('Start writing here...')"
-          :bubbleMenu="true"
-          ref="content"
-        />
+            editor-class="rounded-b-lg max-w-[unset] prose-sm h-mbw-fit-page"
+            :content="page.doc.content"
+            @change="page.doc.content = $event"
+            :placeholder="__('Start writing here...')"
+            ref="content"
+            :editable="!disnableEditContent(page)"
+          >
+            <template v-slot:bottom>
+              <div
+                class="mt-2 flex flex-col justify-between sm:flex-row sm:items-center"
+              >
+                <TextEditorFixedMenu
+                  class="overflow-x-auto"
+                  :buttons="textEditorMenuButtons"
+                />
+              </div>
+            </template>
+          </TextEditor>
       </div>
     </div>
   </div>
 </template>
 <script>
-import { Breadcrumbs, TextEditor, getCachedDocumentResource } from 'frappe-ui'
+import { Breadcrumbs, getCachedDocumentResource } from 'frappe-ui'
 import { getTeam } from '@/data/teams'
 import { getProject } from '@/data/projects'
+import TextEditor from '@/components/TextEditor.vue'
+import TextEditorFixedMenu from 'frappe-ui/src/components/TextEditor/TextEditorFixedMenu.vue'
+import { getUser } from '@/data/users'
 
 export default {
   name: 'Page',
   props: ['pageId', 'slug'],
-  components: { TextEditor, Breadcrumbs },
+  components: { TextEditor, Breadcrumbs, TextEditorFixedMenu },
   resources: {
     page() {
       return {
@@ -113,6 +129,11 @@ export default {
         })
       }
     },
+    disnableEditContent(page){
+      console.log(page)
+      if(page.doc.owner == getUser('sessionUser').name) return false;
+      return true;
+    }
   },
   computed: {
     page() {
@@ -176,6 +197,48 @@ export default {
             params: { pageId: this.pageId, slug: this.slug },
           },
         },
+      ]
+    },
+    textEditorMenuButtons() {
+      return [
+        'Paragraph',
+        ['Heading 2', 'Heading 3', 'Heading 4', 'Heading 5', 'Heading 6'],
+        'Separator',
+        'Bold',
+        'Italic',
+        'Separator',
+        'Bullet List',
+        'Numbered List',
+        'Separator',
+        'Align Left',
+        'Align Center',
+        'Align Right',
+        'FontColor',
+        'Separator',
+        'Image',
+        'Video',
+        'Link',
+        'Blockquote',
+        'Code',
+        'Horizontal Rule',
+        [
+          'InsertTable',
+          'AddColumnBefore',
+          'AddColumnAfter',
+          'DeleteColumn',
+          'AddRowBefore',
+          'AddRowAfter',
+          'DeleteRow',
+          'MergeCells',
+          'SplitCell',
+          'ToggleHeaderColumn',
+          'ToggleHeaderRow',
+          'ToggleHeaderCell',
+          'DeleteTable',
+        ],
+        'Separator',
+        'Undo',
+        'Redo',
       ]
     },
     pageTitle() {

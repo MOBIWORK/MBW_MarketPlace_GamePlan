@@ -14,7 +14,7 @@
               >
                 {{ $user().full_name }}
               </UserProfileLink>
-              in
+              {{__('in')}}
               <router-link
                 class="hover:text-blue-600"
                 :to="{

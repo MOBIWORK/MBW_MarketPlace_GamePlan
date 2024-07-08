@@ -29,6 +29,9 @@ module.exports = {
       },
       width: {
         'mbw-fit': 'calc(100% - 250px)'
+      },
+      height: {
+        'mbw-fit-page': 'calc(100vh - 190px)'
       }
     },
   },
