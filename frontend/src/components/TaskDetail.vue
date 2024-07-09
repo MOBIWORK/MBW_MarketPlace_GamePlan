@@ -125,7 +125,24 @@
             @update:modelValue="changeProject"
           />
         </div>
-        <CommentsList class="mt-8" doctype="GP Task" :name="taskId" />
+        <div class="text-1xl font-semibold mb-2">Activity</div>
+        <div class="flex items-center">
+          <span class="text-sm">{{__('Show')}}:</span>
+          <div class="ml-4 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer" :class="{'mbw-activity-active':activeActivity=='all'}" @click="activeActivity='all'">All</div>
+          <div class="ml-2 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer" :class="{'mbw-activity-active':activeActivity=='comment'}" @click="activeActivity='comment'">Comments</div>
+          <div class="ml-2 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer" :class="{'mbw-activity-active':activeActivity=='history'}" @click="activeActivity='history'">History</div>
+        </div>
+        <template v-if="activeActivity=='all'">
+          <CommentsList class="mt-8" doctype="GP Task" :name="taskId" />
+        </template>
+        <template v-if="activeActivity=='comment'">
+          <div class="mt-5">
+            <CommentsList class="mt-8" doctype="GP Task" :name="taskId" :typeFilter="'comment'" />
+          </div>
+        </template>
+        <template v-if="activeActivity=='history'">
+          <CommentsList class="mt-8" doctype="GP Task" :name="taskId" :disableNewComment="true" :typeFilter="'history'" />
+        </template>
       </div>
     </div>
     <div class="hidden w-[20rem] shrink-0 border-l sm:block">
@@ -233,7 +250,8 @@ export default {
   data() {
     return {
       showDeleteTaskDialog: false,
-      editingDescription: false
+      editingDescription: false,
+      activeActivity: 'all'
     }
   },
   resources: {
@@ -359,3 +377,24 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  .mbw-bg-activity{
+    background-color: #091E420F;
+  }
+  .mbw-bg-activity:hover{
+    background-color: #67402a2c;
+  }
+  .mbw-activity-active{
+    color: #0C66E4 !important;
+    background-color: #E9F2FF !important;
+  }
+  .mbw-text-activity{
+    font-weight: 500;
+    font-size: 14px;
+    font-style: normal;
+    font-family: inherit;
+    text-align: center;
+    color: #172B4D;
+  }
+</style>

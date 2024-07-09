@@ -100,7 +100,7 @@
           ></TextEditor>
         </template>
 
-        <div v-if="discussion.conclusion != '' && discussion.conclusion != null" class="text-1xl font-semibold mb-4">Content</div>
+        <div v-if="discussion.content != '' && discussion.content != null" class="text-1xl font-semibold mb-4">Content</div>
         <div class="mb-2 flex w-full items-center mt-2">
           <UserProfileLink class="mr-3" :user="discussion.owner">
             <UserAvatar :user="discussion.owner" />
@@ -160,7 +160,7 @@
             :editable="editingContent"
           />
         </div>
-        <div class="mt-3">
+        <div class="mt-3 mb-4">
           <Reactions
             doctype="GP Discussion"
             :name="discussion.name"
@@ -168,14 +168,43 @@
             :read-only-mode="readOnlyMode"
           />
         </div>
+        <div class="text-1xl font-semibold mb-4">Activity</div>
+        <div class="flex items-center">
+          <span class="text-sm">{{__('Show')}}:</span>
+          <div class="ml-4 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer" :class="{'mbw-activity-active':activeActivity=='all'}" @click="activeActivity='all'">All</div>
+          <div class="ml-2 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer" :class="{'mbw-activity-active':activeActivity=='comment'}" @click="activeActivity='comment'">Comments</div>
+          <div class="ml-2 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer" :class="{'mbw-activity-active':activeActivity=='history'}" @click="activeActivity='history'">History</div>
+        </div>
       </div>
-      <CommentsArea
-        doctype="GP Discussion"
-        :name="discussion.name"
-        :newCommentsFrom="discussion.last_unread_comment"
-        :read-only-mode="readOnlyMode"
-        :disable-new-comment="discussion.closed_at"
-      />
+      <template v-if="activeActivity=='all'">
+        <CommentsArea
+          doctype="GP Discussion"
+          :name="discussion.name"
+          :newCommentsFrom="discussion.last_unread_comment"
+          :read-only-mode="readOnlyMode"
+          :disable-new-comment="discussion.closed_at"
+        />
+      </template>
+      <template v-if="activeActivity=='comment'">
+        <CommentsArea
+          doctype="GP Discussion"
+          :name="discussion.name"
+          :newCommentsFrom="discussion.last_unread_comment"
+          :read-only-mode="readOnlyMode"
+          :disable-new-comment="discussion.closed_at"
+          :filterType="'comment'"
+        />
+      </template>
+      <template v-if="activeActivity=='history'">
+        <CommentsArea
+          doctype="GP Discussion"
+          :name="discussion.name"
+          :newCommentsFrom="false"
+          :read-only-mode="readOnlyMode"
+          :disable-new-comment="true"
+          :filterType="'history'"
+        />
+      </template>
       <Dialog
         :options="{
           title: __('Move discussion to another project'),
@@ -480,7 +509,8 @@ export default {
       idSessionUser: getUser('sessionUser').name,
       fullNameSessionUser: getUser('sessionUser').full_name,
       content: '',
-      showDeleteConclusionDialog: false
+      showDeleteConclusionDialog: false,
+      activeActivity: 'all'
     }
   },
   methods: {
@@ -703,3 +733,23 @@ export default {
   },
 }
 </script>
+<style scoped>
+  .mbw-bg-activity{
+    background-color: #091E420F;
+  }
+  .mbw-bg-activity:hover{
+    background-color: #67402a2c;
+  }
+  .mbw-activity-active{
+    color: #0C66E4 !important;
+    background-color: #E9F2FF !important;
+  }
+  .mbw-text-activity{
+    font-weight: 500;
+    font-size: 14px;
+    font-style: normal;
+    font-family: inherit;
+    text-align: center;
+    color: #172B4D;
+  }
+</style>

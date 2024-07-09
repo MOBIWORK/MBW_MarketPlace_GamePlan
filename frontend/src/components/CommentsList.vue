@@ -178,6 +178,7 @@ export default {
     'newCommentsFrom',
     'readOnlyMode',
     'disableNewComment',
+    'typeFilter'
   ],
   components: {
     CommentEditor,
@@ -455,15 +456,31 @@ export default {
   computed: {
     timelineItems() {
       let items = []
-      if (this.$resources.comments.data?.length) {
-        items = items.concat(this.$resources.comments.data)
+      if(this.typeFilter != null && this.typeFilter != ""){
+        if(this.typeFilter == "comment"){
+          if (this.$resources.comments.data?.length) {
+            items = items.concat(this.$resources.comments.data)
+          }
+          if (this.$resources.polls.data?.length) {
+            items = items.concat(this.$resources.polls.data)
+          }
+        }else if(this.typeFilter == "history"){
+          if (this.$resources.activities.data?.length) {
+            items = items.concat(this.$resources.activities.data)
+          }
+        }
+      }else{
+        if (this.$resources.comments.data?.length) {
+          items = items.concat(this.$resources.comments.data)
+        }
+        if (this.$resources.activities.data?.length) {
+          items = items.concat(this.$resources.activities.data)
+        }
+        if (this.$resources.polls.data?.length) {
+          items = items.concat(this.$resources.polls.data)
+        }
       }
-      if (this.$resources.activities.data?.length) {
-        items = items.concat(this.$resources.activities.data)
-      }
-      if (this.$resources.polls.data?.length) {
-        items = items.concat(this.$resources.polls.data)
-      }
+      console.log(items);
       return items.sort((a, b) => {
         return new Date(a.creation) - new Date(b.creation)
       })
