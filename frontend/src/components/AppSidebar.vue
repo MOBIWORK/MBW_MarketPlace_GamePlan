@@ -65,7 +65,26 @@
         </button>
       </nav>
       <div class="mt-6 flex items-center justify-between px-3">
-        <h3 class="text-sm font-medium text-gray-600">{{__('Teams')}}</h3>
+        <div class="flex items-center">
+          <h3 class="text-sm font-medium text-gray-600">{{__('Teams')}}</h3>
+          <Button
+            v-if="!isExpandAll"
+            :label="__('Expand all')"
+            variant="ghost"
+            @click="onExpanAll()"
+          >
+            <template #icon><LucideChevronRight class="h-4 w-4" /></template>
+          </Button>
+          <Button
+            v-if="isExpandAll"
+            :label="__('Collapse all')"
+            variant="ghost"
+            @click="onCollapseAll()"
+          >
+            <template #icon><LucideChevronDown class="h-4 w-4" /></template>
+          </Button>
+        </div>
+        
         <Button
           :label="__('Create Team')"
           variant="ghost"
@@ -82,9 +101,7 @@
           >
             <button
               @click.prevent="
-                () => {
-                  team.open = !team.open
-                }
+                () => onExpandOrCollapseItem(team)
               "
               class="mr-1.5 grid h-4 w-4 place-items-center rounded hover:bg-gray-200"
             >
@@ -172,6 +189,7 @@ import LucideInbox from '~icons/lucide/inbox'
 import LucideListTodo from '~icons/lucide/list-todo'
 import LucideNewspaper from '~icons/lucide/newspaper'
 import LucideFiles from '~icons/lucide/files'
+import { getUser } from '@/data/users'
 
 export default {
   name: 'AppSidebar',
@@ -191,6 +209,7 @@ export default {
 
       showAddTeamDialog: false,
       teams,
+      isExpandAll: false
     }
   },
   mounted() {
@@ -243,7 +262,10 @@ export default {
       ].filter((nav) => (nav.condition ? nav.condition() : true))
     },
     activeTeams() {
-      return activeTeams.value.map((team) => {
+      let strActiveTeamCache = localStorage.getItem(`activeTeamCache_${getUser('sessionUser').name}`);
+      let objActiveTeamCache = {};
+      if(strActiveTeamCache != null && strActiveTeamCache != "") objActiveTeamCache = JSON.parse(strActiveTeamCache);
+      let activeTeamsNew = activeTeams.value.map((team) => {
         team.class = function ($route, link) {
           if (
             ['TeamLayout', 'Team', 'TeamOverview'].includes($route.name) &&
@@ -253,8 +275,10 @@ export default {
           }
           return 'text-gray-800 hover:bg-gray-100'
         }
+        if(objActiveTeamCache.hasOwnProperty(team.name)) team["open"] = objActiveTeamCache[team.name];
         return team
-      })
+      });
+      return activeTeamsNew;
     },
   },
   methods: {
@@ -321,6 +345,34 @@ export default {
       }
     },
     showCommandPalette,
+    onExpanAll(){
+      let objActiveTeamCache = {};
+      for(let i = 0; i < this.activeTeams.length; i++){
+        this.activeTeams[i].open = true;
+        objActiveTeamCache[this.activeTeams[i].name] = true;
+      }
+      localStorage.setItem(`activeTeamCache_${getUser('sessionUser').name}`, JSON.stringify(objActiveTeamCache));
+      this.isExpandAll = true;
+    },
+    onCollapseAll(){
+      let objActiveTeamCache = {};
+      for(let i = 0; i < this.activeTeams.length; i++){
+        this.activeTeams[i].open = false;
+        objActiveTeamCache[this.activeTeams[i].name] = false;
+      }
+      localStorage.setItem(`activeTeamCache_${getUser('sessionUser').name}`, JSON.stringify(objActiveTeamCache));
+      this.isExpandAll = false;
+    },
+    onExpandOrCollapseItem(item){
+      let strActiveTeamCache = localStorage.getItem(`activeTeamCache_${getUser('sessionUser').name}`);
+      let objActiveTeamCache = {};
+      if(strActiveTeamCache != null && strActiveTeamCache != ""){
+        objActiveTeamCache = JSON.parse(strActiveTeamCache);
+      }
+      objActiveTeamCache[item.name] = !item.open;
+      localStorage.setItem(`activeTeamCache_${getUser('sessionUser').name}`, JSON.stringify(objActiveTeamCache));
+      item.open = !item.open;
+    }
   },
 }
 </script>
