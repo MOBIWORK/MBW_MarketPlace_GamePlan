@@ -1,19 +1,6 @@
 <template>
   <div class="flex">
     <div class="h-full w-full py-6">
-      <div class="mb-4.5 flex items-center justify-between">
-        <h2 class="text-xl font-semibold">{{__('Discussions')}}</h2>
-        <Button
-          variant="solid"
-          v-if="!$readOnlyMode && !project.doc.archived_at"
-          :route="{ name: 'ProjectDiscussionNew' }"
-        >
-          <template #prefix>
-            <LucidePlus class="h-4 w-4" />
-          </template>
-          {{ __('Add new') }}
-        </Button>
-      </div>
       <DiscussionList
         class="-mx-5 sm:mx-0"
         :listOptions="{ filters: { project: project.doc.name } }"

@@ -7,7 +7,7 @@ import frappe
 from frappe.utils import validate_email_address, split_emails, cstr
 from gameplan.utils import validate_type
 from frappe.translate import get_all_translations
-
+import json
 
 @frappe.whitelist(allow_guest=True)
 def get_user_info(user=None):
@@ -105,12 +105,166 @@ def invite_by_email(emails: str, role: str, projects: list = None):
 	for email in to_invite:
 		frappe.get_doc(doctype="GP Invitation", email=email, role=role, projects=projects).insert(ignore_permissions=True)
 
-
 @frappe.whitelist()
 def unread_notifications():
 	res = frappe.db.get_all("GP Notification", "count(name) as count", {"to_user": frappe.session.user, "read": 0})
 	return res[0].count
 
+@frappe.whitelist()
+def get_teams_by_role():
+	user_doc = frappe.get_doc("User", frappe.session.user)
+	arr_role = [_role.role for _role in user_doc.roles]
+	teams = frappe.get_all('GP Team',
+		fields=['name','title','icon','modified','creation','archived_at','is_private'],
+		order_by='title asc',
+		page_length=999
+	)
+	arr_team_res = []
+	if "Gameplan Admin" in arr_role:
+		return teams
+	elif "Gameplan Member" in arr_role:
+		for team in teams:
+			members = frappe.get_all('GP Member',
+				filters = {
+					'parenttype': "GP Team",
+					'parent': team.name
+				},
+				fields=['user']
+			)
+			for member in members:
+				if member.user == frappe.session.user:
+					arr_team_res.append(team)
+					break
+		return arr_team_res
+	elif "Gameplan Guest" in arr_role:
+		for team in teams:
+			projects = frappe.get_all('GP Project',
+				filters = {
+					'team': team.name
+				},
+				fields=['guests']
+			)
+			for project in projects:
+				guests = project.guests
+				if guests is not None and guests != "":
+					objGuest = json.loads(guests)
+					if user_doc.email in objGuest:
+						arr_team_res.append(team)
+						break
+		return arr_team_res
+	return []
+
+@frappe.whitelist()
+def get_projects_by_role():
+	user_doc = frappe.get_doc('User', frappe.session.user)
+	arr_role = [_role.role for _role in user_doc.roles]
+	projects = frappe.get_all('GP Project',
+		fields=['name','title','icon','team','archived_at','is_private','modified','tasks_count','discussions_count','guests'],
+		order_by='title asc',
+		page_length=999
+	)
+	arr_project_res = []
+	if "Gameplan Admin" in arr_role:
+		return projects
+	elif "Gameplan Member" in arr_role:
+		for project in projects:
+			if project.is_private == True:
+				members = frappe.get_all('GP Member',
+					filters = {
+						'parenttype': "GP Project",
+						'parent': project.team
+					},
+					fields=['user']
+				)
+				for member in members:
+					if member.user == frappe.session.user:
+						arr_project_res.append(project)
+						break
+			else:
+				arr_project_res.append(project)
+		return arr_project_res
+	elif "Gameplan Guest" in arr_role:
+		for project in projects:
+			guests = project.guests
+			if guests is not None and guests != "":
+				objGuest = json.loads(guests)
+				if user_doc.email in objGuest:
+					arr_project_res.append(project)
+		return arr_project_res
+	return []
+
+@frappe.whitelist()
+def get_mypages_by_filter(order_by, search=None, project=None):
+	pages = []
+	if project is not None and project != "":
+		if search is not None and search != "":
+			pages = frappe.get_all('GP Page',
+				filters = {
+					'project': project
+				},
+				fields=['name','creation','title','content','slug','project','team','modified','owner'],
+				or_filters=[
+					["title", "LIKE", f'%{search}%'],
+					["owner", "LIKE", f'%{search}%']
+				],
+				order_by=order_by,
+				page_length=999
+			)
+			print("Dòng 213 ", pages)
+		else:
+			pages = frappe.get_all('GP Page',
+				filters={
+					'project': project
+				},
+				fields=['name','creation','title','content','slug','project','team','modified','owner'],
+				order_by=order_by,
+				page_length=999
+			)
+			print("Dòng 222 ", pages)
+	else:
+		if search is not None and search != "":
+			pages = frappe.get_all('GP Page',
+				filters = {
+					'owner': frappe.session.user
+				},
+				fields=['name','creation','title','content','slug','project','team','modified','owner'],
+				or_filters=[
+					["title", "LIKE", f'%{search}%']
+				],
+				order_by=order_by,
+				page_length=999
+			)
+			page_sources = frappe.get_all('GP Page',
+				filters = {
+					'owner': frappe.session.user
+				},
+				fields=['name','creation','title','content','slug','project','team','modified','owner'],
+				order_by=order_by,
+				page_length=999
+			)
+			team_sources = get_teams_by_role()
+			team_sources = [team.name for team in team_sources if search in team.title]
+			for page in page_sources:
+				if page.team in team_sources:
+					page_filter = [item for item in pages if item.name == page.name]
+					if len(page_filter) == 0:
+						pages.append(page)
+			project_sources = [str(project.name) for project in get_projects_by_role() if search in project.title]
+			for page in page_sources:
+				if page.project in project_sources:
+					page_filter_project = [item for item in pages if item.name == page.name]
+					if len(page_filter_project) == 0:
+						pages.append(page)
+		else:
+			pages = frappe.get_all('GP Page',
+				filters={
+					'owner': frappe.session.user
+				},
+				fields=['name','creation','title','content','slug','project','team','modified','owner'],
+				order_by=order_by,
+				page_length=999
+			)
+	return pages
 
 @frappe.whitelist(allow_guest=True)
 @validate_type
@@ -127,6 +281,14 @@ def accept_invitation(key: str = None):
 	invitation.reload()
 
 	if invitation.status == "Accepted":
+		objProject = json.loads(invitation.projects)
+		strGuest = frappe.db.get_value('GP Project', objProject[0], "guests")
+		objGuest = []
+		if strGuest is not None and strGuest != "":
+			objGuest = json.loads(strGuest)
+		if invitation.email not in objGuest:
+			objGuest.append(invitation.email)
+		frappe.db.set_value('GP Project', objProject[0], "guests", json.dumps(objGuest))
 		frappe.local.login_manager.login_as(invitation.email)
 		frappe.local.response["type"] = "redirect"
 		frappe.local.response["location"] = "/g"

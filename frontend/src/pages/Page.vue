@@ -3,16 +3,7 @@
     <header
       class="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-5 py-2.5"
     >
-      <Breadcrumbs class="h-7" :items="breadcrumbs">
-        <template #prefix="{ item }">
-          <span
-            class="mr-2 flex rounded-sm text-2xl leading-none"
-            v-if="item.icon"
-          >
-            {{ item.icon }}
-          </span>
-        </template>
-      </Breadcrumbs>
+      
       <div class="flex items-center space-x-2">
         <span class="hidden text-sm text-gray-600 sm:block" v-if="page.doc">
           {{__('Last updated')}} {{ $dayjs(page.doc.modified).format('LLL') }}

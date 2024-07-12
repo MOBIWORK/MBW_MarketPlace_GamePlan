@@ -22,7 +22,8 @@
   "discussions_count",
   "archived_at",
   "archived_by",
-  "is_followed"
+  "is_followed",
+  "guests"
  ],
  "fields": [
   {
@@ -120,6 +121,11 @@
    "fieldtype": "Check",
    "is_virtual": 1,
    "label": "Is Followed"
+  },
+  {
+   "fieldname": "guests",
+   "fieldtype": "JSON",
+   "label": "Guests"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -133,7 +139,7 @@
    "link_fieldname": "project"
   }
  ],
- "modified": "2024-02-06 12:12:18.808576",
+ "modified": "2024-07-10 10:45:31.649294",
  "modified_by": "Administrator",
  "module": "Gameplan",
  "name": "GP Project",

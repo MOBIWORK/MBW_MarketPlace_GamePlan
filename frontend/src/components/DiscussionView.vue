@@ -190,7 +190,7 @@
           doctype="GP Discussion"
           :name="discussion.name"
           :newCommentsFrom="discussion.last_unread_comment"
-          :read-only-mode="readOnlyMode"
+          :read-only-mode="false"
           :disable-new-comment="discussion.closed_at"
           :filterType="'comment'"
         />
@@ -510,7 +510,7 @@ export default {
       fullNameSessionUser: getUser('sessionUser').full_name,
       content: '',
       showDeleteConclusionDialog: false,
-      activeActivity: 'all'
+      activeActivity: 'comment'
     }
   },
   methods: {

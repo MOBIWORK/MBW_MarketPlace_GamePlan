@@ -5,16 +5,74 @@
         class="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-5 py-2.5"
         v-if="!route.meta?.hideHeader"
       >
-        <Breadcrumbs class="h-7" :items="breadcrumbs">
-          <template #prefix="{ item }">
-            <span
-              class="mr-2 flex rounded-sm text-2xl leading-none"
-              v-if="item.icon"
+        <div class="flex items-center">
+          <Breadcrumbs class="h-7 mr-4" :items="breadcrumbs">
+            <template #prefix="{ item }">
+              <span
+                class="mr-2 flex rounded-sm text-2xl leading-none"
+                v-if="item.icon"
+              >
+                {{ item.icon }}
+              </span>
+            </template>
+          </Breadcrumbs>
+          <TextInput v-if="route.name=='ProjectPages'" class="border-none md:w-96" type="text" variant="outline" size="sm" :placeholder="__('Search title, author')" v-model="search" :debounce="800" @update:modelValue="onChangeSearch()">
+            <template #suffix>
+              <LucideSearch class="h-4 w-4" />
+            </template>
+          </TextInput>
+        </div>
+        <template v-if="route.name=='ProjectDiscussions'">
+          <Button
+            variant="solid"
+            v-if="!project.doc.archived_at"
+            :route="{ name: 'ProjectDiscussionNew' }"
+          >
+            <template #prefix>
+              <LucidePlus class="h-4 w-4" />
+            </template>
+            {{ __('Add new') }}
+          </Button>
+        </template>
+        <template v-if="route.name=='ProjectTasks'">
+          <Button variant="solid" @click="showNewTaskDialog">
+            <template #prefix>
+              <LucidePlus class="h-4 w-4" />
+            </template>
+            {{__('Add new')}}
+          </Button>
+        </template>
+        <template v-if="route.name=='ProjectPages'">
+          <div class="flex items-center space-x-2">
+            <Dropdown
+              :options="[
+                {
+                  label: __('Date Updated'),
+                  onClick: () => (listOptionsPage.orderBy = 'modified desc'),
+                },
+                {
+                  label: __('Date Created'),
+                  onClick: () => (listOptionsPage.orderBy = 'creation desc'),
+                },
+              ]"
             >
-              {{ item.icon }}
-            </span>
-          </template>
-        </Breadcrumbs>
+              <Button>
+                <div class="flex items-center">
+                  <ArrowDownUp
+                    class="mr-1.5 h-4 w-4 leading-none"
+                    :stroke-width="1.5"
+                  />
+                  <span> {{ __('Sort') }} </span>
+                </div>
+              </Button>
+            </Dropdown>
+            <Button variant="solid" @click="$resources.newPage.submit()">
+              <template #prefix><LucidePlus class="w-4" /></template>
+              {{ __('Add new') }}
+            </Button>
+            </div>
+        </template>
+
         <div
           v-if="$route.name === 'ProjectOverview'"
           class="flex items-center space-x-2"
@@ -244,7 +302,7 @@
           }"
           v-model="showUnArchiveProjectDialog"
         />
-
+        <NewTaskDialog ref="newTaskDialog" />
       </header>
 
       <component
@@ -253,6 +311,7 @@
         :class="{ 'mx-auto w-full px-5': !route.meta?.fullWidth }"
         :project="project"
         :team="team"
+        :listOptionsPage="listOptionsPage"
       />
     </router-view>
   </div>
@@ -269,7 +328,9 @@ import {
   Tooltip,
   Select,
   Textarea,
-  Dialog
+  Dialog,
+  getCachedListResource,
+  TextInput
 } from 'frappe-ui'
 import Pie from '@/components/Pie.vue'
 import IconPicker from '@/components/IconPicker.vue'
@@ -280,6 +341,8 @@ import { projects } from '@/data/projects'
 import { activeTeams, teams } from '@/data/teams'
 import PinIcon from '~icons/lucide/pin'
 import { useScreenSize } from '@/utils/composables'
+import { getUser } from '@/data/users'
+import ArrowDownUp from '~icons/lucide/arrow-up-down'
 
 export default {
   name: 'Project',
@@ -298,6 +361,8 @@ export default {
     Select,
     Textarea,
     Breadcrumbs,
+    ArrowDownUp,
+    TextInput
   },
   setup() {
     const size = useScreenSize()
@@ -313,7 +378,19 @@ export default {
       projectEditDialog: { show: false },
       inviteGuestDialog: { show: false },
       showArchiveProjectDialog: false,
-      showUnArchiveProjectDialog: false
+      showUnArchiveProjectDialog: false,
+      newTaskDialog: null,
+      listOptions:{
+        filters: {
+          project: this.project.name
+        }
+      },
+      listOptionsPage: {
+        orderBy: "modified desc",
+        search: null,
+        project: this.project.name
+      },
+      search: ""
     }
   },
   computed: {
@@ -495,6 +572,45 @@ export default {
       this.projectMoveDialog.team = null
       this.project.moveToTeam.reset()
     },
+    showNewTaskDialog(){
+      let me = this;
+      this.$refs.newTaskDialog.show({
+        defaults: {
+          project: this.listOptions.filters.project,
+          assigned_to: getUser('sessionUser').name,
+        },
+        onSuccess: () => {
+          let tasks = getCachedListResource(['Tasks', this.listOptions])
+          if (tasks) {
+            tasks.reload()
+          }
+        },
+      })
+    },
+    onChangeSearch(){
+      this.listOptionsPage.search = this.search;
+    }
   },
+  resources: {
+    newPage() {
+      return {
+        url: 'frappe.client.insert',
+        params: {
+          doc: {
+            doctype: 'GP Page',
+            project: this.project.name,
+            title: __('Untitled'),
+            content: '',
+          },
+        },
+        onSuccess(doc) {
+          this.$router.push({
+            name: 'ProjectPage',
+            params: { pageId: doc.name },
+          })
+        },
+      }
+    },
+  }
 }
 </script>

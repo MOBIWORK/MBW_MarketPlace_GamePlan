@@ -29,17 +29,22 @@
               })
             "
           >
-            <Button>
+            <Button class="w-32" style="justify-content: start !important;"> 
               <template #prefix>
                 <TaskStatusIcon :status="newTask.status" />
               </template>
               {{ newTask.status }}
             </Button>
           </Dropdown>
-          <TextInput
+          <!-- <TextInput
             type="date"
             :placeholder="__('Set due date')"
             v-model="newTask.due_date"
+          /> -->
+          <DatePicker
+            v-model="newTask.due_date"
+            :placeholder="__('Set due date')"
+            :formatValue="(val) => val.split('-').reverse().join('/')"
           />
           <Autocomplete
             :placeholder="__('Assign a user')"
@@ -63,6 +68,7 @@ import {
   Dropdown,
   TextInput,
   createResource,
+  DatePicker
 } from 'frappe-ui'
 import TaskStatusIcon from './icons/TaskStatusIcon.vue'
 import { activeUsers } from '@/data/users'

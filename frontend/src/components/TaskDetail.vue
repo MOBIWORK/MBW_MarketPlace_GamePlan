@@ -43,6 +43,18 @@
           </Dropdown>
         </div>
         <div class="w-full flex">
+          <div class="text-1xl font-semibold mb-2">{{__('Description')}}</div>
+          <div class="ml-auto flex space-x-2" v-if="!readOnlyMode && !editingDescription">
+            <Button
+              variant="ghost"
+              @click="editingDescription = true"
+              :label="__('Edit Description')"
+            >
+              <template #icon><LucideEdit class="w-4" /></template>
+            </Button>
+          </div>
+        </div>
+        <div class="w-full">
           <div
             :class="{
               'rounded-lg border p-4 focus-within:border-gray-400 w-full':
@@ -73,18 +85,8 @@
               :editable="editingDescription"
             />
           </div>
-          <div class="ml-auto flex space-x-2" v-if="!readOnlyMode && !editingDescription">
-            <Button
-              variant="ghost"
-              @click="editingDescription = true"
-              :label="__('Edit Description')"
-            >
-              <template #icon><LucideEdit class="w-4" /></template>
-            </Button>
-          </div>
         </div>
-        
-        
+
         <div class="mt-8 flex flex-wrap items-center gap-2 sm:hidden">
           <Autocomplete
             :placeholder="__('Assign a user')"
@@ -251,7 +253,7 @@ export default {
     return {
       showDeleteTaskDialog: false,
       editingDescription: false,
-      activeActivity: 'all'
+      activeActivity: 'comment'
     }
   },
   resources: {

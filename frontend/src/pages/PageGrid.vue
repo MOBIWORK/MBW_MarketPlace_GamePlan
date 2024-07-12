@@ -60,20 +60,20 @@
           class="aspect-[37/50] cursor-pointer overflow-hidden rounded-md border border-gray-50 p-3 shadow-lg transition-shadow hover:shadow-2xl"
         >
           <div class="overflow-hidden text-ellipsis whitespace-nowrap">
-            <h1 class="text-lg font-semibold leading-none">
+            <h1 class="text-lg font-semibold leading-none pr-12 truncate">
               {{ d.title }}
             </h1>
             <div
               class="mt-1.5 flex items-center text-sm leading-none text-gray-700"
             >
-              <div v-if="d.project">
+              <!-- <div v-if="d.project">
                 {{ projectTitle(d.project).value }} &middot;&nbsp;
-              </div>
+              </div> -->
               <div>Updated {{ $dayjs(d.modified).fromNow() }}</div>
             </div>
             <hr class="my-2 border-gray-100" />
             <div
-              class="prose prose-sm pointer-events-none w-[200%] origin-top-left scale-[.55] prose-p:my-1 md:w-[250%] md:scale-[.39]"
+              class="prose prose-sm pointer-events-none w-[200%] origin-top-left scale-[.55] prose-p:my-1 md:w-[250%] md:scale-[.39]" style="font-size: 2rem !important;"
               v-html="d.content"
             />
           </div>
@@ -99,23 +99,14 @@ export default {
   resources: {
     pages() {
       return {
-        type: 'list',
-        cache: ['Pages', this.listOptions],
-        doctype: 'GP Page',
-        fields: [
-          'name',
-          'creation',
-          'title',
-          'content',
-          'slug',
-          'project',
-          'team',
-          'modified',
-          'owner'
-        ],
-        filters: this.listOptions.filters,
-        orderBy: this.listOptions.orderBy,
-        auto: true,
+        url: "gameplan.api.get_mypages_by_filter",
+        method: "GET",
+        params: {
+          order_by: this.listOptions.orderBy,
+          search: this.listOptions.search != undefined && this.listOptions.search != null? this.listOptions.search : "",
+          project: this.listOptions.project != undefined && this.listOptions.project != null? this.listOptions.project: "" 
+        },
+        auto: true
       }
     },
   },

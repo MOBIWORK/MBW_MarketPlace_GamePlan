@@ -57,7 +57,7 @@
               label: __('Edit'),
               icon: 'edit',
               onClick: () => (comment.editing = true),
-              condition: () => !comment.deleted_at && !readOnlyMode,
+              condition: () => !comment.deleted_at && isOwnerComment(comment),
             },
             {
               label: __('Revisions'),
@@ -94,8 +94,7 @@
                   ],
                 })
               },
-              condition: () =>
-                $isSessionUser(comment.owner) &&
+              condition: () => isOwnerComment(comment) &&
                 comment.deleted_at == null &&
                 !readOnlyMode,
             },
@@ -159,6 +158,7 @@ import UserProfileLink from './UserProfileLink.vue'
 import CommentEditor from './CommentEditor.vue'
 import Reactions from './Reactions.vue'
 import RevisionsDialog from './RevisionsDialog.vue'
+import { getUser } from '@/data/users'
 
 export default {
   name: 'Comment',
@@ -216,6 +216,10 @@ export default {
       let url = `${location.origin}${location.pathname}?comment=${comment.name}`
       copyToClipboard(url)
     },
+    isOwnerComment(comment){
+      if(comment.owner == getUser('sessionUser').name) return true;
+      return false
+    }
   },
 }
 </script>

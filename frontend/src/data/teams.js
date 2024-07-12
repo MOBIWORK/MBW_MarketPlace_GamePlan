@@ -1,26 +1,15 @@
 import { createListResource, createResource } from 'frappe-ui'
 import { computed } from 'vue'
 
-export let teams = createListResource({
-  type: 'list',
-  doctype: 'GP Team',
-  fields: [
-    'name',
-    'title',
-    'icon',
-    'modified',
-    'creation',
-    'archived_at',
-    'is_private',
-  ],
-  orderBy: 'title asc',
-  cache: 'Teams',
-  pageLength: 999,
+export let teams = createResource({
+  url: "gameplan.api.get_teams_by_role",
+  method: "GET",
   auto: true,
   onSuccess() {
     unreadItems.fetch()
   },
   transform(data) {
+    console.log(data);
     return data.map((team) => {
       return {
         ...team,
@@ -32,7 +21,7 @@ export let teams = createListResource({
         projects: [],
       }
     })
-  },
+  }
 })
 
 export let unreadItems = createResource({

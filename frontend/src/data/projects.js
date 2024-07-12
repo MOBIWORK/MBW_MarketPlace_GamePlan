@@ -1,22 +1,10 @@
 import { computed } from 'vue'
-import { createListResource } from 'frappe-ui'
+import { createListResource, createResource } from 'frappe-ui'
 
-export let projects = createListResource({
-  doctype: 'GP Project',
-  fields: [
-    'name',
-    'title',
-    'icon',
-    'team',
-    'archived_at',
-    'is_private',
-    'modified',
-    'tasks_count',
-    'discussions_count',
-  ],
-  orderBy: 'title asc',
-  pageLength: 999,
-  cache: 'Projects',
+export let projects = createResource({
+  url: "gameplan.api.get_projects_by_role",
+  method: "GET",
+  auto: true,
   transform(projects) {
     return projects.map((project) => {
       project.route = {
@@ -28,8 +16,7 @@ export let projects = createListResource({
       }
       return project
     })
-  },
-  auto: true,
+  }
 })
 
 export function getTeamProjects(team) {
