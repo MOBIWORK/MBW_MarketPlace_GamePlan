@@ -7,7 +7,7 @@
         class="h-7 mr-4"
         :items="[{ label: __('My Pages'), route: { name: 'MyPages' } }]"
       />
-      <TextInput class="border-none md:w-96" type="text" variant="outline" size="sm" :placeholder="__('Search title, team or project')" v-model="search" :debounce="800" @update:modelValue="onChangeSearch()">
+      <TextInput class="border-none md:w-96" type="text" size="sm" :placeholder="__('Search title, team or project')" v-model="search" :debounce="800" @update:modelValue="onChangeSearch()">
         <template #suffix>
           <LucideSearch class="h-4 w-4" />
         </template>

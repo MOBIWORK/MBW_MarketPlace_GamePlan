@@ -16,7 +16,7 @@
               </span>
             </template>
           </Breadcrumbs>
-          <TextInput v-if="route.name=='ProjectPages'" class="border-none md:w-96" type="text" variant="outline" size="sm" :placeholder="__('Search title, author')" v-model="search" :debounce="800" @update:modelValue="onChangeSearch()">
+          <TextInput v-if="route.name=='ProjectPages'" class="border-none md:w-96" type="text" size="sm" :placeholder="__('Search title, author')" v-model="search" :debounce="800" @update:modelValue="onChangeSearch()">
             <template #suffix>
               <LucideSearch class="h-4 w-4" />
             </template>
