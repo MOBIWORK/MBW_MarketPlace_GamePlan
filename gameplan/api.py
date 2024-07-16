@@ -5,8 +5,10 @@ from __future__ import unicode_literals
 import gameplan
 import frappe
 from frappe.utils import validate_email_address, split_emails, cstr
-from gameplan.utils import validate_type
+from gameplan.utils import validate_type, random_config_notification, get_title_by_id_notification
 from frappe.translate import get_all_translations
+from gameplan.notification import send_manager_by_invite_guest
+
 import json
 
 @frappe.whitelist(allow_guest=True)
@@ -49,6 +51,55 @@ def get_user_info(user=None):
 				user.role = role
 	return users
 
+@frappe.whitelist()
+def get_config_notifications():
+	config_notifications = frappe.db.get_all(
+		"GP Config Notification",
+		fields=["config_notification"],
+		filters={"user": frappe.session.user}
+	)
+	config_notification = []
+	if len(config_notifications) == 0:
+		configs = random_config_notification()
+		doc_config_notification = frappe.new_doc('GP Config Notification')
+		doc_config_notification.config_notification = json.dumps(configs)
+		doc_config_notification.user = frappe.session.user
+		doc_config_notification.insert(ignore_permissions=True)
+		frappe.db.commit()
+		config_notification = configs
+	else:
+		config_notification = json.loads(config_notifications[0].config_notification)
+	for config in config_notification:
+		config['title'] = get_title_by_id_notification(config['id'])
+		for permission in config['arr_permission']:
+			permission['title'] = get_title_by_id_notification(permission['id'])
+	return config_notification
+
+@frappe.whitelist()
+def change_config_notification(id_config, type_notify, value_notify):
+	try:
+		config_notifications = frappe.db.get_all(
+			"GP Config Notification",
+			fields=["config_notification", "name"],
+			filters={"user": frappe.session.user}
+		)
+		if len(config_notifications) > 0:
+			config_notification = json.loads(config_notifications[0].config_notification)
+			for config in config_notification:
+				for permission in config['arr_permission']:
+					if permission['id'] == id_config:
+						value_parse = False
+						if value_notify == "true":
+							value_parse = True
+						if type_notify == "email":
+							permission['email'] = value_parse
+						elif type_notify == "browser":
+							permission['browser'] = value_parse
+			frappe.db.set_value('GP Config Notification', config_notifications[0].name, 'config_notification', json.dumps(config_notification))
+			frappe.db.commit()
+		return "ok"
+	except Exception as e:
+		return "error"
 
 @frappe.whitelist()
 @validate_type
@@ -289,6 +340,31 @@ def accept_invitation(key: str = None):
 		if invitation.email not in objGuest:
 			objGuest.append(invitation.email)
 		frappe.db.set_value('GP Project', objProject[0], "guests", json.dumps(objGuest))
+		#Gửi thông báo tới manage,admin
+		user_info = frappe.db.get_value('User', {'email': invitation.email}, ['name'])
+		config_notifications = frappe.db.get_all(
+			"GP Config Notification",
+			fields=["config_notification"],
+			filters={"user": frappe.session.user}
+		)
+		config_notification = []
+		type_notify = []
+		if len(config_notifications) == 0:
+			configs = random_config_notification()
+			doc_config_notification = frappe.new_doc('GP Config Notification')
+			doc_config_notification.config_notification = json.dumps(configs)
+			doc_config_notification.user = frappe.session.user
+			doc_config_notification.insert(ignore_permissions=True)
+			frappe.db.commit()
+			config_notification = configs
+		else:
+			config_notification = json.loads(config_notifications[0].config_notification)
+		if config_notification[0]["arr_permission"][0]["email"] == True:
+			type_notify.append("email")
+		if config_notification[0]["arr_permission"][0]["browser"] == True:
+			type_notify.append('browser')
+		send_manager_by_invite_guest(type_notify, user_info.name, objProject[0])
+
 		frappe.local.login_manager.login_as(invitation.email)
 		frappe.local.response["type"] = "redirect"
 		frappe.local.response["location"] = "/g"

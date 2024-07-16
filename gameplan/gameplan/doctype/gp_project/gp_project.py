@@ -10,6 +10,9 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from pypika.terms import ExistsCriterion
 from gameplan.api import invite_by_email
+from gameplan.notification import send_guest_by_invite_guest, change_limit_project_team
+from gameplan.utils import get_config_notification_by_user
+import json
 
 
 class GPProject(ManageMembersMixin, Archivable, Document):
@@ -80,6 +83,11 @@ class GPProject(ManageMembersMixin, Archivable, Document):
 	def before_save(self):
 		if frappe.db.get_value('GP Team', self.team, 'is_private'):
 			self.is_private = True
+		project_exist = frappe.db.exists('GP Project', self.name)
+		if project_exist is not None:
+			project_old = frappe.get_doc('GP Project', self.name)
+			if project_old.is_private != self.is_private:
+				change_limit_project_team("project", self.name)
 
 	def update_progress(self):
 		result = frappe.db.get_all(
@@ -148,6 +156,14 @@ class GPProject(ManageMembersMixin, Archivable, Document):
 	@frappe.whitelist()
 	def invite_guest(self, email):
 		invite_by_email(email, role='Gameplan Guest', projects=[self.name])
+		user_info = frappe.get_doc('User', {'email': email})
+		type_notify = []
+		config_notification = get_config_notification_by_user(user_info)
+		if config_notification[1]["arr_permission"][0]["email"] == True:
+			type_notify.append("email")
+		if config_notification[1]["arr_permission"][0]["browser"] == True:
+			type_notify.append('browser')
+		send_guest_by_invite_guest(type_notify, user_info.name, "project", self.name)
 
 	@frappe.whitelist()
 	def remove_guest(self, email):

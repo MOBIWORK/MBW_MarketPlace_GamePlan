@@ -2,6 +2,8 @@ export { default as dayjs } from './dayjs'
 import { toast } from 'frappe-ui'
 
 export function createToast(options) {
+  console.log("in toast")
+  console.log(toast)
   toast({
     position: 'bottom-right',
     ...options,

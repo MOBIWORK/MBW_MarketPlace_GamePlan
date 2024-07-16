@@ -8,6 +8,10 @@ from frappe.model.naming import append_number_if_name_exists
 from gameplan.gemoji import get_random_gemoji
 from gameplan.mixins.archivable import Archivable
 from pypika.terms import ExistsCriterion
+from gameplan.notification import send_guest_by_invite_guest,change_limit_project_team
+from gameplan.utils import random_config_notification
+import json
+
 
 class GPTeam(Archivable, Document):
 	on_delete_cascade = ["GP Project"]
@@ -58,6 +62,13 @@ class GPTeam(Archivable, Document):
 		"""
 
 		self.add_member(frappe.session.user)
+	
+	def before_save(self):
+		team_exist = frappe.db.exists('GP Team', self.name)
+		if team_exist is not None:
+			team_old = frappe.get_doc('GP Team', self.name)
+			if team_old.is_private != self.is_private:
+				change_limit_project_team("team", self.name)
 
 	def add_member(self, email):
 		if email not in [member.user for member in self.members]:
@@ -71,6 +82,28 @@ class GPTeam(Archivable, Document):
 	def add_members(self, users):
 		for user in users:
 			self.add_member(user)
+			config_notifications = frappe.db.get_all(
+				"GP Config Notification",
+				fields=["config_notification"],
+				filters={"user": user}
+			)
+			config_notification = []
+			type_notify = []
+			if len(config_notifications) == 0:
+				configs = random_config_notification()
+				doc_config_notification = frappe.new_doc('GP Config Notification')
+				doc_config_notification.config_notification = json.dumps(configs)
+				doc_config_notification.user = user
+				doc_config_notification.insert(ignore_permissions=True)
+				frappe.db.commit()
+				config_notification = configs
+			else:
+				config_notification = json.loads(config_notifications[0].config_notification)
+			if config_notification[1]["arr_permission"][0]["email"] == True:
+				type_notify.append("email")
+			if config_notification[1]["arr_permission"][0]["browser"] == True:
+				type_notify.append('browser')
+			send_guest_by_invite_guest(type_notify, user, "team", self.name)
 		self.save()
 
 	@frappe.whitelist()

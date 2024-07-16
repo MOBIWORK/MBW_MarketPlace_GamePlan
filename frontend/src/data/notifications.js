@@ -6,3 +6,8 @@ export let unreadNotifications = createResource({
   initialData: 0,
   auto: true,
 })
+
+export let configNotifications = createResource({
+  url: 'gameplan.api.get_config_notifications',
+  method: "GET"
+})

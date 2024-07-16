@@ -14,6 +14,7 @@ class Archivable:
 	def archive(self):
 		self.archived_at = frappe.utils.now()
 		self.archived_by = frappe.session.user
+		#Viết thông báo archived ở đây
 		self.save()
 
 	@frappe.whitelist()
