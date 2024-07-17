@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from pypika.terms import ExistsCriterion
 from gameplan.api import invite_by_email
-from gameplan.notification import send_guest_by_invite_guest, change_limit_project_team
+from gameplan.notification import send_guest_by_invite_guest, change_limit_project_team, change_name_project_team
 from gameplan.utils import get_config_notification_by_user
 import json
 
@@ -88,6 +88,8 @@ class GPProject(ManageMembersMixin, Archivable, Document):
 			project_old = frappe.get_doc('GP Project', self.name)
 			if project_old.is_private != self.is_private:
 				change_limit_project_team("project", self.name)
+			if project_old.title != self.title:
+				change_name_project_team("project", self.name, project_old.title, self.title)
 
 	def update_progress(self):
 		result = frappe.db.get_all(

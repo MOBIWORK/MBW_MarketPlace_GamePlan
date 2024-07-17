@@ -5,4 +5,5 @@
 from frappe.model.document import Document
 
 class GPReaction(Document):
-	pass
+	def after_insert(self):
+		print("Dòng 9 ", self)

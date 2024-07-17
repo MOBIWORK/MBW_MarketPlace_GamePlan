@@ -8,7 +8,9 @@ from gameplan.gameplan.doctype.gp_notification.gp_notification import GPNotifica
 from gameplan.mixins.activity import HasActivity
 from gameplan.mixins.mentions import HasMentions
 from gameplan.mixins.reactions import HasReactions
-from gameplan.utils import remove_empty_trailing_paragraphs, url_safe_slug
+from gameplan.utils import remove_empty_trailing_paragraphs, url_safe_slug 
+from gameplan.notification import add_discussion_of_project, close_conclusion_followed_discussion
+from gameplan.utils import get_config_notification_by_user
 
 class GPDiscussion(HasActivity, HasMentions, HasReactions, Document):
 	on_delete_cascade = ['GP Comment', 'GP Discussion Visit', 'GP Activity']
@@ -43,6 +45,8 @@ class GPDiscussion(HasActivity, HasMentions, HasReactions, Document):
 
 	def after_insert(self):
 		self.update_discussions_count(1)
+		add_discussion_of_project(self.project, self.name, frappe.session.user)
+		
 
 	def on_trash(self):
 		self.update_discussions_count(-1)
@@ -130,6 +134,11 @@ class GPDiscussion(HasActivity, HasMentions, HasReactions, Document):
 		self.closed_by = frappe.session.user
 		self.log_activity('Discussion Closed')
 		self.save()
+		#Gửi thông báo cho người dùng đã theo dõi project
+		arr_user_followed = frappe.db.get_list('GP Followed Project', {project: self.project})
+		id_users_followed = [ item.user for item in arr_user_followed]
+		close_conclusion_followed_discussion(id_users_followed, self.name)
+
 
 	@frappe.whitelist()
 	def reopen_discussion(self):

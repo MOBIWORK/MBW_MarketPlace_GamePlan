@@ -7,6 +7,8 @@ from gameplan.search import GameplanSearch
 from gameplan.mixins.mentions import HasMentions
 from gameplan.mixins.reactions import HasReactions
 from gameplan.utils import remove_empty_trailing_paragraphs
+from gameplan.notification import add_comment_owner_discussion, add_comment_followed_discussion
+from gameplan.utils import get_config_notification_by_user
 
 class GPComment(HasMentions, HasReactions, Document):
 	on_delete_set_null = ["GP Notification"]
@@ -35,6 +37,21 @@ class GPComment(HasMentions, HasReactions, Document):
 			reference_doc.update_participants_count()
 			reference_doc.track_visit()
 		reference_doc.save(ignore_permissions=True)
+		if self.reference_doctype == "GP Discussion":
+			owner_discussion = frappe.db.get_value('GP Discussion', self.reference_name, 'owner')
+			user_info = frappe.get_doc('User', owner_discussion)
+			type_notifies = []
+			if config_notification[3]["arr_permission"][0]["email"] == True:
+				type_notifies.append("email")
+			if config_notification[3]["arr_permission"][0]["browser"] == True:
+				type_notifies.append("browser")
+			add_comment_owner_discussion(type_notifies, self.reference_name, self.name)
+			#Gửi thông báo cho người dùng đã theo dõi project
+			project_discussion = frappe.db.get_value('GP Discussion', self.reference_name, 'project')
+			arr_user_followed = frappe.db.get_list('GP Followed Project', {project: project_discussion})
+			id_users_followed = [ item.user for item in arr_user_followed]
+			add_comment_followed_discussion(id_users_followed, self.reference_name, self.name)
+
 
 	def on_trash(self):
 		if self.reference_doctype not in ["GP Discussion", "GP Task"]:

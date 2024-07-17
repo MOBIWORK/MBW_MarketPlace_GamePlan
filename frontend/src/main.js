@@ -23,6 +23,7 @@ import { createToast } from './utils/toasts'
 import { getUser, users } from './data/users'
 import { session } from './data/session'
 import { initSocket } from './socket'
+import { createPinia } from 'pinia'
 import resetDataMixin from './utils/resetDataMixin'
 import translationPlugin from './translation'
 
@@ -37,10 +38,12 @@ let globalComponents = {
   Badge,
 }
 let app = createApp(App)
+let pinia = createPinia()
 setConfig('resourceFetcher', frappeRequest)
 setConfig('defaultListUrl', 'gameplan.extends.client.get_list')
 app.use(resourcesPlugin)
 app.use(pageMetaPlugin)
+app.use(pinia)
 app.use(router)
 app.use(translationPlugin)
 app.mixin(resetDataMixin)

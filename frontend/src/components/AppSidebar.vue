@@ -42,6 +42,30 @@
             </div>
           </template>
         </Links>
+        <button 
+          class="flex w-full items-center rounded px-2 py-1 text-gray-800"
+          @click="onToggleNotification()"  
+        >
+          <div class="flex w-full items-center">
+            <span class="grid h-5 w-6 place-items-center">
+              <LucideBell class="h-4 w-4 text-gray-700" />
+            </span>
+            <span class="ml-2 text-sm">{{__('Notifications')}}</span>
+            <span class="ml-auto text-sm">
+              <Badge
+                v-if="
+                  notification.count
+                "
+                :label="notification.count"
+                variant="subtle"
+              />
+              <div
+                v-else-if="notification.count"
+                class="absolute -left-1.5 top-1 z-20 h-[5px] w-[5px] translate-x-6 translate-y-1 rounded-full bg-gray-800 ring-1 ring-white"
+              />
+            </span>
+          </div>
+        </button>
         <button
           v-if="$user().isNotGuest"
           class="flex w-full items-center rounded px-2 py-1 text-gray-800"
@@ -172,6 +196,7 @@
       "
     />
   </div>
+  <NotificationsList />
 </template>
 <script>
 import { Tooltip } from 'frappe-ui'
@@ -190,6 +215,10 @@ import LucideListTodo from '~icons/lucide/list-todo'
 import LucideNewspaper from '~icons/lucide/newspaper'
 import LucideFiles from '~icons/lucide/files'
 import { getUser } from '@/data/users'
+import SidebarLink from '@/components/SidebarLink.vue'
+import NotificationsIcon from '@/components/icons/NotificationsIcon.vue'
+import NotificationsList from '@/components/NotificationsList.vue'
+import { notificationsStore } from '@/data/notifications'
 
 export default {
   name: 'AppSidebar',
@@ -200,6 +229,7 @@ export default {
     UserDropdown,
     Tooltip,
     ChevronTriangle,
+    NotificationsList
   },
   data() {
     return {
@@ -209,7 +239,7 @@ export default {
 
       showAddTeamDialog: false,
       teams,
-      isExpandAll: false
+      isExpandAll: false,
     }
   },
   mounted() {
@@ -217,6 +247,13 @@ export default {
     this.sidebarWidth = sidebarWidth
   },
   computed: {
+    notification(){
+      return {
+        name: "Notification",
+        icon: LucideInbox,
+        count: unreadNotifications.data || 0
+      }
+    },
     navigation() {
       return [
         {
@@ -251,14 +288,14 @@ export default {
           isActive: /People|PersonProfile/g.test(this.$route.name),
           condition: () => this.$user().isNotGuest,
         },
-        {
-          name: 'Notifications',
-          icon: LucideInbox,
-          route: {
-            name: 'Notifications',
-          },
-          count: unreadNotifications.data || 0,
-        },
+        // {
+        //   name: 'Notifications',
+        //   icon: LucideInbox,
+        //   route: {
+        //     name: 'Notifications',
+        //   },
+        //   count: unreadNotifications.data || 0,
+        // },
       ].filter((nav) => (nav.condition ? nav.condition() : true))
     },
     activeTeams() {
@@ -282,6 +319,11 @@ export default {
     },
   },
   methods: {
+    onToggleNotification(){
+      console.log("vào đây");
+      console.log(notificationsStore())
+      notificationsStore().toggle()
+    },
     teamProjects(teamName) {
       return getTeamProjects(teamName)
         .filter((project) => !project.archived_at)

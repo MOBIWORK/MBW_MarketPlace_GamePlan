@@ -3,10 +3,11 @@
     <div class="h-full flex-1">
       <div class="flex h-full">
         <div
-          class="relative block min-h-0 flex-shrink-0 overflow-hidden hover:overflow-auto"
+          class="relative flex flex-col h-full  transition-all duration-300 ease-in-out"
         >
           <slot name="sidebar" />
           <AppSidebar />
+          
         </div>
         <div class="w-full overflow-auto" id="scrollContainer">
           <div

@@ -7,8 +7,8 @@ from gameplan.extends.client import check_permissions
 from gameplan.gameplan.doctype.gp_notification.gp_notification import GPNotification
 from gameplan.mixins.activity import HasActivity
 from gameplan.mixins.mentions import HasMentions
-from gameplan.search import GameplanSearch
-
+from gameplan.search import GameplanSearch 
+from gameplan.notification import assign_to_someone_task, change_status_owner_task, change_assignee_to_older, change_due_date_to_assignee, change_priority_to_assignee
 
 class GPTask(HasMentions, HasActivity, Document):
 	on_delete_cascade = ["GP Comment", "GP Activity"]
@@ -22,12 +22,32 @@ class GPTask(HasMentions, HasActivity, Document):
 
 	def after_insert(self):
 		self.update_tasks_count(1)
+		if frappe.session.user != self.assigned_to:
+			assign_to_someone_task(self.project, self.name, frappe.session.user, self.assigned_to, self.title)
 
 	def on_update(self):
 		self.update_project_progress()
 		self.notify_mentions()
 		self.log_value_updates()
 		self.update_search_index()
+	
+	def before_save(self):
+		task_exist = frappe.db.exists('GP Task', self.name)
+		if task_exist is not None:
+			task_info = frappe.db.get_value('GP Task', self.name, ['assigned_to', 'status', 'owner', 'due_date', 'priority'], as_dict=1)
+			if task_info.assigned_to != self.assigned_to and self.assigned_to != frappe.session.user:
+				assign_to_someone_task(self.project, self.name, frappe.session.user, self.assigned_to, self.title)
+			if task_info.assigned_to is not None and task_info.assigned_to != "":
+				if task_info.assigned_to != self.assigned_to and self.assigned_to != frappe.session.user:
+					change_assignee_to_older(self.name, self.assigned_to)
+			if task_info.status != self.status and frappe.session.user != task_info.owner:
+				change_status_owner_task(self.name, frappe.session.user, self.status)
+			if task_info.due_date is not None:
+				if task_info.due_date != self.due_date:
+					change_due_date_to_assignee(self.name, self.due_date)
+			if task_info.priority is not None:
+				if task_info.priority != self.priority:
+					change_priority_to_assignee(self.name, self.priority)
 
 	def log_value_updates(self):
 		fields = ['title', 'description', 'status', 'priority', 'assigned_to', 'due_date', 'project']

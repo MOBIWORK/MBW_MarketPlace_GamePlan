@@ -8,7 +8,7 @@ from frappe.model.naming import append_number_if_name_exists
 from gameplan.gemoji import get_random_gemoji
 from gameplan.mixins.archivable import Archivable
 from pypika.terms import ExistsCriterion
-from gameplan.notification import send_guest_by_invite_guest,change_limit_project_team
+from gameplan.notification import send_guest_by_invite_guest,change_limit_project_team,change_name_project_team
 from gameplan.utils import random_config_notification
 import json
 
@@ -69,6 +69,8 @@ class GPTeam(Archivable, Document):
 			team_old = frappe.get_doc('GP Team', self.name)
 			if team_old.is_private != self.is_private:
 				change_limit_project_team("team", self.name)
+			if team_old.title != self.title:
+				change_name_project_team("team", self.name, team_old.title, self.title)
 
 	def add_member(self, email):
 		if email not in [member.user for member in self.members]:

@@ -20,7 +20,8 @@
     "htmldiff-js": "^1.0.5",
     "socket.io-client": "^4.7.2",
     "vue": "^3.3.4",
-    "vue-router": "^4.2.2"
+    "vue-router": "^4.2.2",
+    "pinia": "^2.0.33"
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",

@@ -5,7 +5,8 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import flt
 from .gp_poll_attributes import GPPollAttributes
-
+from gameplan.notification import add_poll_followed_discussion, vote_poll_by_someone, close_poll
+from gameplan.utils import get_config_notification_by_user
 
 class GPPoll(Document, GPPollAttributes):
 	def before_insert(self):
@@ -28,15 +29,20 @@ class GPPoll(Document, GPPollAttributes):
 		discussion.update_participants_count()
 		discussion.track_visit()
 		discussion.save(ignore_permissions=True)
+		#Gửi thông báo cho người dùng đã theo dõi project
+		project_discussion = frappe.db.get_value('GP Discussion', self.discussion, 'project')
+		arr_user_followed = frappe.db.get_list('GP Followed Project', {project: project_discussion})
+		id_users_followed = [ item.user for item in arr_user_followed]
+		add_poll_followed_discussion(id_users_followed, self.discussion, self.name)
 
 	@frappe.whitelist()
 	def submit_vote(self, option):
 		self.check_if_stopped()
-
 		if self.anonymous:
 			self.submit_anonymous_vote(option)
 		else:
 			self.submit_non_anonymous_vote(option)
+		vote_poll_by_someone(self.name, frappe.session.user, option)
 
 	def submit_anonymous_vote(self, option):
 		for d in self.votes:
@@ -83,6 +89,7 @@ class GPPoll(Document, GPPollAttributes):
 			frappe.throw(frappe._("Only owner can stop the poll"))
 		self.stopped_at = frappe.utils.now()
 		self.save()
+		close_poll(self.name)
 
 	def check_if_stopped(self):
 		if self.stopped_at and self.stopped_at < frappe.utils.now_datetime():

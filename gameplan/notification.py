@@ -214,7 +214,7 @@ def change_limit_project_team(type_reference, name_reference):
                 )
                 frappe.db.commit()
 
-def change_name_project_team(type_notify, type_reference, name_reference, title_older, title_new):
+def change_name_project_team(type_reference, name_reference, title_older, title_new):
     arr_member = []
     arr_guest = []
     type_joining = ""
@@ -250,14 +250,14 @@ def change_name_project_team(type_notify, type_reference, name_reference, title_
                 project_doc = frappe.get_doc('GP Project', name_reference)
                 values_notify.project = name_reference
                 values_notify.team = project_doc.team
-            if frappe.db.exists('GP Notification', values_notify):
-                return
-            try:
-                frappe.get_doc(values_notify).insert()
-                frappe.db.commit()
-            except Exception as e:
-                pass
-            if type_notify == "gmail":
+            send_notify_by_value(values_notify)
+            type_notifies = []
+            config_notification = get_config_notification_by_user(member_info)
+            if config_notification[1]["arr_permission"][3]["email"] == True:
+                type_notifies.append("email")
+            if config_notification[1]["arr_permission"][3]["browser"] == True:
+                type_notifies.append("browser")
+            if "email" in type_notifies:
                 content_email = f"""
                     <div class="mb-2 leading-5 text-gray-600">
                         <span class="font-medium">{ get_fullname(frappe.session.user) }</span>
@@ -274,6 +274,7 @@ def change_name_project_team(type_notify, type_reference, name_reference, title_
                     sender_full_name = user_sender.full_name,
                     subject = f'[TEAM] {get_fullname(frappe.session.user)} đã thay đổi {type_joining} {title_new}'
                 )
+                frappe.db.commit()
     for guest in arr_guest:
         guest_info = frappe.get_doc('User', guest)
         if guest != frappe.session.user:
@@ -291,14 +292,14 @@ def change_name_project_team(type_notify, type_reference, name_reference, title_
                 project_doc = frappe.get_doc('GP Project', name_reference)
                 values_notify.project = name_reference
                 values_notify.team = project_doc.team
-            if frappe.db.exists('GP Notification', values_notify):
-                return
-            try:
-                frappe.get_doc(values_notify).insert()
-                frappe.db.commit()
-            except Exception as e:
-                pass
-            if type_notify == "gmail":
+            send_notify_by_value(values_notify)
+            type_notifies = []
+            config_notification = get_config_notification_by_user(guest_info)
+            if config_notification[1]["arr_permission"][3]["email"] == True:
+                type_notifies.append("email")
+            if config_notification[1]["arr_permission"][3]["browser"] == True:
+                type_notifies.append("browser")
+            if "email" in type_notifies:
                 content_email = f"""
                     <div class="mb-2 leading-5 text-gray-600">
                         <span class="font-medium">{ get_fullname(frappe.session.user) }</span>
@@ -315,8 +316,9 @@ def change_name_project_team(type_notify, type_reference, name_reference, title_
                     sender_full_name = user_sender.full_name,
                     subject = f'[TEAM] {get_fullname(frappe.session.user)} đã thay đổi {type_joining} {title_new}'
                 )
+                frappe.db.commit()
 
-def add_discussion_of_project(type_notify, projectId, discussionId, user_creation):
+def add_discussion_of_project(projectId, discussionId, user_creation):
     arr_member = []
     arr_guest = []
     project_doc = frappe.get_doc('GP Project', projectId)
@@ -337,14 +339,14 @@ def add_discussion_of_project(type_notify, projectId, discussionId, user_creatio
             team=discussion_doc.team,
             discussion=discussionId
         )
-        if frappe.db.exists('GP Notification', values_notify):
-            return
-        try:
-            frappe.get_doc(values_notify).insert()
-            frappe.db.commit()
-        except Exception as e:
-            pass
-        if type_notify == "gmail":
+        send_notify_by_value(values_notify)
+        type_notifies = []
+        config_notification = get_config_notification_by_user(member_info)
+        if config_notification[2]["arr_permission"][0]["email"] == True:
+            type_notifies.append("email")
+        if config_notification[2]["arr_permission"][0]["browser"] == True:
+            type_notifies.append("browser")
+        if "email" in type_notifies:
             content_email = f"""
                 <div class="mb-2 leading-5 text-gray-600">
                     <div>
@@ -364,6 +366,7 @@ def add_discussion_of_project(type_notify, projectId, discussionId, user_creatio
                 sender_full_name = user_sender.full_name,
                 subject = f'[TEAM] {get_fullname(user_creation)} đã tạo thảo luận mới {discussion_doc.title}'
             )
+            frappe.db.commit()
     for guest in arr_guest:
         guest_info = frappe.get_doc('User', guest)
         notify_text = f'{get_fullname(user_creation)} đã tạo thảo luận mới {discussion_doc.title}'
@@ -376,14 +379,14 @@ def add_discussion_of_project(type_notify, projectId, discussionId, user_creatio
             team=discussion_doc.team,
             discussion=discussionId
         )
-        if frappe.db.exists('GP Notification', values_notify):
-            return
-        try:
-            frappe.get_doc(values_notify).insert()
-            frappe.db.commit()
-        except Exception as e:
-            pass
-        if type_notify == "gmail":
+        send_notify_by_value(values_notify)
+        type_notifies = []
+        config_notification = get_config_notification_by_user(guest_info)
+        if config_notification[2]["arr_permission"][0]["email"] == True:
+            type_notifies.append("email")
+        if config_notification[2]["arr_permission"][0]["browser"] == True:
+            type_notifies.append("browser")
+        if "email" in type_notifies:
             content_email = f"""
                 <div class="mb-2 leading-5 text-gray-600">
                     <div>
@@ -403,8 +406,9 @@ def add_discussion_of_project(type_notify, projectId, discussionId, user_creatio
                 sender_full_name = user_sender.full_name,
                 subject = f'[TEAM] {get_fullname(user_creation)} đã tạo thảo luận mới {discussion_doc.title}'
             )
+            frappe.db.commit()
 
-def add_page_of_project(type_notify, projectId, pageId, user_creation):
+def add_page_of_project(projectId, pageId, user_creation):
     arr_member = []
     arr_guest = []
     project_doc = frappe.get_doc('GP Project', projectId)
@@ -424,14 +428,14 @@ def add_page_of_project(type_notify, projectId, pageId, user_creation):
             project=page_doc.project,
             team=page_doc.team
         )
-        if frappe.db.exists('GP Notification', values_notify):
-            return
-        try:
-            frappe.get_doc(values_notify).insert()
-            frappe.db.commit()
-        except Exception as e:
-            pass
-        if type_notify == "gmail":
+        send_notify_by_value(values_notify)
+        type_notifies = []
+        config_notification = get_config_notification_by_user(member_info)
+        if config_notification[2]["arr_permission"][1]["email"] == True:
+            type_notifies.append("email")
+        if config_notification[2]["arr_permission"][1]["browser"] == True:
+            type_notifies.append("browser")
+        if "email" in type_notifies:
             content_email = f"""
                 <div class="mb-2 leading-5 text-gray-600">
                     <div>
@@ -451,6 +455,7 @@ def add_page_of_project(type_notify, projectId, pageId, user_creation):
                 sender_full_name = user_sender.full_name,
                 subject = f'[TEAM] {get_fullname(user_creation)} đã tạo trang mới {page_doc.title}'
             )
+            frappe.db.commit()
     for guest in arr_guest:
         guest_info = frappe.get_doc('User', guest)
         notify_text = f'{get_fullname(user_creation)} đã tạo trang mới {page_doc.title}'
@@ -462,14 +467,14 @@ def add_page_of_project(type_notify, projectId, pageId, user_creation):
             project=page_doc.project,
             team=page_doc.team,
         )
-        if frappe.db.exists('GP Notification', values_notify):
-            return
-        try:
-            frappe.get_doc(values_notify).insert()
-            frappe.db.commit()
-        except Exception as e:
-            pass
-        if type_notify == "gmail":
+        send_notify_by_value(values_notify)
+        config_notification = get_config_notification_by_user(guest_info)
+        type_notifies = []
+        if config_notification[2]["arr_permission"][1]["email"] == True:
+            type_notifies.append("email")
+        if config_notification[2]["arr_permission"][1]["browser"] == True:
+            type_notifies.append("browser")
+        if "email" in type_notifies:
             content_email = f"""
                 <div class="mb-2 leading-5 text-gray-600">
                     <div>
@@ -489,8 +494,9 @@ def add_page_of_project(type_notify, projectId, pageId, user_creation):
                 sender_full_name = user_sender.full_name,
                 subject = f'[TEAM] {get_fullname(user_creation)} đã tạo trang mới {discussion_doc.title}'
             )
+            frappe.db.commit()
 
-def add_comment_owner_discussion(type_notify, discussionId, commentId):
+def add_comment_owner_discussion(type_notifies, discussionId, commentId):
     discusson_doc = frappe.get_doc('GP Discussion', discussionId)
     comment_doc = frappe.get_doc('GP Comment', commentId)
     project_doc = frappe.get_doc('GP Project', discusson_doc.project)
@@ -506,14 +512,8 @@ def add_comment_owner_discussion(type_notify, discussionId, commentId):
         team=discusson_doc.team,
         discussion=discussionId
     )
-    if frappe.db.exists('GP Notification', values_notify):
-        return
-    try:
-        frappe.get_doc(values_notify).insert()
-        frappe.db.commit()
-    except Exception as e:
-        pass
-    if type_notify == "gmail":
+    send_notify_by_value(values_notify)
+    if "email" in type_notifies:
         content_email = f"""
             <div class="mb-2 leading-5 text-gray-600">
                 <div>
@@ -534,8 +534,9 @@ def add_comment_owner_discussion(type_notify, discussionId, commentId):
             sender_full_name = user_sender.full_name,
             subject = f'[TEAM] {get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discusson_doc.title}'
         )
+        frappe.db.commit()
 
-def add_reaction_owner_discussion(type_notify, discussionId, userReactionId, nameReaction):
+def add_reaction_owner_discussion(type_notifies, discussionId, userReactionId, nameReaction):
     discussion_doc = frappe.get_doc('GP Discussion', discussionId)
     project_doc = frappe.get_doc('GP Project', discussion_doc.project)
     notify_text = f'{get_fullname(userReactionId)} đã thả cảm xúc về thảo luận {discussion_doc.title}'
@@ -550,14 +551,8 @@ def add_reaction_owner_discussion(type_notify, discussionId, userReactionId, nam
         team=discussion_doc.team,
         discussion=discussionId
     )
-    if frappe.db.exists('GP Notification', values_notify):
-        return
-    try:
-        frappe.get_doc(values_notify).insert()
-        frappe.db.commit()
-    except Exception as e:
-        pass
-    if type_notify == "gmail":
+    send_notify_by_value(values_notify)
+    if "email" in type_notifies:
         content_email = f"""
             <div class="mb-2 leading-5 text-gray-600">
                 <div>
@@ -577,102 +572,476 @@ def add_reaction_owner_discussion(type_notify, discussionId, userReactionId, nam
             sender_full_name = user_sender.full_name,
             subject = f'[TEAM] {get_fullname(userReactionId)} thả cảm xúc về thảo luận {discussion_doc.title}'
         )
+        frappe.db.commit()
 
-def add_poll_followed_discussion(type_notify, discussionId, pollId, userReceived):
+def add_comment_followed_discussion(arr_user, discussionId, commentId):
+    discussion_doc = frappe.get_doc('GP Discussion', discussionId)
+    comment_doc = frappe.get_doc('GP Comment', commentId)
+    project_doc = frappe.get_doc('GP Project', discussion_doc.project)
+    user_sender = frappe.get_doc('User', comment_doc.owner)
+    notify_text = f'{get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discusson_doc.title}'
+    for id_user in arr_user:
+        if id_user != comment_doc.owner:
+            user_recipient = frappe.get_doc('User', id_user)
+            values_notify = frappe._dict(
+                from_user=comment_doc.owner,
+                to_user=id_user,
+                message=notify_text,
+                doctype="GP Notification",
+                project=discusson_doc.project,
+                team=discusson_doc.team,
+                discussion=discussionId
+            )
+            config_notification = get_config_notification_by_user(user_recipient)
+            type_notifies = []
+            if config_notification[3]["arr_permission"][2]["email"] == True:
+                type_notifies.append("email")
+            if config_notification[3]["arr_permission"][2]["browser"] == True:
+                type_notifies.append("browser")
+            send_notify_by_value(values_notify)
+            if "email" in type_notifies:
+                content_email = f"""
+                    <div class="mb-2 leading-5 text-gray-600">
+                        <div>
+                            <span>Dự án </span>
+                            <span>{project_doc.title}</span>
+                        </div>
+                        <div>{get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discusson_doc.title} với nội dung chi tiết như sau:</div>
+                        <div>{comment_doc.content}</div>
+                    </div>
+                    """
+                make(
+                    doctype="GP Comment",
+                    name=commentId,
+                    content = content_email,
+                    recipients = user_recipient.email,
+                    send_email = True,
+                    sender = user_sender.email,
+                    sender_full_name = user_sender.full_name,
+                    subject = f'[TEAM] {get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discusson_doc.title}'
+                )
+                frappe.db.commit()
+
+def add_poll_followed_discussion(arr_user, discussionId, pollId):
     discussion_doc = frappe.get_doc('GP Discussion', discussionId)
     project_doc = frappe.get_doc('GP Project', discussion_doc.project)
     poll_doc = frappe.get_doc('GP Poll', pollId)
     notify_text = f'{get_fullname(poll_doc.owner)} đã tạo cuộc bình chọn trong thảo luận {discussion_doc.title}'
-    user_recipient = frappe.get_doc('User', userReceived)
     user_sender = frappe.get_doc('User', poll_doc.owner)
-    values_notify = frappe._dict(
-        from_user=poll_doc.owner,
-        to_user=userReactionId,
-        message=notify_text,
-        doctype="GP Notification",
-        project=discussion_doc.project,
-        team=discussion_doc.team,
-        discussion=discussionId
-    )
-    if frappe.db.exists('GP Notification', values_notify):
-        return
-    try:
-        frappe.get_doc(values_notify).insert()
-        frappe.db.commit()
-    except Exception as e:
-        pass
-    if type_notify == "gmail":
-        option_poll_content = ''
-        pollOptions = poll_doc.options
-        for option in pollOptions:
-            option_poll_content += f"""
-                <li>{option.title}</li>
-            """
-        content_email = f"""
-            <div class="mb-2 leading-5 text-gray-600">
-                <div>
-                    <span>Dự án </span>
-                    <span>{project_doc.title}:</span>
-                </div>
-                <div>{get_fullname(poll_doc.owner)} đã tạo cuộc bình chọn trong thảo luận {discussion_doc.title}</div>
-                <div>{poll_doc.title}</div>
-                <ul>{option_poll_content}</ul>
-            </div>
-            """
-        make(
-            doctype="GP Discussion",
-            name=discussionId,
-            content = content_email,
-            recipients = user_recipient.email,
-            send_email = True,
-            sender = user_sender.email,
-            sender_full_name = user_sender.full_name,
-            subject = f'[TEAM] {get_fullname(poll_doc.owner)} đã tạo cuộc bình chọn trong thảo luận {discussion_doc.title}'
-        )
+    for id_user in arr_user:
+        if id_user != poll_doc.owner:
+            user_recipient = frappe.get_doc('User', id_user)
+            values_notify = frappe._dict(
+                from_user=poll_doc.owner,
+                to_user=id_user,
+                message=notify_text,
+                doctype="GP Notification",
+                project=discussion_doc.project,
+                team=discussion_doc.team,
+                discussion=discussionId
+            )
+            send_notify_by_value(values_notify)
+            config_notification = get_config_notification_by_user(user_recipient)
+            type_notifies = []
+            if config_notification[3]["arr_permission"][3]["email"] == True:
+                type_notifies.append("email")
+            if config_notification[3]["arr_permission"][3]["browser"] == True:
+                type_notifies.append("browser")
+            if "email" in type_notifies:
+                option_poll_content = ''
+                pollOptions = poll_doc.options
+                for option in pollOptions:
+                    option_poll_content += f"""
+                        <li>{option.title}</li>
+                    """
+                content_email = f"""
+                    <div class="mb-2 leading-5 text-gray-600">
+                        <div>
+                            <span>Dự án </span>
+                            <span>{project_doc.title}:</span>
+                        </div>
+                        <div>{get_fullname(poll_doc.owner)} đã tạo cuộc bình chọn trong thảo luận {discussion_doc.title}</div>
+                        <div>{poll_doc.title}</div>
+                        <ul>{option_poll_content}</ul>
+                    </div>
+                    """
+                make(
+                    doctype="GP Discussion",
+                    name=discussionId,
+                    content = content_email,
+                    recipients = user_recipient.email,
+                    send_email = True,
+                    sender = user_sender.email,
+                    sender_full_name = user_sender.full_name,
+                    subject = f'[TEAM] {get_fullname(poll_doc.owner)} đã tạo cuộc bình chọn trong thảo luận {discussion_doc.title}'
+                )
+                frappe.db.commit()
 
-def close_conclusion_followed_discussion(type_notify, discussionId, userReceived):
+def close_conclusion_followed_discussion(arr_user, discussionId):
     discussion_doc = frappe.get_doc('GP Discussion', discussionId)
     project_doc = frappe.get_doc('GP Project', discussion_doc.project)
     notify_text = f'Thảo luận {discussion_doc.title} đã đóng và có kết luận'
-    user_recipient = frappe.get_doc('User', userReceived)
     user_sender = frappe.get_doc('User', discussion_doc.owner)
+    for id_user in arr_user:
+        if id_user != discussion_doc.owner:
+            user_recipient = frappe.get_doc('User', id_user)
+            values_notify = frappe._dict(
+                from_user=discussion_doc.owner,
+                to_user=id_user,
+                message=notify_text,
+                doctype="GP Notification",
+                project=discussion_doc.project,
+                team=discussion_doc.team,
+                discussion=discussionId
+            )
+            send_notify_by_value(value_notify)
+            config_notification = get_config_notification_by_user(user_recipient)
+            type_notifies = []
+            if config_notification[3]["arr_permission"][4]["email"] == True:
+                type_notifies.append("email")
+            if config_notification[3]["arr_permission"][4]["browser"] == True:
+                type_notifies.append("browser")
+            if "email" in type_notifies:
+                content_email = f"""
+                    <div class="mb-2 leading-5 text-gray-600">
+                        <div>
+                            <span>Dự án </span>
+                            <span>{project_doc.title}</span>
+                        </div>
+                        <div>Thảo luận {discussion_doc.title} đã đóng và có kết luận</div>
+                        <div>{discussion_doc.conclusion}</div>
+                    </div>
+                    """
+                make(
+                    doctype="GP Discussion",
+                    name=discussionId,
+                    content = content_email,
+                    recipients = user_recipient.email,
+                    send_email = True,
+                    sender = user_sender.email,
+                    sender_full_name = user_sender.full_name,
+                    subject = f'[TEAM] Thảo luận {discussion_doc.title} đã đóng và có kết luận'
+                )
+                frappe.db.commit()
+
+def assign_to_someone_task(projectId, taskId, assigner, recipient, title_task):
+    notify_text = f'{get_fullname(assigner)} đã giao cho bạn nhiệm vụ {title_task}'
+    project_info = frappe.db.get_value('GP Project', projectId, ['title', 'team'], as_dict=1)
     values_notify = frappe._dict(
-        from_user=discussion_doc.owner,
-        to_user=userReceived,
+        from_user=assigner,
+        to_user=recipient,
         message=notify_text,
         doctype="GP Notification",
-        project=discussion_doc.project,
-        team=discussion_doc.team,
-        discussion=discussionId
+        project=projectId,
+        team=project_info.team,
+        task=taskId
     )
-    if frappe.db.exists('GP Notification', values_notify):
-        return
-    try:
-        frappe.get_doc(values_notify).insert()
-        frappe.db.commit()
-    except Exception as e:
-        pass
-    if type_notify == "gmail":
+    send_notify_by_value(values_notify)
+    user_recipient = frappe.get_doc('User', recipient)
+    user_sender = frappe.get_doc('User', assigner)
+    config_notification = get_config_notification_by_user(user_recipient)
+    type_notifies = []
+    if config_notification[4]["arr_permission"][0]["email"] == True:
+        type_notifies.append("email")
+    if config_notification[4]["arr_permission"][0]["browser"] == True:
+        type_notifies.append("browser")
+    if "email" in type_notifies:
         content_email = f"""
             <div class="mb-2 leading-5 text-gray-600">
                 <div>
                     <span>Dự án </span>
-                    <span>{project_doc.title}</span>
+                    <span>{project_info.title}</span>
                 </div>
-                <div>Thảo luận {discussion_doc.title} đã đóng và có kết luận</div>
-                <div>{discussion_doc.conclusion}</div>
+                <div>{get_fullname(assigner)} đã giao cho bạn nhiệm vụ {title_task}</div>
             </div>
-            """
+        """
         make(
-            doctype="GP Discussion",
-            name=discussionId,
+            doctype="GP Task",
+            name=taskId,
             content = content_email,
             recipients = user_recipient.email,
             send_email = True,
             sender = user_sender.email,
             sender_full_name = user_sender.full_name,
-            subject = f'[TEAM] Thảo luận {discussion_doc.title} đã đóng và có kết luận'
+            subject = f'[TEAM] Bạn có nhiệm vụ mới trong dự án {project_info.title}'
         )
+        frappe.db.commit()
+
+def change_status_owner_task(taskId, userChange, statusNew):
+    task_info = frappe.db.get_value('GP Task', taskId, ['title', 'status', 'project', 'owner'], as_dict=1)
+    project_info = frappe.db.get_value('GP Project', task_info.project, ['title', 'team'], as_dict=1)
+    notify_text = f'{get_fullname(userChange)} đã cập nhật trạng thái nhiệm vụ {task_info.title} từ {task_info.status} qua {statusNew}'
+    values_notify = frappe._dict(
+        from_user=userChange,
+        to_user=task_info.owner,
+        message=notify_text,
+        doctype="GP Notification",
+        project=task_info.project,
+        team=project_info.team,
+        task=taskId
+    )
+    send_notify_by_value(values_notify)
+    user_recipient = frappe.get_doc('User', task_info.owner)
+    user_sender = frappe.get_doc('User', userChange)
+    config_notification = get_config_notification_by_user(user_recipient)
+    type_notifies = []
+    if config_notification[4]["arr_permission"][1]["email"] == True:
+        type_notifies.append("email")
+    if config_notification[4]["arr_permission"][1]["browser"] == True:
+        type_notifies.append("browser")
+    if "email" in type_notifies:
+        content_email = f"""
+            <div class="mb-2 leading-5 text-gray-600">
+                <div>
+                    <span>Dự án </span>
+                    <span>{project_info.title}</span>
+                </div>
+                <div>{get_fullname(userChange)} đã cập nhật trạng thái nhiệm vụ {task_info.title} từ {task_info.status} qua {statusNew}</div>
+            </div>
+        """
+        make(
+            doctype="GP Task",
+            name=taskId,
+            content = content_email,
+            recipients = user_recipient.email,
+            send_email = True,
+            sender = user_sender.email,
+            sender_full_name = user_sender.full_name,
+            subject = f'[TEAM] {get_fullname(userChange)} đã cập nhật trạng thái nhiệm vụ {project_info.title}'
+        )
+        frappe.db.commit()
+
+def change_assignee_to_older(taskId, new_assignee):
+    task_info = frappe.db.get_value('GP Task', taskId, ['title', 'assigned_to', 'project', 'owner'], as_dict=1)
+    project_info = frappe.db.get_value('GP Project', task_info.project, ['title', 'team'], as_dict=1)
+    notify_text = f'Nhiệm vụ {task_info.title} thay đổi người phụ trách từ bạn qua {get_fullname(new_assignee)}'
+    values_notify = frappe._dict(
+        from_user=task_info.owner,
+        to_user=task_info.assigned_to,
+        message=notify_text,
+        doctype="GP Notification",
+        project=task_info.project,
+        team=project_info.team,
+        task=taskId
+    )
+    send_notify_by_value(values_notify)
+    user_recipient = frappe.get_doc('User', task_info.assigned_to)
+    user_sender = frappe.get_doc('User', task_info.owner)
+    config_notification = get_config_notification_by_user(user_recipient)
+    type_notifies = []
+    if config_notification[4]["arr_permission"][2]["email"] == True:
+        type_notifies.append("email")
+    if config_notification[4]["arr_permission"][2]["browser"] == True:
+        type_notifies.append("browser")
+    if "email" in type_notifies:
+        content_email = f"""
+            <div class="mb-2 leading-5 text-gray-600">
+                <div>
+                    <span>Dự án </span>
+                    <span>{project_info.title}</span>
+                </div>
+                <div>Nhiệm vụ {task_info.title} thay đổi người phụ trách từ bạn qua {get_fullname(new_assignee)}</div>
+            </div>
+        """
+        make(
+            doctype="GP Task",
+            name=taskId,
+            content = content_email,
+            recipients = user_recipient.email,
+            send_email = True,
+            sender = user_sender.email,
+            sender_full_name = user_sender.full_name,
+            subject = f'[TEAM] Nhiệm vụ {task_info.title} thay đổi người phụ trách'
+        )
+        frappe.db.commit()
+
+def change_due_date_to_assignee(taskId, newDueDate):
+    task_info = frappe.db.get_value('GP Task', taskId, ['title', 'assigned_to', 'project', 'owner', 'due_date'], as_dict=1)
+    project_info = frappe.db.get_value('GP Project', task_info.project, ['title', 'team'], as_dict=1)
+    notify_text = f'Nhiệm vụ {task_info.title} thay đổi hạn chót từ {task_info.due_date} qua {newDueDate}'
+    values_notify = frappe._dict(
+        from_user=task_info.owner,
+        to_user=task_info.assigned_to,
+        message=notify_text,
+        doctype="GP Notification",
+        project=task_info.project,
+        team=project_info.team,
+        task=taskId
+    )
+    send_notify_by_value(values_notify)
+    user_recipient = frappe.get_doc('User', task_info.assigned_to)
+    user_sender = frappe.get_doc('User', task_info.owner)
+    config_notification = get_config_notification_by_user(user_recipient)
+    type_notifies = []
+    if config_notification[4]["arr_permission"][3]["email"] == True:
+        type_notifies.append("email")
+    if config_notification[4]["arr_permission"][3]["browser"] == True:
+        type_notifies.append("browser")
+    if "email" in type_notifies:
+        content_email = f"""
+            <div class="mb-2 leading-5 text-gray-600">
+                <div>
+                    <span>Dự án </span>
+                    <span>{project_info.title}</span>
+                </div>
+                <div>Nhiệm vụ {task_info.title} thay đổi hạn chót từ {task_info.due_date} qua {newDueDate}</div>
+            </div>
+        """
+        make(
+            doctype="GP Task",
+            name=taskId,
+            content = content_email,
+            recipients = user_recipient.email,
+            send_email = True,
+            sender = user_sender.email,
+            sender_full_name = user_sender.full_name,
+            subject = f'[TEAM] Nhiệm vụ {task_info.title} thay đổi hạn chót'
+        )
+        frappe.db.commit()
+
+def change_priority_to_assignee(taskId, newPriority):
+    task_info = frappe.db.get_value('GP Task', taskId, ['title', 'assigned_to', 'project', 'owner', 'priority'], as_dict=1)
+    project_info = frappe.db.get_value('GP Project', task_info.project, ['title', 'team'], as_dict=1)
+    notify_text = f'Nhiệm vụ {task_info.title} thay đổi mức ưu tiên từ {task_info.priority} qua {newPriority}'
+    values_notify = frappe._dict(
+        from_user=task_info.owner,
+        to_user=task_info.assigned_to,
+        message=notify_text,
+        doctype="GP Notification",
+        project=task_info.project,
+        team=project_info.team,
+        task=taskId
+    )
+    send_notify_by_value(values_notify)
+    user_recipient = frappe.get_doc('User', task_info.assigned_to)
+    user_sender = frappe.get_doc('User', task_info.owner)
+    config_notification = get_config_notification_by_user(user_recipient)
+    type_notifies = []
+    if config_notification[4]["arr_permission"][4]["email"] == True:
+        type_notifies.append("email")
+    if config_notification[4]["arr_permission"][4]["browser"] == True:
+        type_notifies.append("browser")
+    if "email" in type_notifies:
+        content_email = f"""
+            <div class="mb-2 leading-5 text-gray-600">
+                <div>
+                    <span>Dự án </span>
+                    <span>{project_info.title}</span>
+                </div>
+                <div>Nhiệm vụ {task_info.title} thay đổi mức ưu tiên từ {task_info.priority} qua {newPriority}</div>
+            </div>
+        """
+        make(
+            doctype="GP Task",
+            name=taskId,
+            content = content_email,
+            recipients = user_recipient.email,
+            send_email = True,
+            sender = user_sender.email,
+            sender_full_name = user_sender.full_name,
+            subject = f'[TEAM] Nhiệm vụ {task_info.title} thay đổi mức ưu tiên'
+        )
+        frappe.db.commit()
+
+def vote_poll_by_someone(pollId, userVote, option):
+    poll_info = frappe.db.get_value('GP Poll', pollId, ['title', 'discussion', 'owner'], as_dict=1)
+    if poll_info.owner == userVote:
+        return
+    discussion_info = frappe.db.get_value('GP Discussion', poll_info.discussion, ['project', 'team', 'title'], as_dict=1)
+    project_info = frappe.db.get_value('GP Project', discussion_info.project, ['title', 'team'], as_dict=1)
+    notify_text = f'{get_fullname(userVote)} đã bình chọn {option} trong cuộc bình chọn {poll_info.title}'
+    values_notify = frappe._dict(
+        from_user=userVote,
+        to_user=poll_info.owner,
+        message=notify_text,
+        doctype="GP Notification",
+        project=discussion_info.project,
+        team=discussion_info.team,
+        discussion=poll_info.discussion
+    )
+    send_notify_by_value(values_notify)
+    user_recipient = frappe.get_doc('User', poll_info.owner)
+    user_sender = frappe.get_doc('User', userVote)
+    config_notification = get_config_notification_by_user(user_recipient)
+    type_notifies = []
+    if config_notification[6]["arr_permission"][0]["email"] == True:
+        type_notifies.append("email")
+    if config_notification[6]["arr_permission"][0]["browser"] == True:
+        type_notifies.append("browser")
+    if "email" in type_notifies:
+        content_email = f"""
+            <div class="mb-2 leading-5 text-gray-600">
+                <div>
+                    <span>Dự án </span>
+                    <span>{project_info.title}</span>
+                    <span> - </span>
+                    <span>{poll_info.title}</span>
+                </div>
+                <div>{get_fullname(userVote)} đã bình chọn {option}</div>
+            </div>
+        """
+        make(
+            doctype="GP Discussion",
+            name=poll_info.discussion,
+            content = content_email,
+            recipients = user_recipient.email,
+            send_email = True,
+            sender = user_sender.email,
+            sender_full_name = user_sender.full_name,
+            subject = f'[TEAM] {get_fullname(userVote)} đã tham gia cuộc bình chọn {poll_info.title}'
+        )
+        frappe.db.commit()
+
+def close_poll(pollId):
+    poll_doc = frappe.get_doc('GP Poll', pollId)
+    user_poll = frappe.db.get_value('GP Poll', pollId, 'owner')
+    discussion_info = frappe.db.get_value('GP Discussion', poll_doc.discussion, ['project', 'team', 'title'], as_dict=1)
+    project_info = frappe.db.get_value('GP Project', discussion_info.project, ['title', 'team'], as_dict=1)
+    votes = poll_doc.votes
+    for vote in votes:
+        if vote.user != user_poll:
+            notify_text = f'Cuộc bình chọn {poll_doc.title} đã đóng và có kết quả'
+            values_notify = frappe._dict(
+                from_user=user_poll,
+                to_user=vote.user,
+                message=notify_text,
+                doctype="GP Notification",
+                project=discussion_info.project,
+                team=discussion_info.team,
+                discussion=poll_doc.discussion
+            )
+            send_notify_by_value(values_notify)
+            user_recipient = frappe.get_doc('User', vote.user)
+            user_sender = frappe.get_doc('User', user_poll)
+            config_notification = get_config_notification_by_user(user_recipient)
+            type_notifies = []
+            if config_notification[6]["arr_permission"][1]["email"] == True:
+                type_notifies.append("email")
+            if config_notification[6]["arr_permission"][1]["browser"] == True:
+                type_notifies.append("browser")
+            if "email" in type_notifies:
+                content_email = f"""
+                    <div class="mb-2 leading-5 text-gray-600">
+                        <div>
+                            <span>Dự án </span>
+                            <span>{project_info.title}</span>
+                            <span> - </span>
+                            <span>{discussion_info.title}</span>
+                        </div>
+                        <div>Cuộc bình chọn {poll_doc.title} đã kết thúc với kết quả như sau:</div>
+                    </div>
+                """
+                make(
+                    doctype="GP Discussion",
+                    name=poll_doc.discussion,
+                    content = content_email,
+                    recipients = user_recipient.email,
+                    send_email = True,
+                    sender = user_sender.email,
+                    sender_full_name = user_sender.full_name,
+                    subject = f'[TEAM] Cuộc bình chọn {poll_doc.title} đã đóng và có kết quả'
+                )
+                frappe.db.commit()
 
 def send_notify_by_value(value_notify):
     if frappe.db.exists('GP Notification', value_notify):
