@@ -162,6 +162,23 @@ def unread_notifications():
 	return res[0].count
 
 @frappe.whitelist()
+def all_notifications():
+	res = frappe.db.get_all("GP Notification", "count(name) as count", {"to_user": frappe.session.user})
+	return res[0].count
+
+@frappe.whitelist()
+def get_notifications_by_filter(status):
+	filter_noiti = {"to_user": frappe.session.user}
+	if status == "unread":
+		filter_noiti["read"] = 0
+	notifications = frappe.db.get_list('GP Notification', filters = filter_noiti, fields=['type', 'message', 'comment','discussion','task','project','team','read',"from_user","creation","name"])
+	for notification in notifications:
+		if notification["team"] is not None and notification["team"] != "":
+			title = frappe.db.get_value('GP Team', notification["team"], 'title')
+			notification["team_title"] = title
+	return notifications
+
+@frappe.whitelist()
 def get_teams_by_role():
 	user_doc = frappe.get_doc("User", frappe.session.user)
 	arr_role = [_role.role for _role in user_doc.roles]

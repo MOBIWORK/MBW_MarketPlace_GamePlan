@@ -10,7 +10,7 @@
 <script setup>
 import { computed, defineAsyncComponent } from 'vue'
 import { Dialogs } from '@/utils/dialogs'
-import { Toasts } from '@/utils/toasts'
+import { Toasts } from 'frappe-ui'
 import { users } from '@/data/users'
 import { useScreenSize } from './utils/composables'
 

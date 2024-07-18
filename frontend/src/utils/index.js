@@ -1,5 +1,6 @@
 export { default as dayjs } from './dayjs'
 import { toast } from 'frappe-ui'
+import { useDateFormat, useTimeAgo } from '@vueuse/core'
 
 export function createToast(options) {
   console.log("in toast")
@@ -8,6 +9,17 @@ export function createToast(options) {
     position: 'bottom-right',
     ...options,
   })
+}
+
+export function timeAgo(date) {
+  if(date == null || date == "") return "";
+  let valueTimeAgo = useTimeAgo(date).value;
+  const regex = /(\d+)?\s*(\w+\s\w+|\w+)/;
+  const match = valueTimeAgo.match(regex);
+  let number = match[1] || '';
+  let word = match[2] || '';
+  if (number != null && number != "") return `${number} ${__(word)}`;
+  return `${__(word)}`;
 }
 
 export function getImgDimensions(imgSrc) {

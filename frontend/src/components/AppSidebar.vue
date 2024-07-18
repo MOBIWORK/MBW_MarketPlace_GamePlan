@@ -42,7 +42,7 @@
             </div>
           </template>
         </Links>
-        <button 
+        <button id="notifications-btn"
           class="flex w-full items-center rounded px-2 py-1 text-gray-800"
           @click="onToggleNotification()"  
         >
@@ -196,7 +196,7 @@
       "
     />
   </div>
-  <NotificationsList />
+  <NotificationsSidebar :visible="isVisibleNotification" @changeVisible="(visible) => changeVisible(visible)"/>
 </template>
 <script>
 import { Tooltip } from 'frappe-ui'
@@ -215,10 +215,7 @@ import LucideListTodo from '~icons/lucide/list-todo'
 import LucideNewspaper from '~icons/lucide/newspaper'
 import LucideFiles from '~icons/lucide/files'
 import { getUser } from '@/data/users'
-import SidebarLink from '@/components/SidebarLink.vue'
-import NotificationsIcon from '@/components/icons/NotificationsIcon.vue'
-import NotificationsList from '@/components/NotificationsList.vue'
-import { notificationsStore } from '@/data/notifications'
+import NotificationsSidebar from '@/components/NotificationsSidebar.vue'
 
 export default {
   name: 'AppSidebar',
@@ -229,7 +226,7 @@ export default {
     UserDropdown,
     Tooltip,
     ChevronTriangle,
-    NotificationsList
+    NotificationsSidebar
   },
   data() {
     return {
@@ -240,6 +237,7 @@ export default {
       showAddTeamDialog: false,
       teams,
       isExpandAll: false,
+      isVisibleNotification: false
     }
   },
   mounted() {
@@ -320,9 +318,10 @@ export default {
   },
   methods: {
     onToggleNotification(){
-      console.log("vào đây");
-      console.log(notificationsStore())
-      notificationsStore().toggle()
+      this.isVisibleNotification = true
+    },
+    changeVisible(visible){
+      this.isVisibleNotification = visible
     },
     teamProjects(teamName) {
       return getTeamProjects(teamName)
