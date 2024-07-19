@@ -19,7 +19,7 @@
           ]"
           v-model="newTeam.is_private"
         />
-        <ErrorMessage :message="teams.insert.error?.messages" />
+        <!-- <ErrorMessage :message="teams.insert.error?.messages" /> -->
       </div>
     </template>
     <template #actions>
@@ -27,7 +27,7 @@
         variant="solid"
         class="w-full"
         @click="createTeam(teamName)"
-        :loading="teams.insert.loading"
+        :loading="teams.insert?.loading"
       >
         {{__('Create Team')}}
       </Button>
@@ -64,6 +64,7 @@ export default {
         return this.show
       },
       set(val) {
+        console.log(val)
         this.$emit('update:show', val)
       },
     },

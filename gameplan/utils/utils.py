@@ -282,4 +282,4 @@ def get_title_by_id_notification(idNotifycation):
 	elif idNotifycation == "voting_poll":
 		return "Poll bạn tạo có người vote"
 	elif idNotifycation == "closing_poll":
-		return "Poll bạn tham gia đóng + kết quả"
+		return "Poll bạn tham gia đã đóng và có kết quả"

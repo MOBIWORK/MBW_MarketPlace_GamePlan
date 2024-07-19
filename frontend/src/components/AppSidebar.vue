@@ -413,6 +413,9 @@ export default {
       objActiveTeamCache[item.name] = !item.open;
       localStorage.setItem(`activeTeamCache_${getUser('sessionUser').name}`, JSON.stringify(objActiveTeamCache));
       item.open = !item.open;
+    },
+    onLoadDataTeam(){
+      teams.fetch()
     }
   },
 }

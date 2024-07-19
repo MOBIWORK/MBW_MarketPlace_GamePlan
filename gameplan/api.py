@@ -173,9 +173,9 @@ def get_notifications_by_filter(status):
 		filter_noiti["read"] = 0
 	notifications = frappe.db.get_list('GP Notification', filters = filter_noiti, fields=['type', 'message', 'comment','discussion','task','project','team','read',"from_user","creation","name"])
 	for notification in notifications:
-		if notification["team"] is not None and notification["team"] != "":
-			title = frappe.db.get_value('GP Team', notification["team"], 'title')
-			notification["team_title"] = title
+		if notification["project"] is not None and notification["project"] != "":
+			title = frappe.db.get_value('GP Project', notification["project"], 'title')
+			notification["project_title"] = title
 	return notifications
 
 @frappe.whitelist()

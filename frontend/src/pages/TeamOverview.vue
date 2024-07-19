@@ -153,7 +153,7 @@ export default {
     Dialog,
     TabButtons,
     TextInput,
-    FormControl,
+    FormControl
   },
   data() {
     return {

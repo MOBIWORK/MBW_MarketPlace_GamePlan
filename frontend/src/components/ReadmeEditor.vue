@@ -1,61 +1,44 @@
 <template>
-  <div
-    class="relative"
-    :class="{
-      'rounded-lg border px-3 py-3': border || editReadme,
-      'max-h-[150px] overflow-hidden': !expand && collapsible,
-    }"
-  >
-    <TextEditor
-      ref="readme"
-      editor-class="prose-sm max-w-none"
-      :content="resource.doc[fieldname]"
-      :placeholder="placeholder"
-      @change="(val) => (resource.doc[fieldname] = val)"
-      :bubbleMenu="true"
-      :floating-menu="true"
-      :editable="editReadme"
-    />
-    <div
-      class="absolute right-0 top-0 flex space-x-2"
-      :class="{ 'mr-3 mt-3': border || editReadme }"
-      v-if="editable"
-    >
+  <div class="relative" :class="{
+    'rounded-lg border px-3 py-3': border || editReadme,
+    'max-h-[150px] overflow-hidden': !expand && collapsible,
+  }">
+    <TextEditor ref="readme" editor-class="prose-sm max-w-none" :content="resource['doc'][fieldname]"
+      :placeholder="placeholder" @change="(val) => (resource.doc[fieldname] = val)" :bubbleMenu="true"
+      :floating-menu="true" :editable="editReadme" />
+    <div class="absolute right-0 top-0 flex space-x-2" :class="{ 'mr-3 mt-3': border || editReadme }" v-if="editable">
       <Tooltip v-if="!editReadme && !$readOnlyMode" :text="__('Edit')">
         <Button variant="ghost" :label="__('Edit')" @click="editReadmeAndFocus">
-          <template #icon><LucideEdit2 class="w-4" /> </template>
+          <template #icon>
+            <LucideEdit2 class="w-4" />
+          </template>
         </Button>
       </Tooltip>
       <template v-if="editReadme">
-        <Button
-          @click="
-            () => {
-              editReadme = false
-              resource.setValue.submit({ [fieldname]: resource.doc[fieldname] })
-            }
-          "
-        >
-          <template #prefix><LucideSave class="w-4" /></template>
-          {{__('Save')}}
+        <Button @click="() => {
+            editReadme = false
+            resource.setValue.submit({ [fieldname]: resource.doc[fieldname] })
+          }
+          ">
+          <template #prefix>
+            <LucideSave class="w-4" />
+          </template>
+          {{ __('Save') }}
         </Button>
-        <Button
-          @click="
-            () => {
-              editReadme = false
-              resource.reload()
-            }
-          "
-        >
-          <template #prefix><LucideRotateCcw class="w-4" /></template>
-          {{__('Discard')}}
+        <Button @click="() => {
+            editReadme = false
+            resource.reload()
+          }
+          ">
+          <template #prefix>
+            <LucideRotateCcw class="w-4" />
+          </template>
+          {{ __('Discard') }}
         </Button>
       </template>
     </div>
-    <div
-      class="absolute bottom-0 right-0 flex"
-      :class="{ 'p-3': border || editReadme }"
-      v-if="collapsible && readmeHeight > 150"
-    >
+    <div class="absolute bottom-0 right-0 flex" :class="{ 'p-3': border || editReadme }"
+      v-if="collapsible && readmeHeight > 150">
       <Tooltip text="Expand/Collapse">
         <Button variant="ghost" @click="expand = !expand">
           <template #icon>

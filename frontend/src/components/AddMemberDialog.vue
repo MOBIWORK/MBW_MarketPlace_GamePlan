@@ -1,6 +1,6 @@
 <template>
   <Dialog
-    :options="{ title: __('Add members') }"
+    :options="{ title: __('Team members') }"
     @close="resetValues"
     v-model="open"
   >

@@ -24,27 +24,6 @@
           placement="right"
         />
       </div>
-      <Dialog
-        :options="{
-          title: __('Delete Page'),
-          message: __('Are you sure you want to delete this page?'),
-          actions: [
-            {
-              label: __('Delete'),
-              onClick: ({ close }) => {
-                showDeleteDialog = false
-                return $resources.pages.delete.submit(pageSource.name)
-              },
-              variant: 'solid',
-              theme: 'red',
-            },
-            {
-              label: __('Cancel'),
-            },
-          ],
-        }"
-        v-model="showDeleteDialog"
-      />
       <router-link
         :to="{
           name: d.project ? 'ProjectPage' : 'Page',
@@ -81,6 +60,27 @@
       </router-link>
     </div>
   </div>
+  <Dialog
+        :options="{
+          title: __('Delete Page'),
+          message: __('Are you sure you want to delete this page?'),
+          actions: [
+            {
+              label: __('Delete'),
+              onClick: ({ close }) => {
+                showDeleteDialog = false
+                return $resources.pages_source.delete.submit(pageSource.name)
+              },
+              variant: 'solid',
+              theme: 'red',
+            },
+            {
+              label: __('Cancel'),
+            },
+          ],
+        }"
+        v-model="showDeleteDialog"
+      />
 </template>
 <script>
 import { projectTitle } from '@/utils/formatters'
@@ -109,6 +109,28 @@ export default {
         auto: true
       }
     },
+    pages_source(){
+      return {
+        type: 'list',
+        cache: ['Pages', this.listOptions],
+        doctype: 'GP Page',
+        fields: [
+          'name',
+          'creation',
+          'title',
+          'content',
+          'slug',
+          'project',
+          'team',
+          'modified',
+        ],
+        delete:{
+          onSuccess(){
+            this.$resources.pages.fetch()
+          }
+        }
+      }
+    }
   },
   methods: {
     projectTitle,

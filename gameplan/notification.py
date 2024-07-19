@@ -838,7 +838,8 @@ def assign_to_someone_task(projectId, taskId, assigner, recipient, title_task):
         doctype="GP Notification",
         project=projectId,
         team=project_info.team,
-        task=taskId
+        task=taskId,
+        is_assign_task=True
     )
     send_notify_by_value(values_notify)
     user_recipient = frappe.get_doc('User', recipient)

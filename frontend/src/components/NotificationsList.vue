@@ -65,18 +65,18 @@
                             <div class="mr-2">
                                 <div v-html="notification.message" />
                                 <div class="text-sm text-gray-600 flex items-center mt-1 mb-3">
-                                    <div class="mr-5">{{ formatTimeAgo(notification.creation) }}</div>
+                                    <div class="mr-2">{{ formatTimeAgo(notification.creation) }}</div>
                                     <div class="flex items-center"
-                                        v-if="notification.team_title != null && notification.notificationteam_title != ''">
-                                        <div style="background-color: rgba(97, 97, 97, 1);"
-                                            class="rounded-full h-2.5 w-2.5 mr-2"></div>
-                                        <div>{{ notification.team_title }}</div>
+                                        v-if="notification.project_title != null && notification.project_title != ''">
+                                        <div style="background-color: rgba(97, 97, 97, 0.5);"
+                                            class="rounded-full h-2 w-2 mr-2"></div>
+                                        <div>{{ notification.project_title }}</div>
                                     </div>
                                 </div>
                             </div>
                             <div class="w-8 flex justify-end">
                                 <div class="h-2 w-2 rounded-full ml-1"
-                                    :class="[notification.read == 1 ? 'bg-transparent' : 'bg-red-700']" />
+                                    :class="[notification.read == 1 ? 'bg-transparent' : 'unread']" />
                             </div>
                         </div>
                     </div>
@@ -195,5 +195,8 @@ export default {
 <style scoped>
     .active-status {
         background-color: rgba(0, 0, 0, 0.08);
+    }
+    .unread{
+        background-color: rgba(229, 28, 0, 1);
     }
 </style>

@@ -77,6 +77,7 @@ class GPTeam(Archivable, Document):
 			self.append("members", {
 				"email": email,
 				"user": email,
+				"role": "manager",
 				"status": "Accepted"
 			})
 

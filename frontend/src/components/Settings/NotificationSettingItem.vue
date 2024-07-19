@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full">
+    <div style="width: 99%;">
         <div class="flex justify-between p-1 rounded-md items-center" style="background-color: #F1F1F1;">
             <div class="font-semibold pl-2">{{title}}</div>
             <div class="pr-2 text-sm cursor-pointer" v-if="expanded" @click="onCollapseAndExpand()">Collapse</div>
@@ -55,7 +55,6 @@ export default {
                 onSuccess(data){
                     console.log(data)
                     if(data == "ok"){
-                        console.log("vào đây")
                         createToast({
                             title: __('Đã lưu thành công'),
                             icon: 'check',

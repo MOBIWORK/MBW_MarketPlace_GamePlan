@@ -46,6 +46,11 @@ export function copyToClipboard(text) {
   textField.select()
   document.execCommand('copy')
   textField.remove()
+  createToast({
+    title: __('Sao chép thành công'),
+    icon: 'check',
+    iconClasses: 'text-green-600',
+  })
 }
 
 export function getScrollParent(node) {

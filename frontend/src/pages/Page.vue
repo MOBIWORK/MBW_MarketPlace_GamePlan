@@ -36,7 +36,7 @@
         </div>
 
         <TextEditor
-            editor-class="rounded-b-lg max-w-[unset] prose-sm h-mbw-fit-page"
+            editor-class="rounded-b-lg max-w-[unset] prose-sm h-mbw-fit-page overflow-y-auto"
             :content="page.doc.content"
             @change="page.doc.content = $event"
             :placeholder="__('Start writing here...')"
