@@ -196,7 +196,7 @@
       "
     />
   </div>
-  <NotificationsSidebar :visible="isVisibleNotification" @changeVisible="(visible) => changeVisible(visible)"/>
+  <NotificationsSidebar :visible="isVisibleNotification" @changeVisible="(visible) => changeVisible(visible)" @markAllRead="onLoadUnreadNotification()"/>
 </template>
 <script>
 import { Tooltip } from 'frappe-ui'
@@ -416,6 +416,10 @@ export default {
     },
     onLoadDataTeam(){
       teams.fetch()
+    },
+    onLoadUnreadNotification(){
+      console.log("Dòng 421")
+      unreadNotifications.fetch()
     }
   },
 }

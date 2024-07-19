@@ -35,7 +35,7 @@
         </div>
         <Comment
           :class="{
-            'border-t': item.name != newMessagesFrom,
+            'border-b': item.name != newMessagesFrom,
           }"
           v-if="item.doctype == 'GP Comment'"
           :ref="($comment) => setItemRef($comment, item)"
@@ -45,12 +45,12 @@
           :comments="$resources.comments"
         />
         <Activity
-          class="border-t py-5"
+          class="border-b py-5"
           v-else-if="item.doctype == 'GP Activity'"
           :activity="item"
         />
         <Poll
-          class="border-t"
+          class="border-b"
           v-else-if="item.doctype == 'GP Poll'"
           :ref="($poll) => setItemRef($poll, item)"
           :highlight="highlightedItem == item"

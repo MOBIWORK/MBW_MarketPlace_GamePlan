@@ -6,7 +6,7 @@
       'min-width': '430px',
       left: 'calc(100% + 1px)',
     }">
-    <NotificationsList :parent_panel="'sidebar'"></NotificationsList>
+    <NotificationsList :parent_panel="'sidebar'" ></NotificationsList>
   </div>
 </template>
 
@@ -26,93 +26,6 @@ export default {
     }
   },
   components: { TabButtons, Tooltip, NotificationsList },
-  resources: {
-    unreadNotifications() {
-      if (this.activeTab !== 'Unread') return
-      return {
-        type: 'list',
-        cache: 'Unread Notifications',
-        doctype: 'GP Notification',
-        filters: { to_user: this.$user().name, read: 0 },
-        fields: [
-          'name',
-          'from_user',
-          'message',
-          'read',
-          'type',
-          'creation',
-          'comment',
-          'discussion',
-          'task',
-          'project',
-          'team',
-        ],
-        orderBy: 'creation desc',
-        auto: true,
-      }
-    },
-    readNotifications() {
-      if (this.activeTab !== 'Read') return
-      return {
-        type: 'list',
-        cache: 'Read Notifications',
-        doctype: 'GP Notification',
-        filters: { to_user: this.$user().name, read: 1 },
-        fields: [
-          'name',
-          'from_user',
-          'message',
-          'read',
-          'type',
-          'creation',
-          'comment',
-          'discussion',
-          'task',
-          'project',
-          'team',
-        ],
-        orderBy: 'creation desc',
-        auto: true,
-      }
-    },
-    markAllAsRead() {
-      return {
-        url: 'gameplan.api.mark_all_notifications_as_read',
-        onSuccess() {
-          this.$getResource('Unread Notifications Count')?.reload()
-          this.$resources.unreadNotifications.reload()
-        },
-      }
-    },
-  },
-  computed: {
-    notifications() {
-      return this.activeTab === 'Unread'
-        ? this.$resources.unreadNotifications.data
-        : this.$resources.readNotifications.data
-    },
-  },
-  methods: {
-    markAsRead(name) {
-      this.$resources.unreadNotifications.setValue.submit(
-        {
-          name,
-          read: 1,
-        },
-        {
-          onSuccess: () => {
-            this.$getResource('Unread Notifications Count')?.reload()
-          },
-        }
-      )
-    },
-    toggleNotificationPanel() {
-      this.$emit('changeVisible', false)
-    }
-  },
-  mounted() {
-    this.$getResource('Unread Notifications Count')?.reload()
-  },
   setup(props, { emit }) {
     const target = ref(null)
     const closePanel = () => {
@@ -125,24 +38,4 @@ export default {
 </script>
 
 <style scoped>
-.btn-filter-notify {
-  background-color: #f4f4f4 !important;
-  color: #444 !important;
-  border-color: #ddd !important;
-  font-size: 13px;
-  margin-left: 5px;
-  border-radius: 15px;
-  margin: 10px 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-}
-
-.btn-filter-notify-active {
-  background-color: #baebe1 !important;
-  color: #1876f2 !important;
-  border-color: #baebe1 !important;
-  box-shadow: none !important;
-  font-weight: 500;
-  outline: none !important;
-}
 </style>

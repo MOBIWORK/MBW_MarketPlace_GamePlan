@@ -92,6 +92,7 @@ import { Dropdown, Button } from 'frappe-ui'
 import UserAvatar from '@/components/UserAvatar.vue'
 import { timeAgo } from '@/utils'
 import { showSettingsDialog } from '@/components/Settings/SettingsDialog.vue'
+import { unreadNotifications } from '@/data/notifications'
 
 export default {
     name: 'NotificationsList',
@@ -146,6 +147,7 @@ export default {
                 onSuccess() {
                     this.$resources.unread_notifications.fetch()
                     this.$resources.notifications.fetch()
+                    unreadNotifications.fetch()
                 },
             }
         }

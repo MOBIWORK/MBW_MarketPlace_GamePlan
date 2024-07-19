@@ -15,7 +15,7 @@
       class="group relative block h-15 rounded-[10px] transition hover:bg-gray-100"
     >
       <div class="flex h-full items-center space-x-4 overflow-hidden px-3 py-2">
-        <UserInfo :email="d.last_post_by || d.owner">
+        <UserInfo :email="d.owner">
           <template v-slot="{ user }">
             <div class="flex items-center space-x-3">
               <component
@@ -69,16 +69,14 @@
                 <div
                   class="overflow-hidden text-ellipsis whitespace-nowrap text-base text-gray-600"
                 >
-                  <span :class="filters ? '' : 'hidden sm:inline'">
+                  <span :class="filters ? '' : 'hidden sm:inline'" class="text-gray-800">
                     {{ user.full_name }}
                   </span>
                   <template v-if="!filters || !filters.project">
                     <span> in </span>
-                    <span>
-                      {{ d.team_title }}
-                      <span class="text-gray-500"> &mdash; </span>
-                      {{ d.project_title }}
-                    </span>
+                    <span class="text-gray-800">{{ d.team_title }}</span>
+                    <span class="text-gray-500"> &mdash; </span>
+                    <span class="text-gray-800">{{ d.project_title }}</span>
                   </template>
                 </div>
               </div>

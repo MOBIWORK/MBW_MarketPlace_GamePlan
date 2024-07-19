@@ -1,7 +1,7 @@
 <template>
   <div class="relative flex h-full flex-col" v-if="postId && discussion">
     <div class="mx-auto w-full">
-      <div class="py-6">
+      <div class="pt-6">
         <div class="flex items-start justify-between space-x-1 min-w-0">
           <div v-if="editingTitle" class="w-full">
             <div class="mb-2">
