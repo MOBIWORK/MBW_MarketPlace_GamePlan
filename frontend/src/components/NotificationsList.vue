@@ -64,7 +64,7 @@
                         <div class="flex items-center justify-between w-full">
                             <div class="mr-2">
                                 <div v-html="notification.message" />
-                                <div class="text-sm text-gray-600 flex items-center mt-1 mb-3">
+                                <div class="text-sm text-gray-600 flex items-center mt-1 mb-1">
                                     <div class="mr-2">{{ formatTimeAgo(notification.creation) }}</div>
                                     <div class="flex items-center"
                                         v-if="notification.project_title != null && notification.project_title != ''">
@@ -93,6 +93,7 @@ import UserAvatar from '@/components/UserAvatar.vue'
 import { timeAgo } from '@/utils'
 import { showSettingsDialog } from '@/components/Settings/SettingsDialog.vue'
 import { unreadNotifications } from '@/data/notifications'
+import { h } from 'vue'
 
 export default {
     name: 'NotificationsList',
@@ -186,9 +187,68 @@ export default {
                 onSuccess: () => {
                     this.$resources.unread_notifications.fetch()
                     this.$resources.notifications.fetch()
+                    unreadNotifications.fetch()
                 },
                 }
             )
+            if(notification.type == "Task"){
+                if(notification.project != null && notification.project != ""){
+                    this.$router.push({
+                        name: 'ProjectTaskDetail',
+                        params: {
+                            projectId: notification.project,
+                            teamId: notification.team,
+                            taskId: notification.task
+                        }
+                    })
+                }else{
+                    this.$router.push({
+                        name: 'Task',
+                        params: {
+                            taskId: notification.task
+                        }
+                    })
+                }
+                
+            }else if (notification.type == "Discussion"){
+                this.$router.push({
+                    name: 'ProjectDiscussion',
+                    params: {
+                        teamId: notification.team,
+                        projectId: notification.project,
+                        postId: notification.discussion,
+                    }
+                })
+            }else if(notification.type == "Page"){
+                if(notification.project != null && notification.team != null){
+                    this.$router.push({
+                        name: 'ProjectPages',
+                        params: {
+                            teamId: notification.team,
+                            projectId: notification.project
+                        }
+                    })
+                }else{
+                    this.$router.push({
+                        name: 'MyPages'
+                    })
+                }
+            }else if(notification.type == "Project"){
+                this.$router.push({
+                    name: 'Project',
+                    params: {
+                        teamId: notification.team,
+                        projectId: notification.project
+                    }
+                })
+            }else if(notification.type == "Team"){
+                this.$router.push({
+                    name: 'Team',
+                    params: {
+                        teamId: notification.team
+                    }
+                })
+            }
         }
     }
 }

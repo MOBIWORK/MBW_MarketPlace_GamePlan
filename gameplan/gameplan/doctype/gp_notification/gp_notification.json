@@ -38,7 +38,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Type",
-   "options": "Mention\nReaction",
+   "options": "Mention\nReaction\nDiscussion\nTask\nPage\nReplyComment\nProject\nTeam",
    "reqd": 1
   },
   {
@@ -93,7 +93,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-07-19 10:07:12.175424",
+ "modified": "2024-07-22 14:05:55.125637",
  "modified_by": "Administrator",
  "module": "Gameplan",
  "name": "GP Notification",

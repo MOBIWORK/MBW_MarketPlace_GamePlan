@@ -171,7 +171,11 @@ def get_notifications_by_filter(status):
 	filter_noiti = {"to_user": frappe.session.user}
 	if status == "unread":
 		filter_noiti["read"] = 0
-	notifications = frappe.db.get_list('GP Notification', filters = filter_noiti, fields=['type', 'message', 'comment','discussion','task','project','team','read',"from_user","creation","name"])
+	notifications = frappe.db.get_list('GP Notification', 
+		filters = filter_noiti, 
+		fields=['type', 'message', 'comment','discussion','task','project','team','read',"from_user","creation","name","is_assign_task"],
+		order_by='creation desc'
+	)
 	for notification in notifications:
 		if notification["project"] is not None and notification["project"] != "":
 			title = frappe.db.get_value('GP Project', notification["project"], 'title')
@@ -278,7 +282,6 @@ def get_mypages_by_filter(order_by, search=None, project=None):
 				order_by=order_by,
 				page_length=999
 			)
-			print("Dòng 213 ", pages)
 		else:
 			pages = frappe.get_all('GP Page',
 				filters={
@@ -288,7 +291,6 @@ def get_mypages_by_filter(order_by, search=None, project=None):
 				order_by=order_by,
 				page_length=999
 			)
-			print("Dòng 222 ", pages)
 	else:
 		if search is not None and search != "":
 			pages = frappe.get_all('GP Page',
@@ -358,7 +360,7 @@ def accept_invitation(key: str = None):
 			objGuest.append(invitation.email)
 		frappe.db.set_value('GP Project', objProject[0], "guests", json.dumps(objGuest))
 		#Gửi thông báo tới manage,admin
-		user_info = frappe.db.get_value('User', {'email': invitation.email}, ['name'])
+		user_info = frappe.db.get_value('User', {'email': invitation.email}, ['name'], as_dict=1)
 		config_notifications = frappe.db.get_all(
 			"GP Config Notification",
 			fields=["config_notification"],

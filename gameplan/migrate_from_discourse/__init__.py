@@ -121,7 +121,6 @@ def migrate_posts():
 			log_discourse_map(doc, "topics", topic.id)
 		except Exception:
 			frappe.db.rollback(save_point=savepoint)
-			print(frappe.get_traceback())
 			break
 		else:
 			frappe.db.release_savepoint(savepoint)

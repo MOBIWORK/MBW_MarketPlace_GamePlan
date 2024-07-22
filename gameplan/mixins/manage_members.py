@@ -38,7 +38,7 @@ class ManageMembersMixin:
 		)
 		title = f"Team: {self.title}" if self.doctype == "GP Team" else f"Project: {self.title}"
 		if frappe.local.dev_server:
-			print(f"Invite link for {member.email}: {invite_link}")
+			pass
 
 		frappe.sendmail(
 			recipients=member.email,

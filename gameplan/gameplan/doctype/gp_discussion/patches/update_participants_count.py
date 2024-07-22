@@ -19,4 +19,4 @@ def execute():
 			failed.append(discussion)
 
 	if failed:
-		print("Failed to update participants count for", failed)
+		pass

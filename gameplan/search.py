@@ -51,7 +51,7 @@ class GameplanSearch(Search):
 			if not hasattr(frappe.local, "request"):
 				update_progress_bar("Indexing", i, total)
 		if not hasattr(frappe.local, "request"):
-			print()
+			pass
 
 	def index_doc(self, doc):
 		id, fields, payload = None, None, None

@@ -41,10 +41,8 @@ class GPUserProfile(Document):
 		while True:
 			status = job.get_status()
 			if status in (JobStatus.QUEUED, JobStatus.STARTED, JobStatus.SCHEDULED):
-				print("Waiting for job to complete:", job_id, status)
 				sleep(1)
 			elif status in (JobStatus.FINISHED, JobStatus.FAILED, JobStatus.CANCELED):
-				print("Job status:", job_id, status)
 				self.reload()
 				break
 

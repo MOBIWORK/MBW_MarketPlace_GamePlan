@@ -27,7 +27,6 @@ def rename_doctypes():
 	for old in doctypes:
 		new = doctypes[old]
 		if not frappe.db.exists('DocType', new):
-			print('Renaming {0} to {1}'.format(old, new))
 			frappe.rename_doc('DocType', old, new, force=True, ignore_if_exists=True)
 
 def create_sequences():
@@ -46,7 +45,6 @@ def create_sequences():
 		frappe.db.sql_ddl('drop sequence if exists {0}'.format(sequence_name))
 		last_name = frappe.db.get_all(doctype, fields=['max(name) as last'])[0].last
 		start_value = (last_name or 0) + 1
-		print('Creating sequence for {0} starting at {1}'.format(doctype, start_value))
 		frappe.db.create_sequence(doctype, start_value=start_value, check_not_exists=True, cache=frappe.db.SEQUENCE_CACHE)
 
 def rename_doctype_links():
@@ -60,7 +58,6 @@ def rename_doctype_links():
 	for doctype in doctypes_with_links:
 		fieldname = doctypes_with_links[doctype]
 		if frappe.db.exists(doctype, {fieldname: ('in', doctype_values)}):
-			print(f'Updating {fieldname} in {doctype}')
 			for dt in doctypes:
 				old = dt
 				new = doctypes[dt]

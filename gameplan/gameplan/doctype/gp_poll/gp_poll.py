@@ -30,8 +30,7 @@ class GPPoll(Document, GPPollAttributes):
 		discussion.track_visit()
 		discussion.save(ignore_permissions=True)
 		#Gửi thông báo cho người dùng đã theo dõi project
-		project_discussion = frappe.db.get_value('GP Discussion', self.discussion, 'project')
-		arr_user_followed = frappe.db.get_list('GP Followed Project', {project: project_discussion})
+		arr_user_followed = frappe.db.get_list('GP Followed Project', filters={'project': discussion.project})
 		id_users_followed = [ item.user for item in arr_user_followed]
 		add_poll_followed_discussion(id_users_followed, self.discussion, self.name)
 
