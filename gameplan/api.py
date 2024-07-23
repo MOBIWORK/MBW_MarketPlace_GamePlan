@@ -183,6 +183,99 @@ def get_notifications_by_filter(status):
 	return notifications
 
 @frappe.whitelist()
+def get_members_by_type(team_project, type_filter):
+	arr_member = []
+	if type_filter == "team":
+		team_info = frappe.get_doc('GP Team', team_project)
+		members = team_info.members
+		for member in members:
+			user_info = frappe.get_doc('User', member.user)
+			member_info = {
+				'email': user_info.email,
+				'full_name': user_info.full_name,
+				'id_user': user_info.name,
+				'id': member.name
+			}
+			if member.role is not None and member.role != "":
+				member_info["role"] = member.role
+			else:
+				member_info["role"] = "member"
+			arr_member.append(member_info)
+	elif type_filter == "project":
+		project_info = frappe.get_doc('GP Project', team_project)
+		members = team_info.members
+		for member in members:
+			user_info = frappe.get_doc('User', member.user)
+			member_info = {
+				'email': user_info.email,
+				'full_name': user_info.full_name,
+				'id_user': user_info.name,
+				'id': member.name
+			}
+			if member.role is not None and member.role != "":
+				member_info["role"] = member.role
+			else:
+				member_info["role"] = "member"
+			arr_member.append(member_info)
+	return arr_member
+
+@frappe.whitelist()
+def delete_member_by_id(id_member):
+	frappe.delete_doc('GP Member', id_member)
+	frappe.db.commit()
+	return "ok"
+
+@frappe.whitelist()
+def update_role_member_by_id(id_member, role_member):
+	doc_member = frappe.get_doc('GP Member', id_member)
+	doc_member.role = role_member
+	doc_member.save(ignore_permissions=True)
+	frappe.db.commit()
+	return "ok"
+
+@frappe.whitelist(methods=["POST"])
+def add_role_member_by_id(team_project, type_filter, id_user):
+	member_res = {}
+	reference_doc = None
+	if type_filter == "team":
+		reference_doc = "GP Team"
+	else:
+		reference_doc = "GP Project"
+	if reference_doc is not None:
+		doc_info = frappe.get_doc(reference_doc, team_project)
+		member_doc = frappe.new_doc('GP Member')
+		member_doc.update({
+			'parent': doc_info.name,
+			'parentfield': 'members',
+			'parenttype': reference_doc,
+			'user': id_user,
+			'role': 'member'
+		})
+		member_doc.insert()
+		frappe.db.commit()
+		user_info = frappe.get_doc('User', id_user)
+		member_res["email"] = user_info.email
+		member_res["full_name"] = user_info.full_name
+		member_res["id_user"] = user_info.name
+		member_res["id"] = member_doc.name
+		member_res["role"] = member_doc.role
+	return member_res
+
+@frappe.whitelist()
+def get_user_system_by_filter(txtSearch=None):
+	or_filters = []
+	if txtSearch is not None and txtSearch != "":
+		or_filters = [
+			["email","LIKE", f'%{txtSearch}%'],
+			["full_name", "LIKE", f'%{txtSearch}%']
+		]
+	users = frappe.get_list('User',
+		fields=['name','full_name','email'],
+		or_filters=or_filters
+	)
+	return users
+
+@frappe.whitelist()
 def get_teams_by_role():
 	user_doc = frappe.get_doc("User", frappe.session.user)
 	arr_role = [_role.role for _role in user_doc.roles]

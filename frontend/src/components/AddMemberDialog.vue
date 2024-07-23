@@ -65,6 +65,8 @@
           </li>
         </ul>
       </div>
+
+      <!-- <MemberTeamProject :typeParent="'team'" :idTeamProject="resource.doc.name"></MemberTeamProject> -->
     </template>
     <template #actions v-if="membersToAdd.length">
       <Button
@@ -87,6 +89,7 @@ import {
   ComboboxOption,
 } from '@headlessui/vue'
 import { activeUsers } from '@/data/users'
+import MemberTeamProject from '@/components/MemberTeamProject.vue'
 
 export default {
   name: 'AddMemberDialog',
