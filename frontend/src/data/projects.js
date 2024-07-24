@@ -1,5 +1,5 @@
 import { computed } from 'vue'
-import { createListResource } from 'frappe-ui'
+import { createListResource, createResource } from 'frappe-ui'
 
 export let projects = createListResource({
   doctype: 'GP Project',
@@ -32,16 +32,34 @@ export let projects = createListResource({
   auto: true,
 })
 
+export let projects_by_role = createResource({
+  url: "gameplan.api.get_projects_by_role",
+  method: "GET",
+  auto: true,
+  transform(data) {
+    return data.map((project) => {
+      project.route = {
+        name: 'Project',
+        params: {
+          teamId: project.team,
+          projectId: project.name,
+        },
+      }
+      return project
+    })
+  }
+})
+
 export function getTeamProjects(team) {
   return activeProjects.value.filter((project) => project.team === team) || []
 }
 
 export let activeProjects = computed(
-  () => projects.data?.filter((project) => !project.archived_at) || []
+  () => projects_by_role.data?.filter((project) => !project.archived_at) || []
 )
 
 export let getProject = (projectId) => {
-  return projects.data.find(
+  return projects_by_role.data.find(
     (project) => project.name.toString() === projectId.toString()
   )
 }

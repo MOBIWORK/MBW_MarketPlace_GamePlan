@@ -56,20 +56,20 @@
         </div>
         <div class="overflow-auto" style="height: 89%;">
             <template v-for="notification in $resources.notifications.data">
-                <div class="px-4 py-2.5" @click="onReadNotification(notification)">
-                    <div class="flex cursor-pointer items-start gap-2.5 hover:bg-gray-100 border-b">
+                <div class="" @click="onReadNotification(notification)">
+                    <div class="flex cursor-pointer items-start gap-2.5 hover:bg-gray-100 border-b px-4 py-2.5">
                         <div class="mt-1 flex items-center gap-2.5">
                             <UserAvatar :user="notification.from_user" size="lg" />
                         </div>
                         <div class="flex items-center justify-between w-full">
                             <div class="mr-2">
                                 <div v-html="notification.message" />
-                                <div class="text-sm text-gray-600 flex items-center mt-1 mb-1">
+                                <div class="text-sm text-gray-600 flex items-center mt-1 mb-2">
                                     <div class="mr-2">{{ formatTimeAgo(notification.creation) }}</div>
                                     <div class="flex items-center"
                                         v-if="notification.project_title != null && notification.project_title != ''">
                                         <div style="background-color: rgba(97, 97, 97, 0.5);"
-                                            class="rounded-full h-2 w-2 mr-2"></div>
+                                            class="rounded-full h-1.5 w-1.5 mr-2"></div>
                                         <div>{{ notification.project_title }}</div>
                                     </div>
                                 </div>
@@ -103,6 +103,7 @@ export default {
             type: String
         }
     },
+    emits: ["eventReadNotification"],
     data() {
         return {
             activeStatus: "all"
@@ -116,10 +117,7 @@ export default {
                 params: {
                     status: this.activeStatus
                 },
-                auto: true,
-                transform(data) {
-                    console.log(data)
-                },
+                auto: true
             }
         },
         unread_notifications() {
@@ -178,6 +176,9 @@ export default {
             return timeAgo(time)
         },
         onReadNotification(notification){
+            if(this.parent_panel == 'sidebar'){
+                this.$emit('eventReadNotification')
+            }
             this.$resources.lst_notifications.setValue.submit(
                 {
                     name: notification.name,

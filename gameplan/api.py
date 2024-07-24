@@ -7,7 +7,7 @@ import frappe
 from frappe.utils import validate_email_address, split_emails, cstr
 from gameplan.utils import validate_type, random_config_notification, get_title_by_id_notification
 from frappe.translate import get_all_translations
-from gameplan.notification import send_manager_by_invite_guest
+from gameplan.notification import send_manager_by_invite_guest, send_guest_by_invite_guest
 
 import json
 
@@ -199,7 +199,7 @@ def get_members_by_type(team_project, type_filter):
 			if member.role is not None and member.role != "":
 				member_info["role"] = member.role
 			else:
-				member_info["role"] = "member"
+				member_info["role"] = "manager"
 			arr_member.append(member_info)
 	elif type_filter == "project":
 		project_info = frappe.get_doc('GP Project', team_project)
@@ -215,7 +215,7 @@ def get_members_by_type(team_project, type_filter):
 			if member.role is not None and member.role != "":
 				member_info["role"] = member.role
 			else:
-				member_info["role"] = "member"
+				member_info["role"] = "manager"
 			arr_member.append(member_info)
 	return arr_member
 
@@ -243,22 +243,47 @@ def add_role_member_by_id(team_project, type_filter, id_user):
 		reference_doc = "GP Project"
 	if reference_doc is not None:
 		doc_info = frappe.get_doc(reference_doc, team_project)
-		member_doc = frappe.new_doc('GP Member')
-		member_doc.update({
-			'parent': doc_info.name,
-			'parentfield': 'members',
-			'parenttype': reference_doc,
-			'user': id_user,
-			'role': 'member'
-		})
-		member_doc.insert()
-		frappe.db.commit()
-		user_info = frappe.get_doc('User', id_user)
-		member_res["email"] = user_info.email
-		member_res["full_name"] = user_info.full_name
-		member_res["id_user"] = user_info.name
-		member_res["id"] = member_doc.name
-		member_res["role"] = member_doc.role
+		if id_user not in [member.user for member in doc_info.members]:
+			member_doc = frappe.new_doc('GP Member')
+			member_doc.update({
+				'parent': doc_info.name,
+				'parentfield': 'members',
+				'parenttype': reference_doc,
+				'user': id_user,
+				'role': 'member',
+				"status": "Accepted"
+			})
+			member_doc.insert()
+			frappe.db.commit()
+			config_notifications = frappe.db.get_all(
+				"GP Config Notification",
+				fields=["config_notification"],
+				filters={"user": id_user}
+			)
+			config_notification = []
+			type_notify = []
+			if len(config_notifications) == 0:
+				configs = random_config_notification()
+				doc_config_notification = frappe.new_doc('GP Config Notification')
+				doc_config_notification.config_notification = json.dumps(configs)
+				doc_config_notification.user = id_user
+				doc_config_notification.insert(ignore_permissions=True)
+				frappe.db.commit()
+				config_notification = configs
+			else:
+				config_notification = json.loads(config_notifications[0].config_notification)
+			if config_notification[1]["arr_permission"][0]["email"] == True:
+				type_notify.append("email")
+			if config_notification[1]["arr_permission"][0]["browser"] == True:
+				type_notify.append('browser')
+			send_guest_by_invite_guest(type_notify, id_user, "team", doc_info.name)
+			user_info = frappe.get_doc('User', id_user)
+			member_res["email"] = user_info.email
+			member_res["full_name"] = user_info.full_name
+			member_res["id_user"] = user_info.name
+			member_res["id"] = member_doc.name
+			member_res["role"] = member_doc.role
+			return member_res
 	return member_res
 
 @frappe.whitelist()
@@ -310,12 +335,15 @@ def get_teams_by_role():
 				fields=['guests']
 			)
 			for project in projects:
-				guests = project.guests
-				if guests is not None and guests != "":
-					objGuest = json.loads(guests)
-					if user_doc.email in objGuest:
-						arr_team_res.append(team)
-						break
+				guest_access = frappe.get_all('GP Guest Access',
+					filters={
+						'project': project.name,
+						'user': frappe.session.user
+					}
+				)
+				if len(guest_access) > 0:
+					arr_team_res.append(team)
+					break
 		return arr_team_res
 	return []
 
@@ -350,11 +378,14 @@ def get_projects_by_role():
 		return arr_project_res
 	elif "Gameplan Guest" in arr_role:
 		for project in projects:
-			guests = project.guests
-			if guests is not None and guests != "":
-				objGuest = json.loads(guests)
-				if user_doc.email in objGuest:
-					arr_project_res.append(project)
+			guest_access = frappe.get_all('GP Guest Access',
+				filters={
+					'project': project.name,
+					'user': frappe.session.user
+				}
+			)
+			if len(guest_access) > 0:
+				arr_project_res.append(project)
 		return arr_project_res
 	return []
 

@@ -121,7 +121,6 @@ export default {
       }
     },
     disnableEditContent(page){
-      console.log(page)
       if(page.doc.owner == getUser('sessionUser').name) return false;
       return true;
     }

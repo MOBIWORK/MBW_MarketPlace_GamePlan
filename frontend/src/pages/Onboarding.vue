@@ -68,8 +68,8 @@ import { Input, LoadingIndicator, ErrorMessage } from 'frappe-ui'
 import OnboardingStepTeam from './OnboardingStepTeam.vue'
 import OnboardingStepProject from './OnboardingStepProject.vue'
 import OnboardingStepInvites from './OnboardingStepInvites.vue'
-import { teams } from '@/data/teams'
-import { projects } from '@/data/projects'
+import { teams, teams_by_role } from '@/data/teams'
+import { projects, projects_by_role } from '@/data/projects'
 
 export default {
   name: 'Onboarding',
@@ -91,8 +91,8 @@ export default {
         }
       },
       onSuccess(teamId) {
-        teams.reload()
-        projects.reload()
+        teams_by_role.fetch()
+        projects_by_role.fetch()
         this.$router.push({ name: 'TeamOverview', params: { teamId } })
       },
     },

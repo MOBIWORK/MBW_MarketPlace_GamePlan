@@ -221,7 +221,6 @@ export default {
     watch(
       () => this.$resources.discussions.data,
       (newData) => {
-        console.log(newData);
         this.$emit('load_data', newData);
       },
       { deep: true }

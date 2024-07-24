@@ -5,7 +5,7 @@
     v-model="open"
   >
     <template #body-content>
-      <ul v-if="membersToAdd.length" class="flex flex-wrap gap-2 py-2">
+      <!-- <ul v-if="membersToAdd.length" class="flex flex-wrap gap-2 py-2">
         <li
           class="flex items-center space-x-2 rounded bg-gray-100 px-2 py-1.5"
           v-for="user in membersToAdd"
@@ -30,9 +30,6 @@
           v-model="selectedUser"
           :placeholder="__('Add member by name or email')"
         >
-          <!-- <template #prefix="{ option }">
-            <UserAvatar class="mr-2" :user="option.email" size="sm" />
-          </template> -->
         </Autocomplete>
         <ErrorMessage class="mt-2" :message="resource.addMembers.error" />
       </div>
@@ -64,11 +61,13 @@
             </Button>
           </li>
         </ul>
+      </div> -->
+      <div class="h-80">
+        <MemberTeamProject :typeParent="'team'" :idTeamProject="resource.doc.name" @addMember="onAddMember()" @changeRole="onChangeRoleMember($event)"></MemberTeamProject>
       </div>
-
-      <!-- <MemberTeamProject :typeParent="'team'" :idTeamProject="resource.doc.name"></MemberTeamProject> -->
+      
     </template>
-    <template #actions v-if="membersToAdd.length">
+    <!-- <template #actions v-if="membersToAdd.length">
       <Button
         class="w-full"
         variant="solid"
@@ -77,7 +76,7 @@
       >
         {{__('Add')}}
       </Button>
-    </template>
+    </template> -->
   </Dialog>
 </template>
 <script>
@@ -94,6 +93,7 @@ import MemberTeamProject from '@/components/MemberTeamProject.vue'
 export default {
   name: 'AddMemberDialog',
   props: ['resource', 'modelValue'],
+  emits: ['reloadMember'],
   components: {
     ErrorMessage,
     Combobox,
@@ -147,18 +147,6 @@ export default {
       memberEmails = memberEmails.concat(
         this.membersToAdd.map((user) => user.email)
       )
-
-      console.log(activeUsers.value
-        .filter((user) => !memberEmails.includes(user.email))
-        .sort((a, b) => a.full_name - b.full_name)
-        .map((user) => {
-          return {
-            label: user.full_name,
-            value: user.email,
-            ...user,
-          }
-        }))
-
       return activeUsers.value
         .filter((user) => !memberEmails.includes(user.email))
         .sort((a, b) => a.full_name - b.full_name)
@@ -209,6 +197,12 @@ export default {
       this.selectedUser = null
       this.addMembersIntent = false
     },
+    onAddMember(){
+
+    },
+    onChangeRoleMember(event){
+      this.$emit('reloadMember', event)
+    }
   },
 }
 </script>

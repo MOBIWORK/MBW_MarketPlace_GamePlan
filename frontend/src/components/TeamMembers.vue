@@ -24,7 +24,7 @@
       </template>
     </div>
   </div>
-  <AddMemberDialog :resource="team" v-model="inviteMemberDialog" />
+  <AddMemberDialog :resource="team" v-model="inviteMemberDialog" @reloadMember="onReloadMember($event)"/>
 </template>
 <script>
 import { Avatar } from 'frappe-ui'
@@ -49,5 +49,15 @@ export default {
       )
     },
   },
+  methods: {
+    onReloadMember(event){
+      let arrMember = []
+      for(let i = 0; i < event.length; i++){
+        let filterMember = this.team.doc.members.filter((member) => member.name == event[i].id)
+        if(filterMember.length > 0) arrMember.push(filterMember[0])
+      }
+      this.team.doc.members = arrMember
+    }
+  }
 }
 </script>

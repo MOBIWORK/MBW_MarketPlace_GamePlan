@@ -54,7 +54,6 @@ let emits = defineEmits(['load_data'])
 
 function onAddPage(){
   let me = this;
-  console.log(props.listOptions.filters.project)
   let newPage = createResource({
     url: 'frappe.client.insert',
     params: {

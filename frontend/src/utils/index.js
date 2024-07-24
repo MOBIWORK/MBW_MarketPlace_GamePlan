@@ -3,8 +3,6 @@ import { toast } from 'frappe-ui'
 import { useDateFormat, useTimeAgo } from '@vueuse/core'
 
 export function createToast(options) {
-  console.log("in toast")
-  console.log(toast)
   toast({
     position: 'bottom-right',
     ...options,

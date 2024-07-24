@@ -53,7 +53,6 @@ export default {
                     value_notify: type_notify=="email"? item['email'] : item['browser']
                 },
                 onSuccess(data){
-                    console.log(data)
                     if(data == "ok"){
                         createToast({
                             title: __('Đã lưu thành công'),

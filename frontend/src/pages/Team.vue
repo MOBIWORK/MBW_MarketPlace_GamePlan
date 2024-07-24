@@ -163,7 +163,6 @@ export default {
     },
     onSaveNameTeam(){
       if(this.nameTeamNew == null || this.nameTeamNew == ""){
-        console.log("tesss")
         createToast({
           title: __('Team name is not empty or null'),
           icon: 'x',

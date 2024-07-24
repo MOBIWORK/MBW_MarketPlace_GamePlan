@@ -480,7 +480,6 @@ export default {
           items = items.concat(this.$resources.polls.data)
         }
       }
-      console.log(items);
       return items.sort((a, b) => {
         return new Date(a.creation) - new Date(b.creation)
       })

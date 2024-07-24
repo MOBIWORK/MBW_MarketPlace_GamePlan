@@ -418,7 +418,6 @@ export default {
       teams.fetch()
     },
     onLoadUnreadNotification(){
-      console.log("Dòng 421")
       unreadNotifications.fetch()
     }
   },

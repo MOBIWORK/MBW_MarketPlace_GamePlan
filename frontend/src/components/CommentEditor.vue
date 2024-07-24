@@ -73,7 +73,6 @@ export default {
   components: { TextEditor, TextEditorFixedMenu, EditorContent },
   methods: {
     onFocusEditor(){
-      console.log("Dòng 76");
     }
   },
   computed: {

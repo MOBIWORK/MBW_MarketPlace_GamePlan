@@ -13,7 +13,7 @@ import Link from '@/components/Link.vue'
 import Reactions from '@/components/Reactions.vue'
 import DiscussionList from '@/components/DiscussionList.vue'
 import DiscussionView from '@/components/DiscussionView.vue'
-import { teams } from '@/data/teams'
+import { teams, teams_by_role } from '@/data/teams'
 import { getUser } from '@/data/users'
 
 export default {
@@ -31,7 +31,7 @@ export default {
     postId: {
       immediate: true,
       handler() {
-        for (let team of teams.data || []) {
+        for (let team of teams_by_role.data || []) {
           if (team.name === this.team.doc.name) {
             team.open = true
           }

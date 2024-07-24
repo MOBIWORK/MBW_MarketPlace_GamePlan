@@ -40,8 +40,30 @@ export let unreadItems = createResource({
   cache: 'UnreadItems',
 })
 
+export let teams_by_role = createResource({
+  url: "gameplan.api.get_teams_by_role",
+  method: "GET",
+  auto: true,
+  onSuccess() {
+    unreadItems.fetch()
+  },
+  transform(data) {
+    return data.map((team) => {
+      return {
+        ...team,
+        route: {
+          name: 'Team',
+          params: { teamId: team.name },
+        },
+        open: false,
+        projects: [],
+      }
+    })
+  },
+})
+
 export let activeTeams = computed(() => {
-  return (teams.data || [])
+  return (teams_by_role.data || [])
     .filter((team) => !team.archived_at)
     .map((team) => {
       if (unreadItems.data) {
@@ -52,5 +74,5 @@ export let activeTeams = computed(() => {
 })
 
 export let getTeam = (teamId) => {
-  return teams.data.find((team) => team.name.toString() === teamId.toString())
+  return teams_by_role.data.find((team) => team.name.toString() === teamId.toString())
 }

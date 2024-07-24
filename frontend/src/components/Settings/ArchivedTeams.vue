@@ -31,7 +31,7 @@
               },
               {
                 onSuccess: () => {
-                  teams.reload()
+                  teams_by_role.fetch()
                   $router.push({
                     name: 'Team',
                     params: { teamId: team.name },
@@ -51,7 +51,7 @@
   </div>
 </template>
 <script>
-import { teams } from '@/data/teams'
+import { teams, teams_by_role } from '@/data/teams'
 
 export default {
   name: 'ArchivedTeamsDialog',
@@ -60,11 +60,12 @@ export default {
   data() {
     return {
       teams,
+      teams_by_role
     }
   },
   computed: {
     archivedTeams() {
-      return teams.data.filter((team) => team.archived_at)
+      return teams_by_role.data.filter((team) => team.archived_at)
     },
     show: {
       get() {

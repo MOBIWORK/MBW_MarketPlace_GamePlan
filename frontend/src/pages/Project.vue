@@ -337,8 +337,8 @@ import IconPicker from '@/components/IconPicker.vue'
 import Links from '@/components/Links.vue'
 import Tabs from '@/components/Tabs.vue'
 import InviteGuestDialog from '@/components/InviteGuestDialog.vue'
-import { projects } from '@/data/projects'
-import { activeTeams, teams } from '@/data/teams'
+import { projects, projects_by_role } from '@/data/projects'
+import { activeTeams, teams, teams_by_role } from '@/data/teams'
 import PinIcon from '~icons/lucide/pin'
 import { useScreenSize } from '@/utils/composables'
 import { getUser } from '@/data/users'
@@ -550,8 +550,8 @@ export default {
     },
     onProjectMove() {
       this.projectMoveDialog.show = false
-      projects.reload()
-      for (let team of teams.data || []) {
+      projects_by_role.fetch()
+      for (let team of teams_by_role.data || []) {
         if (
           [this.team.doc.name, this.projectMoveDialog.team.value].includes(
             team.name

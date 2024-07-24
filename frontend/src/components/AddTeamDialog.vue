@@ -64,7 +64,6 @@ export default {
         return this.show
       },
       set(val) {
-        console.log(val)
         this.$emit('update:show', val)
       },
     },

@@ -144,7 +144,7 @@
 </template>
 <script>
 import { Dialog, FormControl, TextInput, TabButtons } from 'frappe-ui'
-import { projects, getTeamProjects } from '@/data/projects'
+import { projects, getTeamProjects, projects_by_role } from '@/data/projects'
 
 export default {
   name: 'TeamOverview',
@@ -190,7 +190,7 @@ export default {
         },
         {
           onSuccess: (project) => {
-            projects.reload()
+            projects_by_role.fetch()
             this.newProject = this.$options.data().newProject
             this.createNewProjectDialog = false
             this.$router.push({

@@ -6,7 +6,7 @@
       'min-width': '430px',
       left: 'calc(100% + 1px)',
     }">
-    <NotificationsList :parent_panel="'sidebar'" ></NotificationsList>
+    <NotificationsList :parent_panel="'sidebar'" @eventReadNotification="onReadNotification()"></NotificationsList>
   </div>
 </template>
 
@@ -33,6 +33,11 @@ export default {
     }
     onClickOutside(target, closePanel, { ignore: ['#notifications-btn'] })
     return { target }
+  },
+  methods: {
+    onReadNotification(){
+      this.$emit('changeVisible', false)
+    }
   }
 }
 </script>
