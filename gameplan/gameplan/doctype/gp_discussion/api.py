@@ -8,7 +8,7 @@ from pypika.terms import ExistsCriterion
 
 
 @frappe.whitelist()
-def get_discussions(filters=None, order_by=None, limit_start=None, limit_page_length=None):
+def get_discussions(filters=None, order_by=None, limit_start=None, limit_page_length=None, or_filter=None):
 	if not frappe.has_permission("GP Discussion", "read"):
 		frappe.throw("Insufficient Permission for GP Discussion", frappe.PermissionError)
 
@@ -17,6 +17,8 @@ def get_discussions(filters=None, order_by=None, limit_start=None, limit_page_le
 	participator = filters.pop("participator", None) if filters else None
 	order_by = order_by or "last_post_at desc"
 	order_field, order_direction = order_by.split(" ", 1)
+
+	print("Dòng 21 ", filters)
 
 	Discussion = frappe.qb.DocType("GP Discussion")
 	Visit = frappe.qb.DocType("GP Discussion Visit")
@@ -45,7 +47,13 @@ def get_discussions(filters=None, order_by=None, limit_start=None, limit_page_le
 	)
 	if filters:
 		for key in filters:
-			query = query.where(Discussion[key] == filters[key])
+			if key != "searchDiscussion":
+				query = query.where(Discussion[key] == filters[key])
+
+		if filters.get("searchDiscussion") is not None and filters.get("searchDiscussion") != "":
+			textSearch = filters.get("searchDiscussion")
+			query = query.where(Discussion.title.like(f'%{textSearch}%') | Discussion.owner.like(f'%{textSearch}%')
+				 | Project.title.like(f'%{textSearch}%') | Team.title.like(f'%{textSearch}%'))
 
 		# order by pinned_at desc if project is selected
 		if filters.get("project"):

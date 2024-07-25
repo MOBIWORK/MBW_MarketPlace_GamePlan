@@ -311,22 +311,26 @@ def get_teams_by_role():
 	)
 	arr_team_res = []
 	if "Gameplan Admin" in arr_role:
-		return teams
-	elif "Gameplan Member" in arr_role:
+		arr_team_res = teams
+	if "Gameplan Member" in arr_role:
 		for team in teams:
-			members = frappe.get_all('GP Member',
-				filters = {
-					'parenttype': "GP Team",
-					'parent': team.name
-				},
-				fields=['user']
-			)
-			for member in members:
-				if member.user == frappe.session.user:
+			filters = {'parent': team.name}
+			members = frappe.db.sql("""
+				SELECT
+					user
+				FROM `tabGP Member`
+				WHERE parent = %(parent)s
+			""", values=filters, as_dict=1)
+			if frappe.session.user in [member.user for member in members]:
+				team_filter = [team_fil.name for team_fil in arr_team_res if team_fil.name == team.name]
+				if len(team_filter) == 0:
 					arr_team_res.append(team)
-					break
-		return arr_team_res
-	elif "Gameplan Guest" in arr_role:
+			else:
+				if team.is_private == 0:
+					team_filter = [team_fil.name for team_fil in arr_team_res if team_fil.name == team.name]
+					if len(team_filter) == 0:
+						arr_team_res.append(team)
+	if "Gameplan Guest" in arr_role:
 		for team in teams:
 			projects = frappe.get_all('GP Project',
 				filters = {
@@ -342,10 +346,11 @@ def get_teams_by_role():
 					}
 				)
 				if len(guest_access) > 0:
-					arr_team_res.append(team)
-					break
-		return arr_team_res
-	return []
+					team_filter = [team_fil.name for team_fil in arr_team_res if team_fil.name == team.name]
+					if len(team_filter) == 0:
+						arr_team_res.append(team)
+						break
+	return arr_team_res
 
 @frappe.whitelist()
 def get_projects_by_role():
@@ -356,38 +361,55 @@ def get_projects_by_role():
 		order_by='title asc',
 		page_length=999
 	)
+	teams = frappe.get_all('GP Team',
+		fields=['name','title','is_private']
+	)
 	arr_project_res = []
 	if "Gameplan Admin" in arr_role:
-		return projects
-	elif "Gameplan Member" in arr_role:
-		for project in projects:
-			if project.is_private == True:
-				members = frappe.get_all('GP Member',
-					filters = {
-						'parenttype': "GP Project",
-						'parent': project.team
-					},
-					fields=['user']
-				)
-				for member in members:
-					if member.user == frappe.session.user:
-						arr_project_res.append(project)
-						break
-			else:
-				arr_project_res.append(project)
-		return arr_project_res
-	elif "Gameplan Guest" in arr_role:
-		for project in projects:
-			guest_access = frappe.get_all('GP Guest Access',
-				filters={
-					'project': project.name,
-					'user': frappe.session.user
-				}
+		arr_project_res = projects
+	if "Gameplan Member" in arr_role:
+		for team in teams:
+			projects_by_team = frappe.get_all('GP Project',
+				fields=['name','title','icon','team','archived_at','is_private','modified','tasks_count','discussions_count','guests'],
+				filters = {
+					'team': team.name
+				},
+				order_by='title asc',
+				page_length=999
 			)
-			if len(guest_access) > 0:
-				arr_project_res.append(project)
-		return arr_project_res
-	return []
+			filters = {'parent': team.name}
+			members = frappe.db.sql("""
+				SELECT
+					user
+				FROM `tabGP Member`
+				WHERE parent = %(parent)s
+			""", values=filters, as_dict=1)
+			if frappe.session.user in [member.user for member in members]:
+				for project in projects_by_team:
+					project_filter = [project_fil.name for project_fil in arr_project_res if project_fil.name == project.name]
+					if len(project_filter) == 0:
+						arr_project_res.append(project)
+			else:
+				if team.is_private == 0:
+					for project in projects_by_team:
+						if project.is_private == 0:
+							project_filter = [project_fil.name for project_fil in arr_project_res if project_fil.name == project.name]
+							if len(project_filter) == 0:
+								arr_project_res.append(project)
+	if "Gameplan Guest" in arr_role:
+		for project in projects:
+			if project.is_private == 1:
+				guest_access = frappe.get_all('GP Guest Access',
+					filters={
+						'project': project.name,
+						'user': frappe.session.user
+					}
+				)
+				if len(guest_access) > 0:
+					project_filter = [project_fil.name for project_fil in arr_project_res if project_fil.name == project.name]
+					if len(project_filter) == 0:
+						arr_project_res.append(project)
+	return arr_project_res
 
 @frappe.whitelist()
 def get_mypages_by_filter(order_by, search=None, project=None):

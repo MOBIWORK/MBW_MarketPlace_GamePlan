@@ -2,10 +2,22 @@
   <header
     class="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-3 py-2.5 sm:px-5"
   >
-    <Breadcrumbs
-      class="h-7"
-      :items="[{ label: __('Discussions'), route: { name: 'Discussions' } }]"
-    />
+    <div class="flex items-center">
+      <Breadcrumbs
+        class="h-7 mr-5"
+        :items="[{ label: __('Discussions'), route: { name: 'Discussions' } }]"
+      />
+      <TextInput class="w-96 border-none" type="text" variant="outline" size="sm" placeholder="Tìm kiếm bài viết, tác giả, nhóm hoặc dự án" 
+        v-model="searchDiscussion" :debounce="debounceSearchDiscussion">
+        <template #prefix>
+          <FeatherIcon
+            class="w-4"
+            name="search"
+          />
+        </template>
+      </TextInput>
+    </div>
+    
     <Button variant="solid" @click="newDiscussionDialog.show = true">
       <template #prefix><LucidePlus class="h-4 w-4" /></template>
       {{__('Add new')}}
@@ -33,6 +45,7 @@
         }}
       </Button>
       <Select
+        style="min-width: 7rem;"
         v-if="feedType === 'recent'"
         :options="orderOptions"
         v-model="orderBy"
@@ -153,6 +166,8 @@ import {
   TabButtons,
   Tooltip,
   Breadcrumbs,
+  TextInput,
+  FeatherIcon
 } from 'frappe-ui'
 import { useSwipe } from '@/utils/composables'
 import { getScrollContainer } from '@/utils/scrollContainer'
@@ -169,6 +184,8 @@ export default {
     FormControl,
     Tooltip,
     Breadcrumbs,
+    TextInput,
+    FeatherIcon
   },
   data() {
     return {
@@ -206,8 +223,18 @@ export default {
           label: __('Created'),
           value: 'creation desc',
         },
+        {
+          label: __('Comments'),
+          value: 'comments_count desc'
+        },
+        {
+          label: __('Participants'),
+          value: 'participants_count desc'
+        }
       ],
       orderBy: 'last_post_at desc',
+      searchDiscussion: '',
+      debounceSearchDiscussion: 500
     }
   },
   setup() {
@@ -236,7 +263,7 @@ export default {
         }
       },
       deep: true,
-    },
+    }
   },
   resources: {
     followedProjects() {
@@ -275,7 +302,9 @@ export default {
   },
   computed: {
     filters() {
-      return this.feedType ? { feed_type: this.feedType } : null
+      let filters = this.feedType ? { feed_type: this.feedType } : {}
+      filters["searchDiscussion"] = this.searchDiscussion
+      return filters
     },
     projectOptions() {
       return activeTeams.value.map((team) => ({

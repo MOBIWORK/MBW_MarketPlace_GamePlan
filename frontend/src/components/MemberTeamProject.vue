@@ -18,10 +18,10 @@
                     :key="user_info.name" @click="onClickAddMember(user_info)">
                     <UserAvatar :user="user_info.name" />
                     <div class="ml-3">
-                        <div class="text-base font-medium text-gray-800">
+                        <div class="text-base font-medium text-gray-800 truncate max-w-sm">
                             {{ user_info.full_name }}
                         </div>
-                        <div class="text-sm text-gray-600">
+                        <div class="text-sm text-gray-600 truncate max-w-sm">
                             {{ user_info.email }}
                         </div>
                     </div>
@@ -33,14 +33,14 @@
         </template>
     </div>
     <div class="mt-1 text-gray-600 text-sm">Enter name or email addess to add new invatation</div>
-    <ul role="list" class="mt-2 divide-y overflow-y-auto max-h-80">
+    <ul role="list" class="mt-2 divide-y overflow-y-auto max-h-56">
         <li class="flex w-full items-center py-2" v-for="member in arrMember" :key="member.id">
             <UserAvatar :user="member.id_user" />
             <div class="ml-3">
-                <div class="text-base font-medium text-gray-800">
+                <div class="text-base font-medium text-gray-800 truncate w-52">
                     {{ member.full_name }}
                 </div>
-                <div class="text-sm text-gray-600">
+                <div class="text-sm text-gray-600 truncate w-52">
                     {{ member.email }}
                 </div>
             </div>
