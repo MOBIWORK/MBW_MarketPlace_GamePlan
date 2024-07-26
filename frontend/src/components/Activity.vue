@@ -82,8 +82,7 @@
         </template>
         <template v-else-if="activity.data.field === 'project'">
           {{__('changed project')}}
-          <span v-if="activity.data.old_value">{{__('from')}}</span>
-          <span>&nbsp;</span>
+          <span v-if="activity.data.old_value">{{__('from')}}&nbsp;</span>
           <span class="text-gray-800">
             {{ projectTitle(activity.data.old_value) }}
           </span>
@@ -94,8 +93,7 @@
         </template>
         <template v-else>
           {{__('changed')}} {{ activity.data.field_label }}
-          <span v-if="activity.data.old_value">{{__('from')}}</span>
-          <span>&nbsp;</span>
+          <span v-if="activity.data.old_value">{{__('from')}}&nbsp;</span>
           <span class="text-gray-800">{{ activity.data.old_value }}</span> {{__('to')}}
           <span class="text-gray-800">{{ activity.data.new_value }}</span>
         </template> </span

@@ -135,7 +135,7 @@ class GPDiscussion(HasActivity, HasMentions, HasReactions, Document):
 		self.log_activity('Discussion Closed')
 		self.save()
 		#Gửi thông báo cho người dùng đã theo dõi project
-		arr_user_followed = frappe.db.get_list('GP Followed Project', {project: self.project})
+		arr_user_followed = frappe.db.get_list('GP Followed Project', filters={'project': self.project}, fields=['name','user'])
 		id_users_followed = [ item.user for item in arr_user_followed]
 		close_conclusion_followed_discussion(id_users_followed, self.name)
 

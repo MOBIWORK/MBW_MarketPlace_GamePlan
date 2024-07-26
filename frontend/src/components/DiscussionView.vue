@@ -165,7 +165,6 @@
             doctype="GP Discussion"
             :name="discussion.name"
             v-model:reactions="discussion.reactions"
-            :read-only-mode="readOnlyMode"
           />
         </div>
         <div class="text-1xl font-semibold mb-4">Activity</div>

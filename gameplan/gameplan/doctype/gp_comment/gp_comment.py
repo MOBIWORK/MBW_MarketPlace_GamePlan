@@ -49,7 +49,7 @@ class GPComment(HasMentions, HasReactions, Document):
 			add_comment_owner_discussion(type_notifies, self.reference_name, self.name)
 			#Gửi thông báo cho người dùng đã theo dõi project
 			project_discussion = frappe.db.get_value('GP Discussion', self.reference_name, 'project')
-			arr_user_followed = frappe.db.get_list('GP Followed Project', filters={'project': project_discussion})
+			arr_user_followed = frappe.db.get_list('GP Followed Project', filters={'project': project_discussion}, fields=['name','user'])
 			id_users_followed = [ item.user for item in arr_user_followed]
 			add_comment_followed_discussion(id_users_followed, self.reference_name, self.name)
 
