@@ -445,27 +445,45 @@ def invite_member(email, teamId):
 	except Exception as e:
 		return {'status': "error", 'message': ""}
 	
-@frappe.whitelist(methods=['GET'])
+@frappe.whitelist()
 def get_connections(reference_doctype, reference_name):
 	connections_res = []
 	connections_filter = frappe.db.get_list('GP Connection',
-		filters=[
-			['reference_name_source', '=', reference_name],
-			['reference_name_destination', '=', reference_name]
-		],
+		filters={
+			'reference_type_source': reference_doctype,
+			'reference_name_source': reference_name
+		},
 		fields=['name', 'reference_type_source', 'reference_name_source', 'reference_type_destination', 'reference_name_destination']
 	)
 	for connection_filter in connections_filter:
-		if connection_filter['reference_type_source'] == reference_doctype or connection_filter['reference_type_destination'] == reference_doctype:
-			destination_info = frappe.get_doc(reference_doctype, reference_name)
+		connection_res_filter = [connecton_fil['name'] for connecton_fil in connections_res if connecton_fil['name'] == connection_filter['name']]
+		if len(connection_res_filter) == 0:
+			destination_info = frappe.get_doc(connection_filter.reference_type_destination, connection_filter.reference_name_destination)
 			connection_res = {
-				name: connection_filter['name'],
-				reference_type_source: connection_filter['reference_type_source'],
-				reference_name_source: connection_filter['reference_name_source'],
-				reference_type_destination: connection_filter['reference_type_destination'],
-				reference_name_destination: connection_filter['reference_name_destination'],
-				title_destination: 
+				'name': connection_filter.name,
+				'doctype_destination': connection_filter.reference_type_destination,
+				'name_destination': connection_filter.reference_name_destination,
+				'title_destination': destination_info.title
 			}
+			connections_res.append(connection_res)
+	connections_filter = frappe.db.get_list('GP Connection',
+		filters={
+			'reference_type_destination': reference_doctype,
+			'reference_name_destination': reference_name
+		},
+		fields=['name', 'reference_type_source', 'reference_name_source', 'reference_type_destination', 'reference_name_destination']
+	)
+	for connection_filter in connections_filter:
+		connection_res_filter = [connecton_fil.name for connecton_fil in connections_res if connecton_fil.name == connection_filter.name]
+		if len(connection_res_filter) == 0:
+			destination_info = frappe.get_doc(connection_filter.reference_type_source, connection_filter.reference_name_source)
+			connection_res = {
+				'name': connection_filter.name,
+				'doctype_destination': connection_filter.reference_type_source,
+				'name_destination': connection_filter.reference_name_source,
+				'title_destination': destination_info.title
+			}
+			connections_res.append(connection_res)
 	return connections_res
 
 @frappe.whitelist()
