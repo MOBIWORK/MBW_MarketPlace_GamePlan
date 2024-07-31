@@ -411,6 +411,63 @@ def get_projects_by_role():
 						arr_project_res.append(project)
 	return arr_project_res
 
+@frappe.whitelist(methods=["POST"])
+def invite_member(email, teamId):
+	try:
+		if not email:
+			return
+		email_string = validate_email_address(email, throw=False)
+		email_list = split_emails(email_string)
+		if not email_list:
+			return
+		existing_members = frappe.db.get_all("User", filters={"email": ["in", email_list]}, pluck="email")
+		user_name = ""
+		if len(existing_members) == 0:
+			first_name = email.split("@")[0].title()
+			user = frappe.get_doc(
+				doctype="User",
+				user_type="Website User",
+				email=email,
+				send_welcome_email=0,
+				first_name=first_name,
+			).insert(ignore_permissions=True)
+			user.append_roles("Gameplan Member")
+			user.save(ignore_permissions=True)
+			user_name = user.name
+		else:
+			user = frappe.get_doc({
+				'doctype': 'User',
+				'email': 'email'
+			})
+			user_name = user.name
+		member_info = add_role_member_by_id(teamId, "team", user_name)
+		return {'status': "ok", 'message': member_info}
+	except Exception as e:
+		return {'status': "error", 'message': ""}
+	
+@frappe.whitelist(methods=['GET'])
+def get_connections(reference_doctype, reference_name):
+	connections_res = []
+	connections_filter = frappe.db.get_list('GP Connection',
+		filters=[
+			['reference_name_source', '=', reference_name],
+			['reference_name_destination', '=', reference_name]
+		],
+		fields=['name', 'reference_type_source', 'reference_name_source', 'reference_type_destination', 'reference_name_destination']
+	)
+	for connection_filter in connections_filter:
+		if connection_filter['reference_type_source'] == reference_doctype or connection_filter['reference_type_destination'] == reference_doctype:
+			destination_info = frappe.get_doc(reference_doctype, reference_name)
+			connection_res = {
+				name: connection_filter['name'],
+				reference_type_source: connection_filter['reference_type_source'],
+				reference_name_source: connection_filter['reference_name_source'],
+				reference_type_destination: connection_filter['reference_type_destination'],
+				reference_name_destination: connection_filter['reference_name_destination'],
+				title_destination: 
+			}
+	return connections_res
+
 @frappe.whitelist()
 def get_mypages_by_filter(order_by, search=None, project=None):
 	pages = []

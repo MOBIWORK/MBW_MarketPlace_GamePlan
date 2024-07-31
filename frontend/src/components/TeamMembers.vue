@@ -21,6 +21,7 @@
             <UserAvatar :user="member.user" />
           </div>
         </button>
+        <!-- <div v-if="members.length >= 5">{{onRenderMemberLength()}}</div> -->
       </template>
     </div>
   </div>
@@ -44,9 +45,11 @@ export default {
   },
   computed: {
     members() {
-      return this.team.doc.members.filter(
+      let arr_team = this.team.doc.members.filter(
         (member) => member.status != 'Invited'
       )
+      if(arr_team.length <= 5) return arr_team
+      return arr_team.slice(0, 5)
     },
   },
   methods: {
@@ -57,6 +60,12 @@ export default {
         if(filterMember.length > 0) arrMember.push(filterMember[0])
       }
       this.team.doc.members = arrMember
+    },
+    onRenderMemberLength(){
+      let arr_team = this.team.doc.members.filter(
+        (member) => member.status != 'Invited'
+      )
+      return `+${arr_team.length - 5}`
     }
   }
 }

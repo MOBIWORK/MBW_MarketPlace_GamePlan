@@ -1,0 +1,61 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-07-31 08:53:24.635055",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "reference_type_source",
+  "reference_name_source",
+  "reference_type_destination",
+  "reference_name_destination"
+ ],
+ "fields": [
+  {
+   "fieldname": "reference_type_source",
+   "fieldtype": "Link",
+   "label": "Reference Type Source",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "reference_name_source",
+   "fieldtype": "Data",
+   "label": "Reference Name Source"
+  },
+  {
+   "fieldname": "reference_type_destination",
+   "fieldtype": "Link",
+   "label": "Reference Type Destination",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "reference_name_destination",
+   "fieldtype": "Data",
+   "label": "Reference Name Destination"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-31 09:05:24.227746",
+ "modified_by": "Administrator",
+ "module": "Gameplan",
+ "name": "GP Connection",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

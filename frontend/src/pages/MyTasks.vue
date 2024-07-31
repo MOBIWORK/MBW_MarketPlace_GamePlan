@@ -7,7 +7,7 @@
         class="h-7"
         :items="[{ label: __('My Tasks'), route: { name: 'MyTasks' } }]"
       />
-      <Button variant="solid" @click="showNewTaskDialog">
+      <Button variant="solid" @click="showNewTaskDialog" v-if="!readOnlyByRole()">
         <template #prefix>
           <LucidePlus class="h-4 w-4" />
         </template>
@@ -27,6 +27,7 @@
 import { ref, computed } from 'vue'
 import { getCachedListResource, usePageMeta, Breadcrumbs } from 'frappe-ui'
 import { getUser } from '@/data/users'
+import {getRoleByUser} from '@/utils'
 
 let newTaskDialog = ref(null)
 
@@ -46,6 +47,12 @@ function showNewTaskDialog() {
       }
     },
   })
+}
+
+function readOnlyByRole(){
+  let role = getRoleByUser(null, null)
+  if(role == "guest") return true
+  return false
 }
 
 usePageMeta(() => {

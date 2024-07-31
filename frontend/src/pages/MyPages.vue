@@ -38,7 +38,7 @@
         @update:modelValue="onChangeSortBy()"
       />
 
-      <Button variant="solid" @click="$resources.newPage.submit()">
+      <Button variant="solid" @click="$resources.newPage.submit()" v-if="!readOnlyByRole()">
         <template #prefix>
           <LucidePlus class="h-4 w-4" />
         </template>
@@ -98,6 +98,11 @@ export default {
     },
     onChangeSortBy(){
       this.listOptions.orderBy = this.orderBy;
+    },
+    readOnlyByRole(){
+      let role = this.$getRoleByUser(null, null)
+      if(role == "guest") return true
+      return false
     }
   },
   pageMeta() {

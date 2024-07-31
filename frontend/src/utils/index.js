@@ -1,6 +1,7 @@
 export { default as dayjs } from './dayjs'
 import { toast } from 'frappe-ui'
 import { useDateFormat, useTimeAgo } from '@vueuse/core'
+import { getUser } from '@/data/users'
 
 export function createToast(options) {
   toast({
@@ -75,5 +76,28 @@ export function getPlatform() {
     return 'mac'
   } else if (ua.indexOf('x11') > -1 || ua.indexOf('linux') > -1) {
     return 'linux'
+  }
+}
+
+export function getRoleByUser(teamInfo=null, projectInfo=null){
+  let userSession = getUser('sessionUser')
+  if(userSession.role == "Gameplan Admin"){
+    return "admin"
+  }
+  if(userSession.role == "Gameplan Member"){
+    if(teamInfo != null){
+      let members = teamInfo.members
+      for(let i = 0; i < members.length; i++){
+        if(members[i].user == userSession.name) return members[i].role
+      }
+    }
+    if(projectInfo != null){
+      if(projectInfo.is_private == 0) return "manager"
+      return null
+    }
+    return "member"
+  }
+  if(userSession.role == "Gameplan Guest"){
+    return "guest"
   }
 }

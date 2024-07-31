@@ -9,7 +9,7 @@
           {{__('Last updated')}} {{ $dayjs(page.doc.modified).format('LLL') }}
         </span>
         <Button
-          v-show="page.doc && page.isDirty"
+          v-show="page.doc && page.isDirty && !readOnly"
           variant="solid"
           @click="save"
           :loading="page.save.loading"
@@ -31,19 +31,19 @@
             @input="page.doc.title = $event.target.value"
             @keydown.enter="$refs.content.editor.commands.focus()"
             ref="titleInput"
-            :readonly="disnableEditContent(page)"
+            :readonly="readOnly"
           />
         </div>
-
+        <div>{{readOnly}}</div>
         <TextEditor
             editor-class="rounded-b-lg max-w-[unset] prose-sm h-mbw-fit-page overflow-y-auto"
             :content="page.doc.content"
             @change="page.doc.content = $event"
-            :placeholder="__('Start writing here...')"
+            :placeholder="!readOnly? __('Start writing here...') : ''"
             ref="content"
-            :editable="!disnableEditContent(page)"
+            :editable="!readOnly"
           >
-            <template v-slot:bottom>
+            <template v-if="!readOnly" v-slot:bottom>
               <div
                 class="mt-2 flex flex-col justify-between sm:flex-row sm:items-center"
               >
@@ -60,7 +60,7 @@
 </template>
 <script>
 import { Breadcrumbs, getCachedDocumentResource } from 'frappe-ui'
-import { getTeam } from '@/data/teams'
+import { getTeam, getTeamInfo } from '@/data/teams'
 import { getProject } from '@/data/projects'
 import TextEditor from '@/components/TextEditor.vue'
 import TextEditorFixedMenu from 'frappe-ui/src/components/TextEditor/TextEditorFixedMenu.vue'
@@ -70,13 +70,19 @@ export default {
   name: 'Page',
   props: ['pageId', 'slug'],
   components: { TextEditor, Breadcrumbs, TextEditorFixedMenu },
+  data(){
+    return {
+      readOnly: true
+    }
+  },
   resources: {
     page() {
       return {
         type: 'document',
         doctype: 'GP Page',
         name: this.pageId,
-        onSuccess() {
+        onSuccess(data) {
+          this.setReadOnlyState(data);
           this.updateUrlSlug()
           this.$nextTick(() => {
             this.$refs.titleInput?.focus()
@@ -120,9 +126,24 @@ export default {
         })
       }
     },
-    disnableEditContent(page){
-      if(page.doc.owner == getUser('sessionUser').name) return false;
-      return true;
+    setReadOnlyState(data) {
+      if (data.owner == getUser('sessionUser').name) {
+        this.readOnly = false;
+      } else if (data.team != null && data.project != null) {
+        let projectInfo = getProject(data.project);
+        let teamInfo = getTeamInfo(data.team).data;
+        let roleByProject = this.$getRoleByUser(null, projectInfo);
+        
+        if (roleByProject == "manager") {
+          this.readOnly = false;
+        } else {
+          let roleByTeam = this.$getRoleByUser(teamInfo, null);
+          if (roleByTeam != "guest" && roleByTeam != "member") {
+            this.readOnly = false;
+          }
+        }
+      }
+      console.log('ReadOnly State Updated:', this.readOnly);
     }
   },
   computed: {
@@ -234,7 +255,7 @@ export default {
     pageTitle() {
       let page = getCachedDocumentResource('GP Page', this.pageId)
       return page?.doc?.title || this.pageId
-    },
+    }
   },
 }
 </script>

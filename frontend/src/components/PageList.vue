@@ -36,11 +36,12 @@
     v-else
   >
     <div class="text-base text-gray-600">{{__('No pages')}}</div>
-    <Button class="mt-1" :variant="'solid'" theme="gray" @click="() => onAddPage()">{{ __('Add page') }}</Button>
+    <Button v-if="!readOnlyByRole()" class="mt-1" :variant="'solid'" theme="gray" @click="() => onAddPage()">{{ __('Add page') }}</Button>
   </div>
 </template>
 <script setup>
 import { createListResource, createResource } from 'frappe-ui'
+import {getRoleByUser} from '@/utils'
 import router from '@/router'
 import { watch } from 'vue';
 
@@ -72,6 +73,12 @@ function onAddPage(){
     }
   })
   newPage.submit();
+}
+
+function readOnlyByRole(){
+  let role = getRoleByUser(null, null)
+  if(role == "guest") return true
+  return false
 }
 
 let pages = createListResource({

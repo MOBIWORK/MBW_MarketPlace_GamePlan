@@ -138,7 +138,7 @@
     v-else
   >
     <div class="text-base text-gray-600">{{__('No tasks')}}</div>
-    <Button v-if="showAddTask" class="mt-1" :variant="'solid'" theme="gray" @click="() => onAddTask()" >{{ __('Add task') }}</Button>
+    <Button v-if="showAddTask && !readOnlyByRole()" class="mt-1" :variant="'solid'" theme="gray" @click="() => onAddTask()" >{{ __('Add task') }}</Button>
   </div>
   <NewTaskDialog ref="newTaskDialog" />
 </template>
@@ -229,6 +229,11 @@ export default {
           }
         },
       })
+    },
+    readOnlyByRole(){
+      let role = this.$getRoleByUser(null, null)
+      if(role == "guest") return true
+      return false
     }
   },
   computed: {

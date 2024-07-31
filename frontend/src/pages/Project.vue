@@ -25,7 +25,7 @@
         <template v-if="route.name=='ProjectDiscussions'">
           <Button
             variant="solid"
-            v-if="!project.doc.archived_at"
+            v-if="!project.doc.archived_at && !readOnlyByRole()"
             :route="{ name: 'ProjectDiscussionNew' }"
           >
             <template #prefix>
@@ -35,7 +35,7 @@
           </Button>
         </template>
         <template v-if="route.name=='ProjectTasks'">
-          <Button variant="solid" @click="showNewTaskDialog">
+          <Button variant="solid" @click="showNewTaskDialog" v-if="!readOnlyByRole()">
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
             </template>
@@ -66,7 +66,7 @@
                 </div>
               </Button>
             </Dropdown>
-            <Button variant="solid" @click="$resources.newPage.submit()">
+            <Button variant="solid" @click="$resources.newPage.submit()" v-if="!readOnlyByRole()">
               <template #prefix><LucidePlus class="w-4" /></template>
               {{ __('Add new') }}
             </Button>
@@ -589,6 +589,11 @@ export default {
     },
     onChangeSearch(){
       this.listOptionsPage.search = this.search;
+    },
+    readOnlyByRole(){
+      let role = this.$getRoleByUser(this.team.doc, this.project.doc)
+      if(role == "guest") return true
+      return false
     }
   },
   resources: {

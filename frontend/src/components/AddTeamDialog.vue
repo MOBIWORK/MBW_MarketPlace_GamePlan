@@ -35,7 +35,7 @@
   </Dialog>
 </template>
 <script>
-import { teams } from '@/data/teams'
+import { teams, teams_by_role } from '@/data/teams'
 
 export default {
   name: 'AddTeamDialog',
@@ -51,7 +51,8 @@ export default {
     createTeam() {
       teams.insert.submit(this.newTeam, {
         onSuccess: (team) => {
-          this.$resetData('newTeam')
+          //this.$resetData('newTeam')
+          teams_by_role.fetch()
           this.showDialog = false
           this.$emit('success', team)
         },

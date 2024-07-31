@@ -17,7 +17,7 @@ import {
 import router from './router'
 import App from './App.vue'
 import './index.css'
-import { dayjs, getPlatform } from '@/utils'
+import { dayjs, getPlatform, getRoleByUser } from '@/utils'
 import { createDialog } from './utils/dialogs'
 import { createToast } from './utils/toasts'
 import { getUser, users } from './data/users'
@@ -54,6 +54,7 @@ app.config.globalProperties.$log = console.log.bind(console)
 app.config.globalProperties.$user = getUser
 app.config.globalProperties.$users = users
 app.config.globalProperties.$session = session
+app.config.globalProperties.$getRoleByUser = getRoleByUser
 app.config.globalProperties.$readOnlyMode = window.read_only_mode
 app.config.globalProperties.$platform = getPlatform()
 app.config.globalProperties.$isSessionUser = (email) => {

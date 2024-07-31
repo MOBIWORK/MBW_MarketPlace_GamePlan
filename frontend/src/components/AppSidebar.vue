@@ -112,6 +112,7 @@
         <Button
           :label="__('Create Team')"
           variant="ghost"
+          v-if="$getRoleByUser(null, null) != 'guest'"
           @click="showAddTeamDialog = true"
         >
           <template #icon><LucidePlus class="h-4 w-4" /></template>

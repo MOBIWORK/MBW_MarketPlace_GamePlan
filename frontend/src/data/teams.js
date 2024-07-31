@@ -11,7 +11,7 @@ export let teams = createListResource({
     'modified',
     'creation',
     'archived_at',
-    'is_private',
+    'is_private'
   ],
   orderBy: 'title asc',
   cache: 'Teams',
@@ -75,4 +75,17 @@ export let activeTeams = computed(() => {
 
 export let getTeam = (teamId) => {
   return teams_by_role.data.find((team) => team.name.toString() === teamId.toString())
+}
+
+export let getTeamInfo = (teamId) => {
+  let resourceTeam = createResource({
+    url: "frappe.client.get",
+    method: "POST",
+    auto: true,
+    params: {
+      doctype: "GP Team",
+      name: teamId
+    }
+  })
+  return resourceTeam
 }

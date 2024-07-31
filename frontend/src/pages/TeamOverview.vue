@@ -6,6 +6,7 @@
       :border="true"
       :collapsible="true"
       :editable="!team.doc.archived_at"
+      :readOnly="readOnlyByRole()"
     />
 
     <div class="mt-8">
@@ -17,7 +18,7 @@
             v-model="activeTab"
           />
           <Button
-            v-if="teamProjects.length"
+            v-if="teamProjects.length && !readOnlyByRole()"
             @click="createNewProjectDialog = true"
             variant="solid"
           >
@@ -201,6 +202,11 @@ export default {
         }
       )
     },
+    readOnlyByRole(){
+      let role = this.$getRoleByUser(this.team.doc, null);
+      if (role == "member" || role == "guest") return true
+      return false
+    }
   },
 }
 </script>

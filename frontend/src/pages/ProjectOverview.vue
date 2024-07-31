@@ -6,7 +6,7 @@
         <div class="mb-3 flex items-center justify-between">
           <h2 class="text-xl font-semibold">{{ __('Discussions') }}</h2>
           <div class="flex items-center" v-if="displayControlDiscussion">
-            <Button :variant="'outline'" theme="gray" :route="{ name: 'ProjectDiscussionNew' }" >{{ __('Add discussion') }}</Button>
+            <Button :variant="'outline'" theme="gray" :route="{ name: 'ProjectDiscussionNew' }" v-if="!readOnlyByRole()">{{ __('Add discussion') }}</Button>
             <Button class="ml-3" :variant="'solid'" theme="gray" :route="{ name: 'ProjectDiscussions' }">{{ __('View all') }}</Button>
           </div>
         </div>
@@ -25,7 +25,7 @@
           <div class="mb-3 flex items-center justify-between">
             <h2 class="text-xl font-semibold">{{ __('Tasks') }}</h2>
             <div class="flex items-center" v-if="displayControlTask">
-              <Button :variant="'outline'" theme="gray" @click="() => onAddTask()" >{{ __('Add task') }}</Button>
+              <Button :variant="'outline'" theme="gray" @click="() => onAddTask()" v-if="!readOnlyByRole()">{{ __('Add task') }}</Button>
               <Button class="ml-3" :variant="'solid'" theme="gray" :route="{ name: 'ProjectTasks' }">{{ __('View all') }}</Button>
             </div>
           </div>
@@ -40,7 +40,7 @@
           <div class="mb-3 flex items-center justify-between">
             <h2 class="text-xl font-semibold">{{ __('Pages') }}</h2>
             <div class="flex items-center" v-if="displayControlPage">
-              <Button :variant="'outline'" theme="gray" @click="() => onAddPage()">{{ __('Add page') }}</Button>
+              <Button :variant="'outline'" theme="gray" @click="() => onAddPage()" v-if="!readOnlyByRole()">{{ __('Add page') }}</Button>
               <Button class="ml-3" :variant="'solid'" theme="gray" :route="{ name: 'ProjectPages' }">{{ __('View all') }}</Button>
             </div>
           </div>
@@ -129,7 +129,13 @@ export default {
     },
     onLoadPage(data){
       if(data.length > 0) this.displayControlPage = true;
+    },
+    readOnlyByRole(){
+      let role = this.$getRoleByUser(null, this.project.doc)
+      if(role == "guest") return true
+      return false
     }
+
   }
 }
 </script>

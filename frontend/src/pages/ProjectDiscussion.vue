@@ -44,9 +44,17 @@ export default {
       return Number(this.$route.params.postId) === update.name
     },
     isReadOnlyMode(project){
-      //Boolean(project.doc.archived_at)
       if(project.doc.owner == getUser('sessionUser').name) return false;
-      return true;
+      else{
+        let roleProject = this.$getRoleByUser(null, this.project.doc)
+        if(roleProject != null) {
+          if(roleProject == "manager") return false
+        }else{  
+          let roleTeam = this.$getRoleByUser(this.team.doc, null)
+          if (roleTeam == "member" || roleTeam == "guest") return true
+          return false
+        }
+      }
     }
   },
 }

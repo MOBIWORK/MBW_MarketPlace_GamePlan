@@ -24,6 +24,7 @@
             "
             v-model="$resources.task.doc.title"
             v-focus
+            :disabled="readOnly"
           />
           <Dropdown
             :options="[
@@ -34,6 +35,7 @@
                 },
               },
             ]"
+            v-if="!readOnly"
           >
             <Button variant="ghost">
               <template #icon
@@ -44,7 +46,7 @@
         </div>
         <div class="w-full flex">
           <div class="text-1xl font-semibold mb-2">{{__('Description')}}</div>
-          <div class="ml-auto flex space-x-2" v-if="!readOnlyMode && !editingDescription">
+          <div class="ml-auto flex space-x-2" v-if="!readOnlyMode && !editingDescription && !readOnly">
             <Button
               variant="ghost"
               @click="editingDescription = true"
@@ -88,44 +90,74 @@
         </div>
 
         <div class="mt-8 flex flex-wrap items-center gap-2 sm:hidden">
-          <Autocomplete
-            :placeholder="__('Assign a user')"
-            :options="assignableUsers"
-            v-model="$resources.task.doc.assigned_to"
-            @update:modelValue="changeUserAssign"
-          />
-          <TextInput
-            type="date"
-            :placeholder="__('Due date')"
-            v-model="$resources.task.doc.due_date"
-            @change="
-              $resources.task.setValue.submit({
-                due_date: $event.target.value,
-              })
-            "
-          />
-          <Dropdown :options="statusOptions">
-            <Button>
-              <template #prefix>
-                <TaskStatusIcon :status="$resources.task.doc.status" />
-              </template>
-              {{ $resources.task.doc.status || __('Set status') }}
-            </Button>
-          </Dropdown>
-          <Dropdown :options="priorityOptions">
-            <Button>
-              <template v-if="$resources.task.doc.priority" #prefix>
-                <TaskPriorityIcon :priority="$resources.task.doc.priority" />
-              </template>
-              {{ $resources.task.doc.priority || __('Set priority') }}
-            </Button>
-          </Dropdown>
-          <Autocomplete
-            :placeholder="__('Select project')"
-            :options="projectOptions"
-            v-model="$resources.task.doc.project"
-            @update:modelValue="changeProject"
-          />
+          <ng-template v-if="!readOnly">
+            <Autocomplete
+              :placeholder="__('Assign a user')"
+              :options="assignableUsers"
+              v-model="$resources.task.doc.assigned_to"
+              @update:modelValue="changeUserAssign"
+            />
+            <TextInput
+              type="date"
+              :placeholder="__('Due date')"
+              v-model="$resources.task.doc.due_date"
+              @change="
+                $resources.task.setValue.submit({
+                  due_date: $event.target.value,
+                })
+              "
+            />
+            <Dropdown :options="statusOptions">
+              <Button>
+                <template #prefix>
+                  <TaskStatusIcon :status="$resources.task.doc.status" />
+                </template>
+                {{ $resources.task.doc.status || __('Set status') }}
+              </Button>
+            </Dropdown>
+            <Dropdown :options="priorityOptions">
+              <Button>
+                <template v-if="$resources.task.doc.priority" #prefix>
+                  <TaskPriorityIcon :priority="$resources.task.doc.priority" />
+                </template>
+                {{ $resources.task.doc.priority || __('Set priority') }}
+              </Button>
+            </Dropdown>
+            <Autocomplete
+              :placeholder="__('Select project')"
+              :options="projectOptions"
+              v-model="$resources.task.doc.project"
+              @update:modelValue="changeProject"
+            />
+          </ng-template>
+          <ng-teamplate v-else>
+            <TextInput
+              type="text"
+              v-model="$resources.task.doc.assigned_to"
+              :disabled="true"
+            />
+            <TextInput
+              type="date"
+              v-model="$resources.task.doc.due_date"
+              :disabled="true"
+            />
+            <TextInput
+              type="text"
+              v-model="$resources.task.doc.status"
+              :disabled="true"
+            />
+            <TextInput
+              type="text"
+              v-model="$resources.task.doc.priority"
+              :disabled="true"
+            />
+            <TextInput
+              type="text"
+              v-model="$resources.task.doc.project"
+              :disabled="true"
+            />
+          </ng-teamplate>
+          
         </div>
         <div class="text-1xl font-semibold mb-2">Activity</div>
         <div class="flex items-center">
@@ -148,62 +180,102 @@
       </div>
     </div>
     <div class="hidden w-[20rem] shrink-0 border-l sm:block">
-      <div
-        class="grid grid-cols-2 items-center gap-y-6 p-6 text-base text-gray-700"
-      >
+      <div class="grid grid-cols-2 items-center gap-y-6 p-6 text-base text-gray-700" v-if="!readOnly">
         <div>{{__('Assignee')}}</div>
-        <div>
-          <Autocomplete
-            :placeholder="__('Assign a user')"
-            :options="assignableUsers"
-            v-model="$resources.task.doc.assigned_to"
-            @update:modelValue="changeUserAssign"
-          />
-        </div>
-        <div>{{__('Due Date')}}</div>
-        <div>
-          <TextInput
-            type="date"
-            :placeholder="__('Due date')"
-            v-model="$resources.task.doc.due_date"
-            @change="
-              $resources.task.setValue.submit({
-                due_date: $event.target.value,
-              })
-            "
-          />
-        </div>
-        <div>{{__('Project')}}</div>
-        <div>
-          <Autocomplete
-            :placeholder="__('Select project')"
-            :options="projectOptions"
-            v-model="$resources.task.doc.project"
-            @update:modelValue="changeProject"
-          />
-        </div>
-        <div>{{__('Status')}}</div>
-        <div>
-          <Dropdown :options="statusOptions">
-            <Button>
-              <template #prefix>
-                <TaskStatusIcon :status="$resources.task.doc.status" />
-              </template>
-              {{ $resources.task.doc.status || __('Set status') }}
-            </Button>
-          </Dropdown>
-        </div>
-        <div>{{__('Priority')}}</div>
-        <div>
-          <Dropdown :options="priorityOptions">
-            <Button>
-              <template v-if="$resources.task.doc.priority" #prefix>
-                <TaskPriorityIcon :priority="$resources.task.doc.priority" />
-              </template>
-              {{ $resources.task.doc.priority || __('Set priority') }}
-            </Button>
-          </Dropdown>
-        </div>
+          <div>
+            <Autocomplete
+              :placeholder="__('Assign a user')"
+              :options="assignableUsers"
+              v-model="$resources.task.doc.assigned_to"
+              @update:modelValue="changeUserAssign"
+            />
+          </div>
+          <div>{{__('Due Date')}}</div>
+          <div>
+            <TextInput
+              type="date"
+              :placeholder="__('Due date')"
+              v-model="$resources.task.doc.due_date"
+              @change="
+                $resources.task.setValue.submit({
+                  due_date: $event.target.value,
+                })
+              "
+            />
+          </div>
+          <div>{{__('Project')}}</div>
+          <div>
+            <Autocomplete
+              :placeholder="__('Select project')"
+              :options="projectOptions"
+              v-model="$resources.task.doc.project"
+              @update:modelValue="changeProject"
+            />
+          </div>
+          <div>{{__('Status')}}</div>
+          <div>
+            <Dropdown :options="statusOptions">
+              <Button>
+                <template #prefix>
+                  <TaskStatusIcon :status="$resources.task.doc.status" />
+                </template>
+                {{ $resources.task.doc.status || __('Set status') }}
+              </Button>
+            </Dropdown>
+          </div>
+          <div>{{__('Priority')}}</div>
+          <div>
+            <Dropdown :options="priorityOptions">
+              <Button>
+                <template v-if="$resources.task.doc.priority" #prefix>
+                  <TaskPriorityIcon :priority="$resources.task.doc.priority" />
+                </template>
+                {{ $resources.task.doc.priority || __('Set priority') }}
+              </Button>
+            </Dropdown>
+          </div>
+      </div>
+      <div class="grid grid-cols-2 items-center gap-y-6 p-6 text-base text-gray-700" v-else>
+        <div>{{__('Assignee')}}</div>
+          <div>
+            <TextInput
+              type="text"
+              v-model="$resources.task.doc.assigned_to"
+              :disabled="true"
+            />
+          </div>
+          <div>{{__('Due Date')}}</div>
+          <div>
+            <TextInput
+              type="text"
+              v-model="$resources.task.doc.due_date"
+              :disabled="true"
+            />
+          </div>
+          <div>{{__('Project')}}</div>
+          <div>
+            <TextInput
+              type="text"
+              v-model="$resources.task.doc.project"
+              :disabled="true"
+            />
+          </div>
+          <div>{{__('Status')}}</div>
+          <div>
+            <TextInput
+              type="text"
+              v-model="$resources.task.doc.status"
+              :disabled="true"
+            />
+          </div>
+          <div>{{__('Priority')}}</div>
+          <div>
+            <TextInput
+              type="text"
+              v-model="$resources.task.doc.priority"
+              :disabled="true"
+            />
+          </div>
       </div>
     </div>
   </div>
@@ -241,8 +313,8 @@ import CommentsList from '@/components/CommentsList.vue'
 import TaskStatusIcon from '@/components/icons/TaskStatusIcon.vue'
 import TaskPriorityIcon from '@/components/icons/TaskPriorityIcon.vue'
 import { activeUsers } from '@/data/users'
-import { activeTeams } from '@/data/teams'
-import { getTeamProjects } from '@/data/projects'
+import { activeTeams, getTeamInfo } from '@/data/teams'
+import { getTeamProjects, getProject } from '@/data/projects'
 import { getUser } from '@/data/users'
 
 export default {
@@ -253,7 +325,8 @@ export default {
     return {
       showDeleteTaskDialog: false,
       editingDescription: false,
-      activeActivity: 'comment'
+      activeActivity: 'comment',
+      readOnly: true
     }
   },
   resources: {
@@ -277,6 +350,7 @@ export default {
           },
         },
         onSuccess(doc) {
+          this.setReadOnlyState(doc)
           if (
             ['ProjectTaskDetail', 'Task'].includes(this.$route.name) &&
             Number(this.$route.params.taskId) === doc.name
@@ -324,6 +398,25 @@ export default {
           },
         }
       )
+    },
+    setReadOnlyState(data) {
+      if (data.owner == getUser('sessionUser').name) {
+        this.readOnly = false;
+      } else if (data.team != null && data.project != null) {
+        let projectInfo = getProject(data.project);
+        let teamInfo = getTeamInfo(data.team).data;
+        let roleByProject = this.$getRoleByUser(null, projectInfo);
+        
+        if (roleByProject == "manager") {
+          this.readOnly = false;
+        } else {
+          let roleByTeam = this.$getRoleByUser(teamInfo, null);
+          if (roleByTeam != "guest" && roleByTeam != "member") {
+            this.readOnly = false;
+          }
+        }
+      }
+      console.log('ReadOnly State Updated:', this.readOnly);
     }
   },
   computed: {

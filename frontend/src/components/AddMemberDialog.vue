@@ -63,7 +63,8 @@
         </ul>
       </div> -->
       <div class="h-80">
-        <MemberTeamProject :typeParent="'team'" :idTeamProject="resource.doc.name" @addMember="onAddMember()" @changeRole="onChangeRoleMember($event)"></MemberTeamProject>
+        <MemberTeamProject :typeParent="'team'" :idTeamProject="resource.doc.name" :readOnly="getRoleByUser()"
+          @addMember="onAddMember()" @changeRole="onChangeRoleMember($event)"></MemberTeamProject>
       </div>
       
     </template>
@@ -202,6 +203,12 @@ export default {
     },
     onChangeRoleMember(event){
       this.$emit('reloadMember', event)
+    },
+    getRoleByUser(){
+      let role = this.$getRoleByUser(this.resource.doc, null);
+      console.log(role)
+      if (role == "member" || role == "guest") return true
+      return false
     }
   },
 }

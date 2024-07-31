@@ -1,6 +1,7 @@
 <template>
-    <div class="text-gray-600 text-sm mb-1">Add members</div>
+    <div v-if="readOnly==false" class="text-gray-600 text-sm mb-1">Add members</div>
     <TextInput
+        v-if="readOnly==false"
         ref="target"
         :type="'text'"
         size="sm"
@@ -8,12 +9,12 @@
         placeholder="Enter name or email address"
         autocomplete="off"
         modelValue=""
-        v-model="nameOrEmailMember" :debounce="debounceSearch" @focus="onFocusInputUser()" @keyup.enter.native="onEnterInputUser()"
+        v-model="nameOrEmailMember" @focus="onFocusInputUser()" @keydown.enter.prevent="onEnterInputUser($event)"
     />
     <div ref="result_user" class="max-h-50 overflow-y-auto absolute z-50 mt-1 rounded-lg bg-white text-base shadow-2xl" style="width: 91%;"
         v-if="displayUserSystem">
         <template v-if="arrUserSystem.length > 0">
-            <ul role="list" class="mt-2 ml-2 divide-y overflow-y-auto max-h-80">
+            <ul role="list" class="mt-2 ml-2 divide-y overflow-y-auto max-h-64">
                 <li class="flex w-full items-center py-2 cursor-pointer hover:bg-gray-300" v-for="user_info in arrUserSystem"
                     :key="user_info.name" @click="onClickAddMember(user_info)">
                     <UserAvatar :user="user_info.name" />
@@ -32,8 +33,8 @@
             <div class="m-2 text-sm text-gray-700">Không có dữ liệu</div>
         </template>
     </div>
-    <div class="mt-1 text-gray-600 text-sm">Enter name or email addess to add new invatation</div>
-    <ul role="list" class="mt-2 divide-y overflow-y-auto max-h-56">
+    <div class="mt-1 text-gray-600 text-sm" v-if="readOnly==false">Enter name or email addess to add new invitation</div>
+    <ul role="list" class="mt-2 divide-y overflow-y-auto" v-bind:class="[readOnly? 'max-h-64': 'max-h-56']">
         <li class="flex w-full items-center py-2" v-for="member in arrMember" :key="member.id">
             <UserAvatar :user="member.id_user" />
             <div class="ml-3">
@@ -58,7 +59,7 @@
                         label: 'Remove',
                         value: 'remove',
                     },
-                ]" size="sm" variant="subtle" :disabled="false" v-model="member.role"
+                ]" size="sm" variant="subtle" :disabled="readOnly==true" v-model="member.role"
                     @change="onChangeRole(member)" />
             </div>
         </li>
@@ -84,12 +85,13 @@
 <script>
 
 import { FormControl, createResource } from 'frappe-ui'
-import { onClickOutside } from '@vueuse/core';
+import { onClickOutside } from '@vueuse/core'
+import { createToast } from '@/utils'
 
 export default {
     name: 'MemberTeamProject',
     components: [FormControl],
-    props: ["idTeamProject", "typeParent"],
+    props: ["idTeamProject", "typeParent", "readOnly"],
     emits: ["addMember", "changeRole"],
     resources: {
         initMemberById() {
@@ -243,8 +245,50 @@ export default {
                 this.displayUserSystem = false
             }
         },
-        onEnterInputUser(){
-            console.log(this.nameOrEmailMember)
+        onEnterInputUser(event){
+            var me = this
+            event.stopPropagation();
+            const regular_email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if(!regular_email.test(this.nameOrEmailMember)){
+                createToast({
+                    title: __('Định dạng email không hợp lệ. Vui lòng nhập lại email để thêm vào nhóm'),
+                    icon: 'x',
+                    iconClasses: 'text-red-600',
+                })
+                return
+            }
+            let resourceAddMemberNotExist = createResource({
+                url: "gameplan.api.invite_member",
+                method: 'POST',
+                auto: false,
+                onSuccess(data){
+                    if(data.status == "ok"){
+                        createToast({
+                            title: __('Thêm thành viên vào nhóm thành công'),
+                            icon: 'check',
+                            iconClasses: 'text-green-600'
+                        })
+                        let member_info = data.message
+                        me.arrMember.push({
+                            'id_user': member_info.id_user,
+                            'full_name': member_info.full_name,
+                            'email': member_info.email,
+                            'role': "member",
+                            'id': member_info.id
+                        })
+                        me.$emit('addMember', me.arrMember)
+                        me.nameOrEmailMember = ""
+                        me.displayUserSystem = false
+                    }else{
+                        createToast({
+                            title: __('Lỗi khi thêm thành viên vào nhóm'),
+                            icon: 'x',
+                            iconClasses: 'text-red-600',
+                        })
+                    }
+                }
+            })
+            resourceAddMemberNotExist.submit({email: this.nameOrEmailMember, teamId: this.idTeamProject})
         }
     },
     watch: {

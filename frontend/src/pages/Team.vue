@@ -53,7 +53,7 @@
         <div class="flex items-center space-x-2">
           <TeamMembers :team="team" />
           <Dropdown
-            v-if="!team.doc.archived_at"
+            v-if="!team.doc.archived_at && !readOnlyByRole()"
             placement="left"
             :options="[
               {
@@ -172,6 +172,11 @@ export default {
       }
       this.team.setValue.submit({ title:  this.nameTeamNew});
       this.showLayoutInputNameTeam = false;
+    },
+    readOnlyByRole(){
+      let role = this.$getRoleByUser(this.team.doc, null);
+      if (role == "member" || role == "guest") return true
+      return false
     }
   },
 }

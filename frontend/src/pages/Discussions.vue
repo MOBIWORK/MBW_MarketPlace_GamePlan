@@ -18,7 +18,7 @@
       </TextInput>
     </div>
     
-    <Button variant="solid" @click="newDiscussionDialog.show = true">
+    <Button variant="solid" @click="newDiscussionDialog.show = true" v-if="!readOnlyByRole()">
       <template #prefix><LucidePlus class="h-4 w-4" /></template>
       {{__('Add new')}}
     </Button>
@@ -299,6 +299,11 @@ export default {
       )
       return followedProjects.includes(project)
     },
+    readOnlyByRole(){
+      let role = this.$getRoleByUser(null, null)
+      if(role == "guest") return true
+      return false
+    }
   },
   computed: {
     filters() {

@@ -8,7 +8,7 @@
       :floating-menu="true" :editable="editReadme" />
     <div class="absolute right-0 top-0 flex space-x-2" :class="{ 'mr-3 mt-3': border || editReadme }" v-if="editable">
       <Tooltip v-if="!editReadme && !$readOnlyMode" :text="__('Edit')">
-        <Button variant="ghost" :label="__('Edit')" @click="editReadmeAndFocus">
+        <Button v-if="readOnly==false" variant="ghost" :label="__('Edit')" @click="editReadmeAndFocus">
           <template #icon>
             <LucideEdit2 class="w-4" />
           </template>
@@ -81,6 +81,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    readOnly: {
+      type: Boolean,
+      default: false
+    }
   },
   components: { TextEditor, Tooltip },
   data() {

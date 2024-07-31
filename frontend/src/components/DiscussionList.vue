@@ -119,7 +119,9 @@
           <LucideCoffee class="h-7 w-7 text-gray-500" />
           {{ __('No discussions') }}
         </div>
-        <Button v-if="showDiscussion" class="mt-1" :variant="'solid'" theme="gray" :route="{ name: 'ProjectDiscussionNew' }" >{{ __('Add discussion') }}</Button>
+        <Button v-if="showDiscussion && !readOnlyByRole()" class="mt-1" :variant="'solid'" theme="gray" :route="{ name: 'ProjectDiscussionNew' }" >
+          {{ __('Add discussion') }}
+        </Button>
       </div>
       <div
         class="flex items-center justify-center p-3"
@@ -205,6 +207,11 @@ export default {
         `${__('Latest Post')}: ${this.$dayjs(d.last_post_at)}`,
       ].join('\n')
     },
+    readOnlyByRole(){
+      let role = this.$getRoleByUser(null, null)
+      if(role == "guest") return true
+      return false
+    }
   },
   computed: {
     discussions() {
