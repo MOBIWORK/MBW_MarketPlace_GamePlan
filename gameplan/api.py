@@ -463,7 +463,9 @@ def get_connections(reference_doctype, reference_name):
 				'name': connection_filter.name,
 				'doctype_destination': connection_filter.reference_type_destination,
 				'name_destination': connection_filter.reference_name_destination,
-				'title_destination': destination_info.title
+				'title_destination': destination_info.title,
+				'team_destination': destination_info.team,
+				'project_destination': destination_info.project
 			}
 			connections_res.append(connection_res)
 	connections_filter = frappe.db.get_list('GP Connection',
@@ -474,17 +476,71 @@ def get_connections(reference_doctype, reference_name):
 		fields=['name', 'reference_type_source', 'reference_name_source', 'reference_type_destination', 'reference_name_destination']
 	)
 	for connection_filter in connections_filter:
-		connection_res_filter = [connecton_fil.name for connecton_fil in connections_res if connecton_fil.name == connection_filter.name]
+		connection_res_filter = [connecton_fil['name'] for connecton_fil in connections_res if connecton_fil['name'] == connection_filter['name']]
 		if len(connection_res_filter) == 0:
 			destination_info = frappe.get_doc(connection_filter.reference_type_source, connection_filter.reference_name_source)
 			connection_res = {
 				'name': connection_filter.name,
 				'doctype_destination': connection_filter.reference_type_source,
 				'name_destination': connection_filter.reference_name_source,
-				'title_destination': destination_info.title
+				'title_destination': destination_info.title,
+				'team_destination': destination_info.team,
+				'project_destination': destination_info.project
 			}
 			connections_res.append(connection_res)
 	return connections_res
+
+@frappe.whitelist()
+def delete_connections(reference_doctype, reference_name):
+	try:
+		frappe.db.delete('GP Connection', {
+			'reference_type_source': reference_doctype,
+			'reference_name_source': reference_name
+		})
+		frappe.db.delete('GP Connection', {
+			'reference_type_destination': reference_doctype,
+			'reference_name_destination': reference_name
+		})
+		frappe.db.commit()
+		return "ok"
+	except Exception as e:
+		return "error"
+
+
+@frappe.whitelist()
+def get_value_by_reference_doctype(reference_doctype, project=None):
+	values_by_reference = []
+	print("Dòng 512 ",project)
+	if project is not None and project != "":
+		project_info = frappe.get_doc('GP Project', project)
+		if project_info.is_private == 0:
+			values_public = frappe.db.get_list(reference_doctype,
+				filters={
+					'project': project
+				},
+				fields=['name', 'title']
+			)
+			for value_public in values_public:
+				arr_filter = [val_fil['value'] for val_fil in values_by_reference if val_fil['value'] == value_public.name]
+				if len(arr_filter) == 0:
+					values_by_reference.append({
+						'label': value_public.title,
+						'value': value_public.name
+					})
+	values_public = frappe.db.get_list(reference_doctype,
+		filters={
+			'owner': frappe.session.user
+		},
+		fields=['name', 'title']
+	)
+	for value_public in values_public:
+		arr_filter = [val_fil['value'] for val_fil in values_by_reference if val_fil['value'] == value_public.name]
+		if len(arr_filter) == 0:
+			values_by_reference.append({
+				'label': value_public.title,
+				'value': value_public.name
+			})
+	return values_by_reference
 
 @frappe.whitelist()
 def get_mypages_by_filter(order_by, search=None, project=None):

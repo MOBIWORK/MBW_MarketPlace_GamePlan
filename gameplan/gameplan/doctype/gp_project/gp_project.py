@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from pypika.terms import ExistsCriterion
 from gameplan.api import invite_by_email
-from gameplan.notification import send_guest_by_invite_guest, change_limit_project_team, change_name_project_team
+from gameplan.notification import send_invite_guest, change_limit_project_team, change_name_project_team
 from gameplan.utils import get_config_notification_by_user
 import json
 
@@ -158,14 +158,7 @@ class GPProject(ManageMembersMixin, Archivable, Document):
 	@frappe.whitelist()
 	def invite_guest(self, email):
 		invite_by_email(email, role='Gameplan Guest', projects=[self.name])
-		user_info = frappe.get_doc('User', {'email': email})
-		type_notify = []
-		config_notification = get_config_notification_by_user(user_info)
-		if config_notification[1]["arr_permission"][0]["email"] == True:
-			type_notify.append("email")
-		if config_notification[1]["arr_permission"][0]["browser"] == True:
-			type_notify.append('browser')
-		send_guest_by_invite_guest(type_notify, user_info.name, "project", self.name)
+		send_invite_guest(email, "project", self.name)
 
 	@frappe.whitelist()
 	def remove_guest(self, email):

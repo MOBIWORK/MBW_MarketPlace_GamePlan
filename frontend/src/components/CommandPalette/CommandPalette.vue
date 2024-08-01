@@ -111,6 +111,7 @@ export default {
         },
         debounce: 300,
         transform(groups) {
+          console.log(groups)
           for (let group of groups) {
             if (group.title === 'Discussions') {
               group.component = 'Item'
@@ -188,7 +189,9 @@ export default {
   methods: {
     onInput(e) {
       this.query = e.target.value
+      console.log(this.query)
       if (this.query) {
+        console.log(this.searchList)
         let results = fuzzysort
           .go(this.query, this.searchList, {
             key: 'title',
@@ -200,6 +203,7 @@ export default {
         this.filteredOptions = results
 
         if (this.query.length > 2) {
+          console.log("go to")
           this.$resources.search.submit(this.query)
         }
       } else {

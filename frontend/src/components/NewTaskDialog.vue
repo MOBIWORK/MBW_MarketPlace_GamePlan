@@ -22,7 +22,9 @@
           v-model="newTask.description"
         />
         <div class="flex space-x-2">
-          <Dropdown
+          <div>
+            <div class="mb-1.5 text-sm text-gray-600">{{ __('Status') }}</div>
+            <Dropdown
             :options="
               statusOptions({
                 onClick: (status) => (newTask.status = status),
@@ -36,23 +38,74 @@
               {{ newTask.status }}
             </Button>
           </Dropdown>
-          <!-- <TextInput
-            type="date"
-            :placeholder="__('Set due date')"
-            v-model="newTask.due_date"
-          /> -->
-          <DatePicker
-            v-model="newTask.due_date"
-            :placeholder="__('Set due date')"
-            :formatValue="(val) => val.split('-').reverse().join('/')"
-          />
-          <Autocomplete
-            :placeholder="__('Assign a user')"
-            :options="assignableUsers"
-            v-model="newTask.assigned_to"
-            @update:modelValue="onChangeUserAssign"
+          </div>
+          <div>
+            <div class="mb-1.5 text-sm text-gray-600">{{ __('Due date') }}</div>
+            <DateTimePicker class="datepicker"
+                icon-left="calendar"
+                :value="newTask.due_date"
+                @change="(val) => (newTask.due_date = val)"
+                :placeholder="__('Set due date')"
+                input-class="border-none" />
+          </div>
+          <div>
+            <div class="mb-1.5 text-sm text-gray-600">{{ __('Assign to') }}</div>
+            <Autocomplete
+              :placeholder="__('Assign a user')"
+              :options="assignableUsers"
+              v-model="newTask.assigned_to"
+              @update:modelValue="onChangeUserAssign"
 
-          />
+            />
+          </div>
+        </div>
+        <div class="flex items-end">
+          <div class="mr-3 w-1/3">
+            <div class="mb-1.5 text-sm text-gray-600">{{ __('Reminder') }}</div>
+            <TextInput
+              :type="'number'"
+              size="sm"
+              variant="subtle"
+              placeholder="Nhập thời gian nhắc nhở"
+              v-model="newTask.remind_times"
+            />
+          </div>
+          <div class="mr-3 w-1/3">
+            <Select
+              :placeholder="'Chọn đơn vị'"
+              :options="[
+                {
+                  label: 'minutes',
+                  value: 'minute',
+                },
+                {
+                  label: 'hours',
+                  value: 'hour',
+                },
+                {
+                  label: 'days',
+                  value: 'day',
+                }
+              ]"
+              v-model="newTask.remind_unit"
+            />
+          </div>
+          <div class="mr-3">
+            <Checkbox
+              size="sm"
+              :value="false"
+              v-model="newTask.notify_browser"
+              label="Browser"
+            />
+          </div>
+          <div>
+            <Checkbox
+              size="sm"
+              :value="false"
+              v-model="newTask.notify_email"
+              label="Email"
+            />
+          </div>
         </div>
         <ErrorMessage class="mt-2" :message="createTask.error" />
       </div>
@@ -68,10 +121,13 @@ import {
   Dropdown,
   TextInput,
   createResource,
-  DatePicker
+  DatePicker,
+  Select,
+  Checkbox
 } from 'frappe-ui'
 import TaskStatusIcon from './icons/TaskStatusIcon.vue'
 import { activeUsers } from '@/data/users'
+import DateTimePicker from '@/components/Controls/DateTimePicker.vue'
 
 const props = defineProps(['modelValue', 'defaults'])
 const emit = defineEmits(['update:modelValue'])

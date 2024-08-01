@@ -144,7 +144,8 @@ on_login = 'gameplan.www.g.on_login'
 
 scheduler_events = {
 	"all": [
-		"gameplan.search.build_index_if_not_exists"
+		"gameplan.search.build_index_if_not_exists",
+		"gameplan.scheduler.send_reminders"
 	],
 	"hourly": [
 		"gameplan.gameplan.doctype.gp_invitation.gp_invitation.expire_invitations"

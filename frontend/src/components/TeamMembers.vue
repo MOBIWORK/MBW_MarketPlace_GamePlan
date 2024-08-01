@@ -21,7 +21,7 @@
             <UserAvatar :user="member.user" />
           </div>
         </button>
-        <div v-if="members.length >= 5" class="w-7 h-7 rounded-full p-2 bg-gray-200	text-sm pl-0.5 pt-1.5">
+        <div v-if="members.length > 5" class="w-7 h-7 rounded-full p-2 bg-gray-200	text-sm flex justify-center items-center text-gray-700">
           {{onRenderMemberLength()}}
         </div>
       </template>

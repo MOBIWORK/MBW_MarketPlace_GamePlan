@@ -9,6 +9,8 @@ from gameplan.mixins.activity import HasActivity
 from gameplan.mixins.mentions import HasMentions
 from gameplan.search import GameplanSearch 
 from gameplan.notification import assign_to_someone_task, change_status_owner_task, change_assignee_to_older, change_due_date_to_assignee, change_priority_to_assignee
+from datetime import datetime, timedelta
+import json
 
 class GPTask(HasMentions, HasActivity, Document):
 	on_delete_cascade = ["GP Comment", "GP Activity"]
@@ -24,6 +26,7 @@ class GPTask(HasMentions, HasActivity, Document):
 		self.update_tasks_count(1)
 		if frappe.session.user != self.assigned_to:
 			assign_to_someone_task(self.project, self.name, frappe.session.user, self.assigned_to, self.title)
+		self.insert_reminder()
 
 	def on_update(self):
 		self.update_project_progress()
@@ -48,6 +51,34 @@ class GPTask(HasMentions, HasActivity, Document):
 			if task_info.priority is not None:
 				if task_info.priority != self.priority:
 					change_priority_to_assignee(self.name, self.priority)
+
+	def insert_reminder(self):
+		if self.remind_times is None or self.remind_times == "" or self.remind_times == 0:
+			return
+		reminder = frappe.new_doc("GP Reminder")
+		unit = "phút"
+		remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S')
+		if self.remind_unit == "minute":
+			delta_minutes = timedelta(minutes=int(self.remind_times))
+			remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_minutes
+		elif self.remind_unit == "hour":
+			unit = "giờ"
+			delta_hours = timedelta(hours=int(self.remind_times))
+			remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_hours
+		elif self.remind_unit == "day":
+			unit = "ngày"
+			delta_days = timedelta(days=int(self.remind_times))
+			remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_days
+		reminder.description = f"Nhiệm vụ {self.title} sẽ đến hạn trong {self.remind_times} {unit} nữa"
+		reminder.remind_at = remind_at
+		reminder.user = self.assigned_to
+		reminder.reminder_doctype = "GP Task"
+		reminder.reminder_docname = self.name
+		reminder.notified = 0
+		reminder.insert()
+		custom_field = {'id_reminder': reminder.name}
+		frappe.db.set_value('GP Task', self.name, 'custom_fields', json.dumps(custom_field))
+		frappe.db.commit()
 
 	def log_value_updates(self):
 		fields = ['title', 'description', 'status', 'priority', 'assigned_to', 'due_date', 'project']

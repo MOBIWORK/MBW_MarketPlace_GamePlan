@@ -34,7 +34,6 @@
             :readonly="readOnly"
           />
         </div>
-        <div>{{readOnly}}</div>
         <TextEditor
             editor-class="rounded-b-lg max-w-[unset] prose-sm h-mbw-fit-page overflow-y-auto"
             :content="page.doc.content"

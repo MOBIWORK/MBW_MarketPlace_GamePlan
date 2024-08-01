@@ -52,6 +52,43 @@ def send_manager_by_invite_guest(type_notifys, idGuest, idProject):
         )
         frappe.db.commit()
 
+def send_invite_guest(emailGuest, type_reference, name_reference):
+    user_send = frappe.get_doc('User', frappe.session.user)
+    link_btn = ""
+    type_joining = ""
+    name_joining = ""
+    doctype_reference = ""
+    if type_reference == "team":
+        type_joining = "nhóm"
+        team_doc = frappe.get_doc('GP Team', name_reference)
+        name_joining = team_doc.title
+        link_btn = frappe.utils.get_url(f'/g/{name_reference}')
+        doctype_reference = "GP Team"
+    elif type_reference == "project":
+        project_doc = frappe.get_doc('GP Project', name_reference)
+        link_btn = frappe.utils.get_url(f'/g/{project_doc.team}/projects/{name_reference}')
+        type_joining = "dự án"
+        name_joining = project_doc.title
+        doctype_reference = "GP Project"
+    content_email = f"""
+        <div class="mb-2 leading-5 text-gray-600">
+            <span class="font-medium">{ get_fullname(frappe.session.user) }</span>
+            <span> đã thêm bạn vào {type_joining} {name_joining} với vai trò Guest</span>
+        </div>
+        <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
+    """
+    make(
+        doctype=doctype_reference,
+        name=name_reference,
+        content = content_email,
+        recipients = emailGuest,
+        send_email = True,
+        sender = user_send.email,
+        sender_full_name = user_send.full_name,
+        subject = f'[TEAM] {get_fullname(frappe.session.user)} đã thêm bạn vào {type_joining} {name_joining}'
+    )
+    frappe.db.commit()
+
 def send_guest_by_invite_guest(type_notifys, idGuest, type_reference, name_reference):
     user_send = frappe.get_doc('User', frappe.session.user)
     user_received = frappe.get_doc('User', idGuest)

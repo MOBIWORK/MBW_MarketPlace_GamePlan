@@ -19,7 +19,12 @@
   "project",
   "team",
   "assigned_to",
-  "comments_count"
+  "comments_count",
+  "remind_times",
+  "remind_unit",
+  "notify_browser",
+  "notify_email",
+  "custom_fields"
  ],
  "fields": [
   {
@@ -41,7 +46,7 @@
   },
   {
    "fieldname": "due_date",
-   "fieldtype": "Date",
+   "fieldtype": "Datetime",
    "label": "Due Date"
   },
   {
@@ -105,11 +110,39 @@
    "fieldname": "comments_count",
    "fieldtype": "Int",
    "label": "Comments Count"
+  },
+  {
+   "fieldname": "custom_fields",
+   "fieldtype": "JSON",
+   "label": "Custom Fields"
+  },
+  {
+   "fieldname": "remind_times",
+   "fieldtype": "Int",
+   "label": "Remind Times"
+  },
+  {
+   "fieldname": "remind_unit",
+   "fieldtype": "Select",
+   "label": "Remind Unit",
+   "options": "minute\nhour\nday"
+  },
+  {
+   "default": "0",
+   "fieldname": "notify_browser",
+   "fieldtype": "Check",
+   "label": "Notify Browser"
+  },
+  {
+   "default": "0",
+   "fieldname": "notify_email",
+   "fieldtype": "Check",
+   "label": "Notify Email"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-06-15 21:01:42.058336",
+ "modified": "2024-08-01 15:46:47.057933",
  "modified_by": "Administrator",
  "module": "Gameplan",
  "name": "GP Task",
