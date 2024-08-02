@@ -54,8 +54,16 @@ export function getTeamProjects(team) {
   return activeProjects.value.filter((project) => project.team === team) || []
 }
 
+export function getTeamProjectArchived(team) {
+  return archivedProjects.value.filter((project) => project.team === team) || []
+}
+
 export let activeProjects = computed(
   () => projects_by_role.data?.filter((project) => !project.archived_at) || []
+)
+
+export let archivedProjects = computed(
+  () => projects_by_role.data?.filter((project) => project.archived_at) || []
 )
 
 export let getProject = (projectId) => {

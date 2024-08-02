@@ -71,9 +71,15 @@ import fuzzysort from 'fuzzysort'
 import { activeTeams } from '@/data/teams'
 import { activeProjects } from '@/data/projects'
 import { activeUsers } from '@/data/users'
+import { activeDiscussion } from '@/data/discussions'
+import { activePage } from '@/data/pages'
+import { activeTask } from '@/data/tasks'
 import ItemTeam from './ItemTeam.vue'
 import ItemProject from './ItemProject.vue'
 import Item from './Item.vue'
+import ItemDiscussion from './ItemDiscussion.vue'
+import ItemPage from './ItemPage.vue'
+import ItemTask from './ItemTask.vue'
 import UserAvatar from '../UserAvatar.vue'
 import LucideHome from '~icons/lucide/home'
 import LucideUsers from '~icons/lucide/users'
@@ -111,7 +117,6 @@ export default {
         },
         debounce: 300,
         transform(groups) {
-          console.log(groups)
           for (let group of groups) {
             if (group.title === 'Discussions') {
               group.component = 'Item'
@@ -179,6 +184,9 @@ export default {
     ItemTeam,
     ItemProject,
     Item,
+    ItemDiscussion,
+    ItemPage,
+    ItemTask
   },
   mounted() {
     this.addKeyboardShortcut()
@@ -189,9 +197,7 @@ export default {
   methods: {
     onInput(e) {
       this.query = e.target.value
-      console.log(this.query)
       if (this.query) {
-        console.log(this.searchList)
         let results = fuzzysort
           .go(this.query, this.searchList, {
             key: 'title',
@@ -203,7 +209,6 @@ export default {
         this.filteredOptions = results
 
         if (this.query.length > 2) {
-          console.log("go to")
           this.$resources.search.submit(this.query)
         }
       } else {
@@ -233,6 +238,7 @@ export default {
     searchList() {
       let list = []
       let teamsByName = {}
+      let projectsByName = {}
       for (const team of activeTeams.value) {
         teamsByName[team.name] = team
         list.push({
@@ -252,6 +258,7 @@ export default {
 
       for (const project of activeProjects.value) {
         let team = teamsByName[project.team] || null
+        projectsByName[project.name] = project
         list.push({
           type: 'Project',
           group: 'Projects',
@@ -281,6 +288,87 @@ export default {
             params: { personId: user.user_profile },
           },
         })
+      }
+
+      for(const discussion of activeDiscussion.value){
+        let project = projectsByName[discussion.project] || null
+        list.push({
+          type: 'Discussion',
+          group: 'Discussions',
+          doctype: 'GP Dicussion',
+          name: discussion.name,
+          title: discussion.title,
+          project: project?.title,
+          modified: discussion.modified,
+          route: {
+            name: 'ProjectDiscussion',
+            params: { teamId: discussion.team, projectId: discussion.name, postId: discussion.name }
+          }
+        })
+      }
+
+      for(const page of activePage.value){
+        let project = null
+        if(page.project != null && page.project != "") project = projectsByName[page.project] || null
+        let pageInfo = {
+          type: 'Page',
+          group: 'Pages',
+          doctype: 'GP Page',
+          name: page.name,
+          title: page.title,
+          project: project?.title,
+          modified: page.modified
+        }
+        if(page.project != null && page.project != ""){
+          pageInfo['route'] = {
+            name: 'ProjectPage',
+            params: {
+              teamId: page.team,
+              projectId: page.project,
+              pageId: page.name
+            }
+          }
+        }else{
+          pageInfo['route'] = {
+            name: 'Page',
+            params: {
+              pageId: page.name
+            }
+          }
+        }
+        list.push(pageInfo)
+      }
+
+      for(const task of activeTask.value){
+        let project = null
+        if(task.project != null && task.project != "") project = projectsByName[task.project] || null
+        let taskInfo = {
+          type: 'Task',
+          group: 'Tasks',
+          doctype: 'GP Task',
+          name: task.name,
+          title: task.title,
+          project: project?.title,
+          modified: task.modified
+        }
+        if(task.project != null && task.project != ""){
+          taskInfo['route'] = {
+            name: 'ProjectTaskDetail',
+            params: {
+              teamId: task.team,
+              projectId: task.project,
+              taskId: task.name
+            }
+          }
+        }else{
+          taskInfo['route'] = {
+            name: 'Task',
+            params: {
+              taskId: task.name
+            }
+          }
+        }
+        list.push(taskInfo)
       }
       return list
     },
@@ -328,6 +416,9 @@ export default {
         { title: __('Teams'), component: 'ItemTeam' },
         { title: __('Projects'), component: 'ItemProject' },
         { title: __('People'), component: 'Item' },
+        { title: __('Discussions'), component: 'ItemDiscussion'},
+        { title: __('Pages'), component: 'ItemPage'},
+        { title: __('Tasks'), component: 'ItemTask'}
       ]
       let itemsByGroup = {}
       for (const group of groups) {

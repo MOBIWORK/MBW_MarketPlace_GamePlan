@@ -46,10 +46,10 @@ class GPTask(HasMentions, HasActivity, Document):
 			if task_info.status != self.status and frappe.session.user != task_info.owner:
 				change_status_owner_task(self.name, frappe.session.user, self.status)
 			if task_info.due_date is not None:
-				if task_info.due_date != self.due_date:
+				if task_info.due_date != self.due_date and frappe.session.user != self.assigned_to:
 					change_due_date_to_assignee(self.name, self.due_date)
 			if task_info.priority is not None:
-				if task_info.priority != self.priority:
+				if task_info.priority != self.priority and frappe.session.user != self.assigned_to:
 					change_priority_to_assignee(self.name, self.priority)
 
 	def insert_reminder(self):

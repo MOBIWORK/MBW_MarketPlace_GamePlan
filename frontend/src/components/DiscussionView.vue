@@ -100,7 +100,7 @@
           ></TextEditor>
         </template>
 
-        <div v-if="discussion.content != '' && discussion.content != null" class="text-1xl font-semibold mb-4">Content</div>
+        <div v-if="discussion.content != '' && discussion.content != null" class="text-1xl font-semibold mb-2 mt-3">Content</div>
         <div class="mb-2 flex w-full items-center mt-2">
           <UserProfileLink class="mr-3" :user="discussion.owner">
             <UserAvatar :user="discussion.owner" />
@@ -160,14 +160,14 @@
             :editable="editingContent"
           />
         </div>
-        <div class="mt-3 mb-4">
+        <div class="mt-2 mb-3">
           <Reactions
             doctype="GP Discussion"
             :name="discussion.name"
             v-model:reactions="discussion.reactions"
           />
         </div>
-        <div class="text-1xl font-semibold mb-4">Activity</div>
+        <div class="text-1xl font-semibold mb-2">Activity</div>
         <div class="flex items-center">
           <span class="text-sm">{{__('Show')}}:</span>
           <div class="ml-4 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer" :class="{'mbw-activity-active':activeActivity=='all'}" @click="activeActivity='all'">All</div>

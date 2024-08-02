@@ -61,7 +61,7 @@
               }" :editable="editingDescription" />
           </div>
         </div>
-        <div class="w-full my-3">
+        <div class="w-full mb-3 mt-1">
           <Connection :reference_doctype="'GP Task'" :reference_name="taskId" :project="projectTask"
             :readOnly="readOnly">
           </Connection>

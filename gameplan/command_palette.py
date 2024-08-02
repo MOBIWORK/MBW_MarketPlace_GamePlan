@@ -45,7 +45,7 @@ def get_discussion_owner():
 		filters = {
 			'owner': frappe.session.user
 		},
-		fields = ['name', 'project', 'team', 'status', 'title']
+		fields = ['name', 'project', 'team', 'status', 'title', 'modified']
 	)
 	for discussion in discussion_list:
 		discussions_filter = [discussion_fil['name'] for discussion_fil in discussions_owner if discussion_fil['name'] == discussion['name']]
@@ -62,7 +62,7 @@ def get_discussion_owner():
 			filters = {
 				'project': project.name
 			},
-			fields = ['name', 'project', 'team', 'status', 'title']
+			fields = ['name', 'project', 'team', 'status', 'title', 'modified']
 		)
 		for discussion_by_project in discussions_by_project:
 			discussions_filter = [discussion_fil['name'] for discussion_fil in discussions_owner if discussion_fil['name'] == discussion_by_project['name']]
@@ -77,7 +77,7 @@ def get_page_owner():
 		filters = {
 			'owner': frappe.session.user
 		},
-		fields = ['name', 'title', 'project', 'team']
+		fields = ['name', 'title', 'project', 'team', 'modified']
 	)
 	for page in page_list:
 		page_filter = [page_fil['name'] for page_fil in page_owner if page_fil['name'] == page['name']]
@@ -94,7 +94,7 @@ def get_page_owner():
 			filters = {
 				'project': project.name
 			},
-			fields = ['name', 'title', 'project', 'team']
+			fields = ['name', 'title', 'project', 'team', 'modified']
 		)
 		for page_by_project in pages_by_project:
 			pages_filter = [page_fil['name'] for page_fil in page_owner if page_fil['name'] == page_by_project['name']]
@@ -102,4 +102,18 @@ def get_page_owner():
 				page_owner.append(page_by_project)
 	return page_owner
 
-
+@frappe.whitelist()
+def get_task_owner():
+	task_owner = []
+	task_list = frappe.db.get_list('GP Task',
+		or_filters = [
+			['owner', '=', frappe.session.user],
+			['assigned_to', '=', frappe.session.user]
+		],
+		fields = ['name', 'title', 'project', 'team', 'modified']
+	)
+	for task in task_list:
+		task_filter = [task_fil['name'] for task_fil in task_owner if task_fil['name'] == task['name']]
+		if len(task_filter) == 0:
+			task_owner.append(task)
+	return task_owner

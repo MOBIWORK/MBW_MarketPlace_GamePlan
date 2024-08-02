@@ -273,7 +273,10 @@
                 variant: 'solid',
                 onClick: ({ close }) => {
                   return this.project.archive.submit(null, {
-                    onSuccess: () => { showArchiveProjectDialog = false },
+                    onSuccess: () => {
+                      reloadProjects()
+                      showArchiveProjectDialog = false 
+                    },
                   })
                 },
               }
@@ -291,7 +294,10 @@
                 variant: 'solid',
                 onClick: ({ close }) => {
                   return this.project.unarchive.submit(null, {
-                    onSuccess: ()=>{ showUnArchiveProjectDialog = false },
+                    onSuccess: ()=>{
+                      reloadProjects()
+                      showUnArchiveProjectDialog = false
+                    },
                   })
                 },
               },
@@ -594,6 +600,9 @@ export default {
       let role = this.$getRoleByUser(this.team.doc, this.project.doc)
       if(role == "guest") return true
       return false
+    },
+    reloadProjects(){
+      projects_by_role.fetch()
     }
   },
   resources: {

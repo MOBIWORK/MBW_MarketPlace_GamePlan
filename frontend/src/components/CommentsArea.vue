@@ -248,7 +248,7 @@ export default {
           reference_doctype: this.doctype,
           reference_name: this.name,
         },
-        orderBy: 'creation asc',
+        orderBy: 'creation desc',
         pageLength: 99999,
         auto: true,
         onSuccess() {
@@ -275,7 +275,7 @@ export default {
           reference_doctype: this.doctype,
           reference_name: this.name,
         },
-        orderBy: 'creation asc',
+        orderBy: 'creation desc',
         pageLength: 99999,
         auto: true,
         transform(activities) {
@@ -306,7 +306,7 @@ export default {
         filters: {
           discussion: this.name,
         },
-        orderBy: 'creation asc',
+        orderBy: 'creation desc',
         auto: true,
         pageLength: 99999,
         transform(data) {
@@ -476,9 +476,10 @@ export default {
           items = items.concat(this.$resources.polls.data)
         }
       }
-      return items.sort((a, b) => {
-        return new Date(a.creation) - new Date(b.creation)
-      })
+      return items
+      // return items.sort((a, b) => {
+      //   return new Date(a.creation) - new Date(b.creation)
+      // })
     },
     commentEmpty() {
       return !this.newComment || this.newComment === '<p></p>'

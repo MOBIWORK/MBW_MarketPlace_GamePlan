@@ -24,7 +24,7 @@ class GPDiscussion(HasActivity, HasMentions, HasReactions, Document):
 		result = frappe.db.get_all(
 			'GP Comment',
 			filters={'reference_doctype': self.doctype, 'reference_name': self.name, 'creation': ('>', last_visit)},
-			order_by='creation asc',
+			order_by='creation desc',
 			limit=1,
 			pluck='name'
 		)
@@ -32,7 +32,7 @@ class GPDiscussion(HasActivity, HasMentions, HasReactions, Document):
 		polls = frappe.db.get_all(
 			'GP Poll',
 			filters={'discussion': self.name, 'creation': ('>', last_visit)},
-			order_by='creation asc',
+			order_by='creation desc',
 			limit=1,
 			pluck='name'
 		)

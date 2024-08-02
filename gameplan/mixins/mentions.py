@@ -35,8 +35,18 @@ class HasMentions:
 				continue
 			notification = frappe.get_doc(doctype='GP Notification')
 			if "GP Task" in [self.doctype, self.get('reference_doctype')]:
-				notification.message = f'{get_fullname(self.owner)} mentioned you in a task'
+				notification.message = f"""
+					<div class="text-gray-700">
+						<span class="text-sm font-medium text-gray-900">{ get_fullname(self.owner) }</span>
+						<span style="font-size:14px;"> đề cập bạn trong một công việc</span>
+					</div>
+				"""
 			elif "GP Discussion" in [self.doctype, self.get('reference_doctype')]:
-				notification.message = f'{get_fullname(self.owner)} mentioned you in a post'
+				notification.message = f"""
+					<div class="text-gray-700">
+						<span class="text-sm font-medium text-gray-900">{ get_fullname(self.owner) }</span>
+						<span style="font-size:14px;"> đề cập bạn trong một bài</span>
+					</div>
+				"""
 			notification.update(values)
 			notification.insert(ignore_permissions=True)

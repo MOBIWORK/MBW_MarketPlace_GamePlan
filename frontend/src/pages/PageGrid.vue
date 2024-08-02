@@ -39,7 +39,7 @@
           class="aspect-[37/50] cursor-pointer overflow-hidden rounded-md border border-gray-50 p-3 shadow-lg transition-shadow hover:shadow-2xl"
         >
           <div class="overflow-hidden text-ellipsis whitespace-nowrap">
-            <h1 class="text-lg font-semibold leading-none pr-12 truncate">
+            <h1 class="text-lg font-semibold leading-5 pr-12 truncate">
               {{ d.title }}
             </h1>
             <div

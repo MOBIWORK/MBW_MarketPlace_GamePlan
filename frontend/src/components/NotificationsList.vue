@@ -65,12 +65,12 @@
                             <div class="mr-2">
                                 <div v-html="notification.message" />
                                 <div class="text-sm text-gray-600 flex items-center mt-1 mb-2">
-                                    <div class="mr-2">{{ formatTimeAgo(notification.creation) }}</div>
+                                    <div style="min-width:72px;" class="mr-2">{{ formatTimeAgo(notification.creation) }}</div>
                                     <div class="flex items-center"
                                         v-if="notification.project_title != null && notification.project_title != ''">
                                         <div style="background-color: rgba(97, 97, 97, 0.5);"
                                             class="rounded-full h-1.5 w-1.5 mr-2"></div>
-                                        <div>{{ notification.project_title }}</div>
+                                        <div class="truncate" style="max-width: 65%;">{{ notification.project_title }}</div>
                                     </div>
                                 </div>
                             </div>
