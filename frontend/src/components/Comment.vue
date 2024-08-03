@@ -1,6 +1,6 @@
 <template>
   <div
-    class="py-6 transition-shadow"
+    class="py-3 transition-shadow"
     :class="{
       ring: !comment.loading && highlight,
     }"

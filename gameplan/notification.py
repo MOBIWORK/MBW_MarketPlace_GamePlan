@@ -11,9 +11,9 @@ def send_manager_by_invite_guest(type_notifys, idGuest, idProject):
     project_doc = frappe.get_doc('GP Project', idProject)
     members = project_doc.members
     notify_text = f"""
-        <div class="text-gray-700">
-            <span class="text-sm font-medium text-gray-900">{ get_fullname(idGuest) }</span>
-            <span style="font-size:14px;"> đã tham gia dự án</span>
+        <div class="text-gray-700 text-sm">
+            <span class="font-medium text-gray-900">{ get_fullname(idGuest) }</span>
+            <span> đã tham gia dự án</span>
             <span class="font-medium text-gray-900"> {project_doc.title}</span>
         </div>
     """
@@ -72,7 +72,7 @@ def send_invite_guest(emailGuest, type_reference, name_reference):
         doctype_reference = "GP Project"
     content_email = f"""
         <div class="mb-2 leading-5 text-gray-600">
-            <span class="text-sm font-medium">{ get_fullname(frappe.session.user) }</span>
+            <span class="font-medium">{ get_fullname(frappe.session.user) }</span>
             <span> đã thêm bạn vào {type_joining} {name_joining} với vai trò Guest</span>
         </div>
         <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
@@ -117,9 +117,9 @@ def send_guest_by_invite_guest(type_notifys, idGuest, type_reference, name_refer
         return
     if frappe.session.user != idGuest:
         notify_text = f"""
-            <div class="text-gray-700">
-                <span class="text-sm font-medium text-gray-900">{ get_fullname(frappe.session.user) }</span>
-                <span style="font-size:14px;"> đã thêm bạn vào {type_joining}</span>
+            <div class="text-gray-700 text-sm">
+                <span class="font-medium text-gray-900">{ get_fullname(frappe.session.user) }</span>
+                <span> đã thêm bạn vào {type_joining}</span>
                 <span class="font-medium text-gray-900"> {name_joining}</span>
             </div>
         """
@@ -209,11 +209,11 @@ def change_limit_project_team(type_reference, name_reference):
             user_sender = frappe.get_doc('User', frappe.session.user)
             user_receive_info = frappe.get_doc('User', user_received)
             notify_text = f"""
-                <div class="text-gray-700">
-                    <span class="text-sm font-medium text-gray-900">{ get_fullname(frappe.session.user) }</span>
-                    <span style="font-size:14px;"> đã thay đổi {type_joining}</span>
+                <div class="text-gray-700 text-sm">
+                    <span class="font-medium text-gray-900">{ get_fullname(frappe.session.user) }</span>
+                    <span> đã thay đổi {type_joining}</span>
                     <span class="font-medium text-gray-900"> {name_joining}</span>
-                    <span style="font-size:14px;"> thành {type_joining}</span>
+                    <span> thành {type_joining}</span>
                     <span class="font-medium text-gray-900"> {limit}</span>
                 </div>
             """
@@ -302,9 +302,9 @@ def change_archived_project_team(type_reference, name_reference, idUserActor):
         if user_received != idUserActor:
             user_sender = frappe.get_doc('User', idUserActor)
             notify_text = f"""
-                <div class="text-gray-700">
-                    <span class="text-sm font-medium text-gray-900">{ get_fullname(idUserActor) }</span>
-                    <span style="font-size:14px;"> đã lưu trữ {type_joining}</span>
+                <div class="text-gray-700 text-sm">
+                    <span class="font-medium text-gray-900">{ get_fullname(idUserActor) }</span>
+                    <span> đã lưu trữ {type_joining}</span>
                     <span class="font-medium text-gray-900"> {name_joining}</span>
                 </div>
             """
@@ -392,11 +392,11 @@ def change_name_project_team(type_reference, name_reference, title_older, title_
         if user_received != frappe.session.user:
             user_sender = frappe.get_doc('User', frappe.session.user)
             notify_text = f"""
-                <div class="text-gray-700">
-                    <span class="text-sm font-medium text-gray-900">{ get_fullname(frappe.session.user) }</span>
-                    <span style="font-size:14px;"> đổi tên {type_joining}</span>
+                <div class="text-gray-700 text-sm">
+                    <span class="font-medium text-gray-900">{ get_fullname(frappe.session.user) }</span>
+                    <span> đổi tên {type_joining}</span>
                     <span class="font-medium text-gray-900"> {title_older}</span>
-                    <span style="font-size:14px;"> thành</span>
+                    <span> thành</span>
                     <span class="font-medium text-gray-900"> {title_new}</span>
                 </div>
             """
@@ -469,8 +469,8 @@ def add_discussion_of_project(projectId, discussionId, user_creation):
         user_received_info = frappe.get_doc('User', user_received)
         if user_received != user_creation:
             notify_text = f"""
-                <div class="text-gray-700">
-                    <span class="text-sm font-medium text-gray-900">{ get_fullname(user_creation) }</span>
+                <div class="text-gray-700 text-sm">
+                    <span class="font-medium text-gray-900">{ get_fullname(user_creation) }</span>
                     <span style="font-size:14px;"> đã tạo thảo luận mới</span>
                     <span class="font-medium text-gray-900"> {discussion_doc.title}</span>
                 </div>
@@ -542,9 +542,9 @@ def add_page_of_project(projectId, pageId, user_creation):
         if received_user != user_creation:
             received_user_info = frappe.get_doc('User', received_user)
             notify_text=f"""
-                <div class="text-gray-700">
-                    <span class="text-sm font-medium text-gray-900">{ get_fullname(user_creation) }</span>
-                    <span style="font-size:14px;"> đã tạo trang mới</span>
+                <div class="text-gray-700 text-sm">
+                    <span class="font-medium text-gray-900">{ get_fullname(user_creation) }</span>
+                    <span> đã tạo trang mới</span>
                     <span class="font-medium text-gray-900"> {page_doc.title}</span>
                 </div>
             """
@@ -591,14 +591,12 @@ def add_page_of_project(projectId, pageId, user_creation):
 def add_comment_owner_discussion(type_notifies, discussionId, commentId):
     discusson_doc = frappe.get_doc('GP Discussion', discussionId)
     comment_doc = frappe.get_doc('GP Comment', commentId)
-    print("Comment ", comment_doc.owner)
-    print("Discussion ", discusson_doc.owner)
     if comment_doc.owner != discusson_doc.owner:
         project_doc = frappe.get_doc('GP Project', discusson_doc.project)
         notify_text = f"""
-            <div class="text-gray-700">
-                <span class="text-sm font-medium text-gray-900">{ get_fullname(comment_doc.owner) }</span>
-                <span style="font-size:14px;"> đã bình luận trong thảo luận</span>
+            <div class="text-gray-700 text-sm">
+                <span class="font-medium text-gray-900">{ get_fullname(comment_doc.owner) }</span>
+                <span> đã bình luận trong thảo luận</span>
                 <span class="font-medium text-gray-900"> {discusson_doc.title}</span>
             </div>
         """
@@ -643,14 +641,11 @@ def add_comment_owner_discussion(type_notifies, discussionId, commentId):
 def add_reaction_owner_discussion(discussionId, userReactionId, nameReaction):
     discussion_doc = frappe.get_doc('GP Discussion', discussionId)
     project_doc = frappe.get_doc('GP Project', discussion_doc.project)
-    print("Vào đây ", discussionId)
-    print(userReactionId)
-    print(nameReaction)
     if userReactionId != discussion_doc.owner:
         notify_text = f"""
-            <div class="text-gray-700">
-                <span class="text-sm font-medium text-gray-900">{ get_fullname(userReactionId) }</span>
-                <span style="font-size:14px;"> đã thả cảm xúc về thảo luận</span>
+            <div class="text-gray-700 text-sm">
+                <span class="font-medium text-gray-900">{ get_fullname(userReactionId) }</span>
+                <span> đã thả cảm xúc về thảo luận</span>
                 <span class="font-medium text-gray-900"> {discussion_doc.title}</span>
             </div>
         """
@@ -703,9 +698,9 @@ def add_comment_followed_discussion(arr_user, discussionId, commentId):
     project_doc = frappe.get_doc('GP Project', discussion_doc.project)
     user_sender = frappe.get_doc('User', comment_doc.owner)
     notify_text = f"""
-        <div class="text-gray-700">
-            <span class="text-sm font-medium text-gray-900">{ get_fullname(comment_doc.owner) }</span>
-            <span style="font-size:14px;"> đã bình luận trong thảo luận</span>
+        <div class="text-gray-700 text-sm">
+            <span class="font-medium text-gray-900">{ get_fullname(comment_doc.owner) }</span>
+            <span> đã bình luận trong thảo luận</span>
             <span class="font-medium text-gray-900"> {discussion_doc.title}</span>
         </div>
     """
@@ -759,9 +754,9 @@ def add_poll_followed_discussion(arr_user, discussionId, pollId):
     project_doc = frappe.get_doc('GP Project', discussion_doc.project)
     poll_doc = frappe.get_doc('GP Poll', pollId)
     notify_text = f"""
-        <div class="text-gray-700">
-            <span class="text-sm font-medium text-gray-900">{ get_fullname(poll_doc.owner) }</span>
-            <span style="font-size:14px;"> đã tạo cuộc bình chọn trong thảo luận</span>
+        <div class="text-gray-700 text-sm">
+            <span class="font-medium text-gray-900">{ get_fullname(poll_doc.owner) }</span>
+            <span> đã tạo cuộc bình chọn trong thảo luận</span>
             <span class="font-medium text-gray-900"> {discussion_doc.title}</span>
         </div>
     """
@@ -822,10 +817,10 @@ def close_conclusion_followed_discussion(arr_user, discussionId):
     discussion_doc = frappe.get_doc('GP Discussion', discussionId)
     project_doc = frappe.get_doc('GP Project', discussion_doc.project)
     notify_text = f"""
-        <div class="text-gray-700">
-            <span style="font-size:14px;">Thảo luận </span>
+        <div class="text-gray-700 text-sm">
+            <span>Thảo luận </span>
             <span class="font-medium text-gray-900">{ discussion_doc.title }</span>
-            <span style="font-size:14px;"> đã đóng và có kết luận</span>
+            <span> đã đóng và có kết luận</span>
         </div>
     """
     user_sender = frappe.get_doc('User', discussion_doc.owner)
@@ -876,9 +871,9 @@ def close_conclusion_followed_discussion(arr_user, discussionId):
 
 def assign_to_someone_task(projectId, taskId, assigner, recipient, title_task):
     notify_text = f"""
-        <div class="text-gray-700">
-            <span class="text-sm font-medium text-gray-900">{ get_fullname(assigner) }</span>
-            <span style="font-size:14px;"> đã giao cho bạn nhiệm vụ</span>
+        <div class="text-gray-700 text-sm">
+            <span class="font-medium text-gray-900">{ get_fullname(assigner) }</span>
+            <span> đã giao cho bạn nhiệm vụ</span>
             <span class="font-medium text-gray-900"> {title_task}</span>
         </div>
     """
@@ -951,13 +946,13 @@ def change_status_owner_task(taskId, userChange, statusNew):
     if project_info is not None:
         teamId = project_info.team
     notify_text = f"""
-        <div class="text-gray-700">
-            <span class="text-sm font-medium text-gray-900">{ get_fullname(userChange) }</span>
-            <span style="font-size:14px;"> đã cập nhật trạng thái nhiệm vụ</span>
+        <div class="text-gray-700 text-sm">
+            <span class="font-medium text-gray-900">{ get_fullname(userChange) }</span>
+            <span> đã cập nhật trạng thái nhiệm vụ</span>
             <span class="font-medium text-gray-900"> {task_info.title}</span>
-            <span style="font-size:14px;"> từ</span>
+            <span> từ</span>
             <span class="font-medium text-gray-900"> {task_info.status}</span>
-            <span style="font-size:14px;"> qua</span>
+            <span> qua</span>
             <span class="font-medium text-gray-900">{statusNew}</span>
         </div>
     """
@@ -1022,11 +1017,11 @@ def change_assignee_to_older(taskId, new_assignee):
     if project_info is not None:
         teamId = project_info.team
     notify_text = f"""
-        <div class="text-gray-700">
-            <span style="font-size:14px;">Nhiệm vụ</span>
+        <div class="text-gray-700 text-sm">
+            <span>Nhiệm vụ</span>
             <span class="font-medium text-gray-900"> {task_info.title}</span>
-            <span style="font-size:14px;"> thay đổi người phụ trách từ bạn qua</span>
-            <span class="text-sm font-medium text-gray-900"> {get_fullname(new_assignee)}</span>
+            <span> thay đổi người phụ trách từ bạn qua</span>
+            <span class="font-medium text-gray-900"> {get_fullname(new_assignee)}</span>
         </div>
     """
     values_notify = frappe._dict(
@@ -1085,12 +1080,12 @@ def change_due_date_to_assignee(taskId, newDueDate):
     if project_info is not None:
         teamId = project_info.team
     notify_text = f"""
-        <div class="text-gray-700">
-            <span style="font-size:14px;">Nhiệm vụ</span>
+        <div class="text-gray-700 text-sm">
+            <span>Nhiệm vụ</span>
             <span class="font-medium text-gray-900"> {task_info.title}</span>
-            <span style="font-size:14px;"> thay đổi hạn chót từ</span>
+            <span> thay đổi hạn chót từ</span>
             <span class="font-medium text-gray-900"> {task_info.due_date}</span>
-            <span style="font-size:14px;"> qua</span>
+            <span> qua</span>
             <span class="font-medium text-gray-900"> {newDueDate}</span>
         </div>
     """
@@ -1155,12 +1150,12 @@ def change_priority_to_assignee(taskId, newPriority):
     if project_info is not None:
         teamId = project_info.team
     notify_text = f"""
-        <div class="text-gray-700">
-            <span style="font-size:14px;">Nhiệm vụ</span>
+        <div class="text-gray-700 text-sm">
+            <span>Nhiệm vụ</span>
             <span class="font-medium text-gray-900"> {task_info.title}</span>
-            <span style="font-size:14px;"> thay đổi mức ưu tiên từ</span>
+            <span> thay đổi mức ưu tiên từ</span>
             <span class="font-medium text-gray-900"> {task_info.priority}</span>
-            <span style="font-size:14px;"> qua</span>
+            <span> qua</span>
             <span class="font-medium text-gray-900"> {newPriority}</span>
         </div>
     """
@@ -1225,11 +1220,11 @@ def vote_poll_by_someone(pollId, userVote, option):
     discussion_info = frappe.db.get_value('GP Discussion', poll_info.discussion, ['project', 'team', 'title'], as_dict=1)
     project_info = frappe.db.get_value('GP Project', discussion_info.project, ['title', 'team'], as_dict=1)
     notify_text = f"""
-        <div class="text-gray-700">
-            <span class="text-sm font-medium text-gray-900">{get_fullname(userVote)}</span>
-            <span style="font-size:14px;"> đã bình chọn</span>
+        <div class="text-gray-700 text-sm">
+            <span class="font-medium text-gray-900">{get_fullname(userVote)}</span>
+            <span> đã bình chọn</span>
             <span class="font-medium text-gray-900"> {option}</span>
-            <span style="font-size:14px;"> trong cuộc bình chọn</span>
+            <span> trong cuộc bình chọn</span>
             <span class="font-medium text-gray-900"> {poll_info.title}</span>
         </div>
     """
@@ -1287,10 +1282,10 @@ def close_poll(pollId):
     for vote in votes:
         if vote.user != user_poll:
             notify_text = f"""
-                <div class="text-gray-700">
-                    <span style="font-size:14px;">Cuộc bình chọn</span>
+                <div class="text-gray-700 text-sm">
+                    <span>Cuộc bình chọn</span>
                     <span class="font-medium text-gray-900"> {poll_doc.title}</span>
-                    <span style="font-size:14px;"> đã đóng và có kết quả</span>
+                    <span> đã đóng và có kết quả</span>
                 </div>
             """
             values_notify = frappe._dict(

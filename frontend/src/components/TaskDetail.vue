@@ -6,7 +6,7 @@
           <LoadingText v-if="!$resources.task.setValueDebounced.error" :text="__('Saving...')" />
           <ErrorMessage :message="$resources.task.setValueDebounced.error" />
         </div>
-        <div class="mb-2 flex items-center justify-between space-x-2">
+        <div class="mb-4 flex items-center justify-between space-x-2">
           <input type="text" :placeholder="__('Title')"
             class="-ml-0.5 w-full rounded-sm border-none p-0.5 text-2xl font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-400"
             @change="
@@ -27,7 +27,7 @@
                 <LucideMoreHorizontal class="h-4 w-4" />
               </template>
             </Button>
-          </Dropdown>
+          </Dropdown> 
         </div>
         <div class="w-full flex">
           <div class="text-1xl font-semibold mb-2">{{ __('Description') }}</div>
@@ -39,7 +39,7 @@
             </Button>
           </div>
         </div>
-        <div class="w-full">
+        <div class="w-full mb-6">
           <div :class="{
             'rounded-lg border p-4 focus-within:border-gray-400 w-full':
               editingDescription,
@@ -61,7 +61,7 @@
               }" :editable="editingDescription" />
           </div>
         </div>
-        <div class="w-full mb-3 mt-1">
+        <div class="w-full mb-6 mt-1">
           <Connection :reference_doctype="'GP Task'" :reference_name="taskId" :project="projectTask"
             :readOnly="readOnly">
           </Connection>
@@ -129,6 +129,7 @@
       </div>
     </div>
     <div class="hidden w-[20rem] shrink-0 border-l sm:block">
+      <div>{{readOnly}}</div>
       <div class="grid grid-cols-2 items-center gap-y-6 p-6 text-base text-gray-700" v-if="!readOnly">
         <div>{{ __('Assignee') }}</div>
         <div>
@@ -317,6 +318,7 @@ export default {
       )
     },
     setReadOnlyState(data) {
+      console.log("Dòng 321 ", this.readOnly)
       if (data.owner == getUser('sessionUser').name) {
         this.readOnly = false;
       } else if (data.team != null && data.project != null) {
@@ -333,7 +335,8 @@ export default {
           }
         }
       }
-      console.log('ReadOnly State Updated:', this.readOnly);
+      console.log("Dòng 336 ", this.readOnly)
+      console.log('ReadOnly State Updated:', this.readOnly)
     }
   },
   computed: {
@@ -374,6 +377,15 @@ export default {
         })),
       }))
     },
+  },
+  watch: {
+    readOnly(newVal, oldVal) {
+      console.log("new value: ", newVal)
+      console.log("old value: ", oldVal)
+    }
+  },
+  unmounted(){
+    this.readOnly = true
   },
   components: {
     ReadmeEditor,

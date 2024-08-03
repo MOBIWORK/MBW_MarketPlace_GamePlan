@@ -18,11 +18,16 @@ class HasMentions:
 				from_user=self.owner,
 				to_user=mention.email,
 			)
+			title = ""
 			if self.doctype == "GP Discussion":
 				values.discussion = self.name
+				discussion_info = frappe.get_doc('GP Discussion', self.name)
+				title = discussion_info.title
 			if self.doctype == "GP Task":
 				values.task = self.name
 				values.project = self.project
+				task_info = frappe.get_doc('GP Task', self.name)
+				title = task_info.title
 			elif self.doctype == "GP Comment":
 				values.comment = self.name
 				if self.reference_doctype == "GP Discussion":
@@ -36,16 +41,18 @@ class HasMentions:
 			notification = frappe.get_doc(doctype='GP Notification')
 			if "GP Task" in [self.doctype, self.get('reference_doctype')]:
 				notification.message = f"""
-					<div class="text-gray-700">
-						<span class="text-sm font-medium text-gray-900">{ get_fullname(self.owner) }</span>
-						<span style="font-size:14px;"> đề cập bạn trong một công việc</span>
+					<div class="text-gray-700 text-sm">
+						<span class="font-medium text-gray-900">{ get_fullname(self.owner) }</span>
+						<span> đề cập bạn trong một công việc</span>
+						<span class="font-medium text-gray-900"> {title}</span>
 					</div>
 				"""
 			elif "GP Discussion" in [self.doctype, self.get('reference_doctype')]:
 				notification.message = f"""
-					<div class="text-gray-700">
+					<div class="text-gray-700 text-sm">
 						<span class="text-sm font-medium text-gray-900">{ get_fullname(self.owner) }</span>
-						<span style="font-size:14px;"> đề cập bạn trong một bài</span>
+						<span> đề cập bạn trong một thảo luận</span>
+						<span class="text-sm font-medium text-gray-900"> {title}</span>
 					</div>
 				"""
 			notification.update(values)

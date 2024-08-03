@@ -5,9 +5,9 @@
   >
     <span class="mr-3 h-4 w-4">{{ item.icon }}</span>
     <span class="font-medium text-gray-800"> {{ item.title }}&nbsp; </span>
-    <span class="ml-auto text-gray-600">
+    <!-- <span class="ml-auto text-gray-600">
       {{ $dayjs(item.modified).fromNow(true) }}
-    </span>
+    </span> -->
   </div>
 </template>
 <script setup>

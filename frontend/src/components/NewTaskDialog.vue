@@ -149,6 +149,8 @@ const initialData = {
   status: 'Backlog',
   assigned_to: null,
   project: null,
+  remind_times: '30',
+  remind_unit: 'minute'
 }
 
 const newTask = ref(initialData)

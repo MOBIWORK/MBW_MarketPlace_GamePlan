@@ -102,6 +102,7 @@
 import { Autocomplete, Dropdown, Tooltip } from 'frappe-ui'
 import { projects, getTeamProjects } from '@/data/projects'
 import { activeTeams } from '@/data/teams'
+import { createToast } from '@/utils'
 
 export default {
   name: 'Invite',
@@ -135,6 +136,11 @@ export default {
         }
       },
       onSuccess() {
+        createToast({
+          title: __('Invitation sent successfully'),
+          icon: 'check',
+          iconClasses: 'text-green-600'
+        })
         this.$resetData()
         this.$resources.pendingInvitations.reload()
       },

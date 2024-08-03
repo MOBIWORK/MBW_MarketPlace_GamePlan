@@ -12,7 +12,7 @@
         </div>
     </div>
     <div v-if="show_adding_connection">
-        <div class="flex items-center mb-1 mt-3">
+        <div class="flex items-center mb-2 mt-3">
             <Select :options="[
                 {
                     label: 'Task',
@@ -52,10 +52,17 @@
         v-model="show_confirm_deleteing"
     />
     <div class="flex items-center mt-3" v-for="connection in connections">
-        <TextInput :type="'text'" size="sm" variant="outline" :readonly="true" :value="onRenderValueDoctype(connection)" 
-            class="mr-2" style="width: 8rem !important;color:rgb(37 99 235) !important;"/>
+        <Badge
+            :variant="'solid'"
+            theme="gray"
+            size="lg"
+            label="Badge"
+            class="mr-3"
+            >
+            {{onRenderValueDoctype(connection)}}
+            </Badge>
         <TextInput :type="'text'" size="sm" variant="outline" :readonly="true" :value="connection.title_destination" 
-            class="w-full cursor-pointer hover:bg-gray-200" @click="onLinkConnection($event, connection)"/>
+            class="w-full cursor-pointer hover:bg-gray-200 border-none" @click="onLinkConnection($event, connection)"/>
         <Button variant="outline" @click="onDeleteConnection(connection)" style="width: 2rem !important;" class="ml-2" v-if="!readOnly">
             <template #icon>
                 <LucideTrash2 class="w-4" />
@@ -64,7 +71,7 @@
     </div>
 </template>
 <script>
-import { Button, TextInput, Tooltip, Select, Dialog } from 'frappe-ui'
+import { Button, TextInput, Tooltip, Select, Dialog, Badge } from 'frappe-ui'
 import { createToast } from '@/utils'
 
 export default {
@@ -99,7 +106,8 @@ export default {
         TextInput,
         Tooltip,
         Select,
-        Dialog
+        Dialog,
+        Badge
     },
     resources: {
         connections() {

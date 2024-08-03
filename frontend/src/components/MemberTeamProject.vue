@@ -41,7 +41,7 @@
                 <div class="text-base font-medium text-gray-800 truncate w-52">
                     {{ member.full_name }}
                 </div>
-                <div class="text-sm text-gray-600 truncate w-52">
+                <div class="text-sm text-gray-600 truncate w-52" style="height:1rem;">
                     {{ member.email }}
                 </div>
             </div>
@@ -263,6 +263,8 @@ export default {
                 auto: false,
                 onSuccess(data){
                     if(data.status == "ok"){
+                        me.nameOrEmailMember = ""
+                        me.displayUserSystem = false
                         createToast({
                             title: __('Thêm thành viên vào nhóm thành công'),
                             icon: 'check',
@@ -277,8 +279,6 @@ export default {
                             'id': member_info.id
                         })
                         me.$emit('addMember', me.arrMember)
-                        me.nameOrEmailMember = ""
-                        me.displayUserSystem = false
                     }else{
                         createToast({
                             title: __('Lỗi khi thêm thành viên vào nhóm'),

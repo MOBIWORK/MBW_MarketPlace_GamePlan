@@ -124,7 +124,10 @@ def change_user_role(user: str, role: str):
 @validate_type
 def remove_user(user: str):
 	user_doc = frappe.get_doc("User", user)
-	user_doc.enabled = 0
+	for _role in user_doc.roles:
+		if _role.role in ["Gameplan Guest", "Gameplan Member", "Gameplan Admin"]:
+			user_doc.remove(_role)
+	#user_doc.enabled = 0
 	user_doc.save(ignore_permissions=True)
 	return user
 

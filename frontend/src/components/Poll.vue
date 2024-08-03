@@ -1,5 +1,5 @@
 <template>
-  <div class="py-6 transition-shadow" :class="{ ring: highlight }">
+  <div class="py-3 transition-shadow" :class="{ ring: highlight }">
     <div class="mb-2 flex items-center text-base text-gray-900">
       <UserInfo :email="_poll.owner" v-slot="{ user }">
         <UserProfileLink class="mr-3" :user="user.name">

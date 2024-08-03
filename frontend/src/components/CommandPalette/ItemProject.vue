@@ -4,13 +4,13 @@
     :class="{ 'bg-gray-200': active }"
   >
     <span class="font-medium text-gray-800"> {{ item.title }}&nbsp; </span>
-    <span v-if="item.team" class="inline-flex space-x-1 text-gray-600">
+    <!-- <span v-if="item.team" class="inline-flex space-x-1 text-gray-600">
       <span>in</span>
       <span> {{ item.team }} </span>
-    </span>
-    <span class="ml-auto text-gray-600">
+    </span> -->
+    <!-- <span class="ml-auto text-gray-600">
       {{ $dayjs(item.modified).fromNow(true) }}
-    </span>
+    </span> -->
   </div>
 </template>
 <script setup>

@@ -57,27 +57,26 @@
         <div class="overflow-auto" style="height: 89%;">
             <template v-for="notification in $resources.notifications.data">
                 <div class="" @click="onReadNotification(notification)">
-                    <div class="flex cursor-pointer items-start gap-2.5 hover:bg-gray-100 border-b px-4 py-2.5">
-                        <div class="mt-1 flex items-center gap-2.5">
+                    <div class="flex cursor-pointer hover:bg-gray-100 border-b px-4 py-2.5">
+                        <div class="mt-1 mr-2 flex items-center w-7">
                             <UserAvatar :user="notification.from_user" size="lg" />
                         </div>
-                        <div class="flex items-center justify-between w-full">
-                            <div class="mr-2">
-                                <div v-html="notification.message" />
-                                <div class="text-sm text-gray-600 flex items-center mt-1 mb-2">
-                                    <div style="min-width:72px;" class="mr-2">{{ formatTimeAgo(notification.creation) }}</div>
-                                    <div class="flex items-center"
-                                        v-if="notification.project_title != null && notification.project_title != ''">
-                                        <div style="background-color: rgba(97, 97, 97, 0.5);"
-                                            class="rounded-full h-1.5 w-1.5 mr-2"></div>
-                                        <div class="truncate" style="max-width: 65%;">{{ notification.project_title }}</div>
-                                    </div>
+                        <div class="mr-2" style="width: calc(100% - 60px);">
+                            <div v-html="notification.message" />
+                            <div class="text-sm text-gray-600 flex items-center mt-1 mb-2 w-full">
+                                <div class="min-w-16">{{ formatTimeAgo(notification.creation) }}</div>
+                                <div class="ml-2 mr-1 w-3 flex items-center"  v-if="notification.project_title != null && notification.project_title != ''">
+                                    <div style="background-color: rgba(97, 97, 97, 0.5);"
+                                            class="rounded-full h-1.5 w-1.5"></div>
+                                </div>
+                                <div class="w-full truncate">
+                                    {{ notification.project_title }}
                                 </div>
                             </div>
-                            <div class="w-8 flex justify-end">
-                                <div class="h-2 w-2 rounded-full ml-1"
-                                    :class="[notification.read == 1 ? 'bg-transparent' : 'unread']" />
-                            </div>
+                        </div>
+                        <div class="w-4 flex items-center">
+                            <div class="h-2 w-2 rounded-full ml-1"
+                                :class="[notification.read == 1 ? 'bg-transparent' : 'unread']" />
                         </div>
                     </div>
                 </div>

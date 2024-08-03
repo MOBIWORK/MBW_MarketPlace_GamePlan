@@ -11,12 +11,12 @@
     <span class="overflow-hidden text-ellipsis whitespace-nowrap">
       {{ item.title }}&nbsp;
     </span>
-    <span
+    <!-- <span
       v-if="item.modified"
       class="ml-auto whitespace-nowrap pl-2 text-gray-600"
     >
       {{ $dayjs(item.modified).fromNow(true) }}
-    </span>
+    </span> -->
   </div>
 </template>
 <script setup>
