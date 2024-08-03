@@ -13,7 +13,7 @@
               $resources.task.setValueDebounced.submit({
                 title: $event.target.value,
               })
-              " v-model="$resources.task.doc.title" v-focus :disabled="readOnly" />
+              " v-model="$resources.task.doc.title" v-focus :disabled="readOnlyControl" />
           <Dropdown :options="[
             {
               label: __('Delete'),
@@ -21,7 +21,7 @@
                 showDeleteTaskDialog = true;
               },
             },
-          ]" v-if="!readOnly">
+          ]" v-if="!readOnlyControl">
             <Button variant="ghost">
               <template #icon>
                 <LucideMoreHorizontal class="h-4 w-4" />
@@ -31,7 +31,7 @@
         </div>
         <div class="w-full flex">
           <div class="text-1xl font-semibold mb-2">{{ __('Description') }}</div>
-          <div class="ml-auto flex space-x-2" v-if="!readOnlyMode && !editingDescription && !readOnly">
+          <div class="ml-auto flex space-x-2" v-if="!readOnlyMode && !editingDescription && !readOnlyControl">
             <Button variant="ghost" @click="editingDescription = true" :label="__('Edit Description')">
               <template #icon>
                 <LucideEdit class="w-4" />
@@ -63,12 +63,12 @@
         </div>
         <div class="w-full mb-6 mt-1">
           <Connection :reference_doctype="'GP Task'" :reference_name="taskId" :project="projectTask"
-            :readOnly="readOnly">
+            :readOnly="readOnlyControl">
           </Connection>
         </div>
 
         <div class="mt-8 flex flex-wrap items-center gap-2 sm:hidden">
-          <ng-template v-if="!readOnly">
+          <ng-template v-if="!readOnlyControl">
             <Autocomplete :placeholder="__('Assign a user')" :options="assignableUsers"
               v-model="$resources.task.doc.assigned_to" @update:modelValue="changeUserAssign" />
             <TextInput type="date" :placeholder="__('Due date')" v-model="$resources.task.doc.due_date" @change="
@@ -129,8 +129,7 @@
       </div>
     </div>
     <div class="hidden w-[20rem] shrink-0 border-l sm:block">
-      <div>{{readOnly}}</div>
-      <div class="grid grid-cols-2 items-center gap-y-6 p-6 text-base text-gray-700" v-if="!readOnly">
+      <div class="grid grid-cols-2 items-center gap-y-6 p-6 text-base text-gray-700" v-if="!readOnlyControl">
         <div>{{ __('Assignee') }}</div>
         <div>
           <Autocomplete :placeholder="__('Assign a user')" :options="assignableUsers"
@@ -240,7 +239,6 @@ export default {
       showDeleteTaskDialog: false,
       editingDescription: false,
       activeActivity: 'comment',
-      readOnly: true,
       projectTask: null
     }
   },
@@ -265,9 +263,7 @@ export default {
           },
         },
         onSuccess(doc) {
-          console.log(doc)
           this.projectTask = doc.project
-          this.setReadOnlyState(doc)
           if (
             ['ProjectTaskDetail', 'Task'].includes(this.$route.name) &&
             Number(this.$route.params.taskId) === doc.name
@@ -316,27 +312,6 @@ export default {
           },
         }
       )
-    },
-    setReadOnlyState(data) {
-      console.log("Dòng 321 ", this.readOnly)
-      if (data.owner == getUser('sessionUser').name) {
-        this.readOnly = false;
-      } else if (data.team != null && data.project != null) {
-        let projectInfo = getProject(data.project);
-        let teamInfo = getTeamInfo(data.team).data;
-        let roleByProject = this.$getRoleByUser(null, projectInfo);
-
-        if (roleByProject == "manager") {
-          this.readOnly = false;
-        } else {
-          let roleByTeam = this.$getRoleByUser(teamInfo, null);
-          if (roleByTeam != "guest" && roleByTeam != "member") {
-            this.readOnly = false;
-          }
-        }
-      }
-      console.log("Dòng 336 ", this.readOnly)
-      console.log('ReadOnly State Updated:', this.readOnly)
     }
   },
   computed: {
@@ -377,15 +352,25 @@ export default {
         })),
       }))
     },
-  },
-  watch: {
-    readOnly(newVal, oldVal) {
-      console.log("new value: ", newVal)
-      console.log("old value: ", oldVal)
+    readOnlyControl(){
+      if (this.$resources.task.doc.owner == getUser('sessionUser').name) {
+        return false;
+      } else if (this.$resources.task.doc.team != null && this.$resources.task.doc.project != null) {
+        let projectInfo = getProject(this.$resources.task.doc.project);
+        let teamInfo = getTeamInfo(this.$resources.task.doc.team).data;
+        let roleByProject = this.$getRoleByUser(null, projectInfo);
+
+        if (roleByProject == "manager") {
+          return false;
+        } else {
+          let roleByTeam = this.$getRoleByUser(teamInfo, null);
+          if (roleByTeam != "guest" && roleByTeam != "member") {
+            return false;
+          }
+        }
+      }
+      return true
     }
-  },
-  unmounted(){
-    this.readOnly = true
   },
   components: {
     ReadmeEditor,

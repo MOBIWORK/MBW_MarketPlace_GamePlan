@@ -9,7 +9,7 @@
           {{__('Last updated')}} {{ $dayjs(page.doc.modified).format('LLL') }}
         </span>
         <Button
-          v-show="page.doc && page.isDirty && !readOnly"
+          v-show="page.doc && page.isDirty && !readOnlyControl"
           variant="solid"
           @click="save"
           :loading="page.save.loading"
@@ -31,18 +31,18 @@
             @input="page.doc.title = $event.target.value"
             @keydown.enter="$refs.content.editor.commands.focus()"
             ref="titleInput"
-            :readonly="readOnly"
+            :readonly="readOnlyControl"
           />
         </div>
         <TextEditor
             editor-class="rounded-b-lg max-w-[unset] prose-sm h-mbw-fit-page overflow-y-auto"
             :content="page.doc.content"
             @change="page.doc.content = $event"
-            :placeholder="!readOnly? __('Start writing here...') : ''"
+            :placeholder="!readOnlyControl? __('Start writing here...') : ''"
             ref="content"
-            :editable="!readOnly"
+            :editable="!readOnlyControl"
           >
-            <template v-if="!readOnly" v-slot:bottom>
+            <template v-if="!readOnlyControl" v-slot:bottom>
               <div
                 class="mt-2 flex flex-col justify-between sm:flex-row sm:items-center"
               >
@@ -69,11 +69,6 @@ export default {
   name: 'Page',
   props: ['pageId', 'slug'],
   components: { TextEditor, Breadcrumbs, TextEditorFixedMenu },
-  data(){
-    return {
-      readOnly: true
-    }
-  },
   resources: {
     page() {
       return {
@@ -81,7 +76,6 @@ export default {
         doctype: 'GP Page',
         name: this.pageId,
         onSuccess(data) {
-          this.setReadOnlyState(data);
           this.updateUrlSlug()
           this.$nextTick(() => {
             this.$refs.titleInput?.focus()
@@ -124,25 +118,6 @@ export default {
           query: this.$route.query,
         })
       }
-    },
-    setReadOnlyState(data) {
-      if (data.owner == getUser('sessionUser').name) {
-        this.readOnly = false;
-      } else if (data.team != null && data.project != null) {
-        let projectInfo = getProject(data.project);
-        let teamInfo = getTeamInfo(data.team).data;
-        let roleByProject = this.$getRoleByUser(null, projectInfo);
-        
-        if (roleByProject == "manager") {
-          this.readOnly = false;
-        } else {
-          let roleByTeam = this.$getRoleByUser(teamInfo, null);
-          if (roleByTeam != "guest" && roleByTeam != "member") {
-            this.readOnly = false;
-          }
-        }
-      }
-      console.log('ReadOnly State Updated:', this.readOnly);
     }
   },
   computed: {
@@ -254,6 +229,25 @@ export default {
     pageTitle() {
       let page = getCachedDocumentResource('GP Page', this.pageId)
       return page?.doc?.title || this.pageId
+    },
+    readOnlyControl(){
+      if (this.page.doc.owner == getUser('sessionUser').name) {
+        return false
+      } else if (this.page.doc.team != null && this.page.doc.project != null) {
+        let projectInfo = getProject(this.page.doc.project);
+        let teamInfo = getTeamInfo(this.page.doc.team).data;
+        let roleByProject = this.$getRoleByUser(null, projectInfo);
+        
+        if (roleByProject == "manager") {
+          return false
+        } else {
+          let roleByTeam = this.$getRoleByUser(teamInfo, null);
+          if (roleByTeam != "guest" && roleByTeam != "member") {
+            return false
+          }
+        }
+      }
+      return true
     }
   },
 }
