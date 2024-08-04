@@ -1150,14 +1150,24 @@ def change_priority_to_assignee(taskId, newPriority):
     teamId = None
     if project_info is not None:
         teamId = project_info.team
-    notify_text = f"""
-        <div class="text-gray-700 text-sm">
-            <span>Nhiệm vụ</span>
-            <span class="font-medium text-gray-900"> {task_info.title}</span>
+    sub_content_notify = ""
+    if task_info.priority != None and task_info.priority != "":
+        sub_content_notify = f"""
             <span> thay đổi mức ưu tiên từ</span>
             <span class="font-medium text-gray-900"> {task_info.priority}</span>
             <span> qua</span>
             <span class="font-medium text-gray-900"> {newPriority}</span>
+        """
+    else:
+        sub_content_notify = f"""
+            <span> thay đổi mức ưu tiên thành</span>
+            <span class="font-medium text-gray-900"> {newPriority}</span>
+        """
+    notify_text = f"""
+        <div class="text-gray-700 text-sm">
+            <span>Nhiệm vụ</span>
+            <span class="font-medium text-gray-900"> {task_info.title}</span>
+            {sub_content_notify}
         </div>
     """
     values_notify = frappe._dict(
@@ -1182,6 +1192,15 @@ def change_priority_to_assignee(taskId, newPriority):
     if "email" in type_notifies:
         link_btn = ""
         content_email = ""
+        sub_content_email = ""
+        if task_info.priority != None and task_info.priority != "":
+            sub_content_email = f"""
+                <div>Nhiệm vụ {task_info.title} thay đổi mức ưu tiên từ {task_info.priority} qua {newPriority}</div>
+            """
+        else:
+            sub_content_email = f"""
+                <div>Nhiệm vụ {task_info.title} thay đổi mức ưu tiên thành {newPriority}</div>
+            """
         if project_info is not None and values_notify.project is not None and values_notify.project != "":
             link_btn = frappe.utils.get_url(f'/g/{values_notify.team}/projects/{values_notify.project}/task/{taskId}')
             content_email = f"""
@@ -1190,7 +1209,7 @@ def change_priority_to_assignee(taskId, newPriority):
                         <span>Dự án </span>
                         <span>{project_info.title}</span>
                     </div>
-                    <div>Nhiệm vụ {task_info.title} thay đổi mức ưu tiên từ {task_info.priority} qua {newPriority}</div>
+                    {sub_content_email}
                 </div>
                 <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
@@ -1198,7 +1217,7 @@ def change_priority_to_assignee(taskId, newPriority):
             link_btn = frappe.utils.get_url(f'/g/task/{taskId}')
             content_email = f"""
                 <div class="mb-2 leading-5 text-gray-600">
-                    <div>Nhiệm vụ {task_info.title} thay đổi mức ưu tiên từ {task_info.priority} qua {newPriority}</div>
+                    {sub_content_email}
                 </div>
                 <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
