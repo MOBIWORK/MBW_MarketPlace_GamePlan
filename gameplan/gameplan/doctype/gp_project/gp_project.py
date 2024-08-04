@@ -87,7 +87,8 @@ class GPProject(ManageMembersMixin, Archivable, Document):
 		if project_exist is not None:
 			project_old = frappe.get_doc('GP Project', self.name)
 			if project_old.is_private != self.is_private:
-				change_limit_project_team("project", self.name)
+				print("Dong 90 ", self.is_private)
+				change_limit_project_team("project", self.name, self.is_private)
 			if project_old.title != self.title:
 				change_name_project_team("project", self.name, project_old.title, self.title)
 
@@ -175,6 +176,7 @@ class GPProject(ManageMembersMixin, Archivable, Document):
 		existing = frappe.db.get_value("GP Project Visit", values)
 		if existing:
 			visit = frappe.get_doc("GP Project Visit", existing)
+			visit.reload()
 			visit.last_visit = frappe.utils.now()
 			visit.save(ignore_permissions=True)
 		else:

@@ -162,7 +162,7 @@ def send_guest_by_invite_guest(type_notifys, idGuest, type_reference, name_refer
             )
             frappe.db.commit()
 
-def change_limit_project_team(type_reference, name_reference):
+def change_limit_project_team(type_reference, name_reference, newLimit):
     type_joining = ""
     name_joining = ""
     doctype_reference = ""
@@ -177,7 +177,7 @@ def change_limit_project_team(type_reference, name_reference):
             member_filter = [user_fil for user_fil in arr_user_receiveds if user_fil == member.user]
             if len(member_filter) == 0:
                 arr_user_receiveds.append(member.user)
-        if team_doc.is_private == True:
+        if newLimit == 1:
             limit = "riêng tư"
         else:
             limit = "công khai"
@@ -200,7 +200,7 @@ def change_limit_project_team(type_reference, name_reference):
             guest_filter = [guest_fil for guest_fil in arr_user_receiveds if guest_fil == guest.user]
             if len(guest_filter) == 0:
                 arr_user_receiveds.append(guest.user)
-        if project_doc.is_private == True:
+        if newLimit == 1 or newLimit == "1":
             limit = "riêng tư"
         else:
             limit = "công khai"
@@ -281,6 +281,7 @@ def change_archived_project_team(type_reference, name_reference, idUserActor):
     elif type_reference == "project":
         type_joining = "dự án"
         project_doc = frappe.get_doc('GP Project', name_reference)
+        name_joining = project_doc.title
         team_doc = frappe.get_doc('GP Team', project_doc.team)
         doctype_reference = "GP Project"
         for member in team_doc.members:

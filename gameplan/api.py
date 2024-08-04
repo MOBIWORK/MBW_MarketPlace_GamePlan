@@ -424,6 +424,7 @@ def invite_member(email, teamId):
 		if not email_list:
 			return
 		existing_members = frappe.db.get_all("User", filters={"email": ["in", email_list]}, pluck="email")
+		print("Dongf 427 ", existing_members)
 		user_name = ""
 		if len(existing_members) == 0:
 			first_name = email.split("@")[0].title()
@@ -436,6 +437,7 @@ def invite_member(email, teamId):
 			).insert(ignore_permissions=True)
 			user.append_roles("Gameplan Member")
 			user.save(ignore_permissions=True)
+			frappe.db.commit()
 			user_name = user.name
 		else:
 			user = frappe.get_doc({

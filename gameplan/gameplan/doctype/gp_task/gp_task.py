@@ -41,13 +41,15 @@ class GPTask(HasMentions, HasActivity, Document):
 			if task_info.assigned_to != self.assigned_to and self.assigned_to != frappe.session.user:
 				assign_to_someone_task(self.project, self.name, frappe.session.user, self.assigned_to, self.title)
 			if task_info.assigned_to is not None and task_info.assigned_to != "":
-				if task_info.assigned_to != self.assigned_to and self.assigned_to != frappe.session.user:
+				if task_info.assigned_to != self.assigned_to and task_info.assigned_to != frappe.session.user:
 					change_assignee_to_older(self.name, self.assigned_to)
 			if task_info.status != self.status and frappe.session.user != task_info.owner:
 				change_status_owner_task(self.name, frappe.session.user, self.status)
 			if task_info.due_date is not None:
 				if task_info.due_date != self.due_date and frappe.session.user != self.assigned_to:
 					change_due_date_to_assignee(self.name, self.due_date)
+				if task_info.due_date != self.due_date:
+					self.update_reminder()
 			if task_info.priority is not None:
 				if task_info.priority != self.priority and frappe.session.user != self.assigned_to:
 					change_priority_to_assignee(self.name, self.priority)
@@ -79,6 +81,49 @@ class GPTask(HasMentions, HasActivity, Document):
 		custom_field = {'id_reminder': reminder.name}
 		frappe.db.set_value('GP Task', self.name, 'custom_fields', json.dumps(custom_field))
 		frappe.db.commit()
+
+	def update_reminder(self):
+		if self.due_date is None or self.due_date == "":
+			return
+		if self.remind_times is None or self.remind_times == "" or self.remind_times == 0:
+			return
+		if isinstance(self.due_date, str):
+			date_due_date = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S')
+		else:
+			date_due_date = self.due_date
+		is_exist_remind = False
+		if self.get('custom_fields') is not None:
+			obj_customer = json.loads(self.get('custom_fields'))
+			id_reminder = obj_customer.get('id_reminder')
+			if frappe.db.exists('GP Reminder', id_reminder) is not None:
+				is_exist_remind = True
+		if is_exist_remind == True and date_due_date > datetime.now():
+			obj_customer = json.loads(self.get('custom_fields'))
+			id_reminder = obj_customer.get('id_reminder')
+			doc_reminder = frappe.get_doc('GP Reminder', id_reminder)
+			unit = "phút"
+			remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S')
+			if self.remind_unit == "minute":
+				delta_minutes = timedelta(minutes=int(self.remind_times))
+				remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_minutes
+			elif self.remind_unit == "hour":
+				unit = "giờ"
+				delta_hours = timedelta(hours=int(self.remind_times))
+				remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_hours
+			elif self.remind_unit == "day":
+				unit = "ngày"
+				delta_days = timedelta(days=int(self.remind_times))
+				remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_days
+			doc_reminder.description = f"Nhiệm vụ {self.title} sẽ đến hạn trong {self.remind_times} {unit} nữa"
+			doc_reminder.remind_at = remind_at
+			doc_reminder.user = self.assigned_to
+			doc_reminder.reminder_doctype = "GP Task"
+			doc_reminder.reminder_docname = self.name
+			doc_reminder.notified = 0
+			doc_reminder.save()
+			frappe.db.commit()
+		elif is_exist_remind == False and date_due_date > datetime.now():
+			self.insert_reminder()
 
 	def log_value_updates(self):
 		fields = ['title', 'description', 'status', 'priority', 'assigned_to', 'due_date', 'project']

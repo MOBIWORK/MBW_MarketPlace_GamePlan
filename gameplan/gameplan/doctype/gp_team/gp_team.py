@@ -68,7 +68,7 @@ class GPTeam(Archivable, Document):
 		if team_exist is not None:
 			team_old = frappe.get_doc('GP Team', self.name)
 			if team_old.is_private != self.is_private:
-				change_limit_project_team("team", self.name)
+				change_limit_project_team("team", self.name, self.is_privates)
 			if team_old.title != self.title:
 				change_name_project_team("team", self.name, team_old.title, self.title)
 

@@ -353,7 +353,7 @@ export default {
       }))
     },
     readOnlyControl(){
-      if (this.$resources.task.doc.owner == getUser('sessionUser').name) {
+      if (this.$resources.task.doc.owner == getUser('sessionUser').name || this.$resources.task.doc.assigned_to == getUser('sessionUser').name) {
         return false;
       } else if (this.$resources.task.doc.team != null && this.$resources.task.doc.project != null) {
         let projectInfo = getProject(this.$resources.task.doc.project);
