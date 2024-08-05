@@ -7,6 +7,5 @@ from gameplan.notification import add_reaction_owner_discussion
 
 class GPReaction(Document):
 	def before_save(self):
-		print("Dòng 10 ", self)
 		if self.parenttype == "GP Discussion":
 			add_reaction_owner_discussion(self.parent, self.user, self.emoji)

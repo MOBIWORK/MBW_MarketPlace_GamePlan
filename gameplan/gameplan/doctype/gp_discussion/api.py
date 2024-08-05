@@ -17,9 +17,6 @@ def get_discussions(filters=None, order_by=None, limit_start=None, limit_page_le
 	participator = filters.pop("participator", None) if filters else None
 	order_by = order_by or "last_post_at desc"
 	order_field, order_direction = order_by.split(" ", 1)
-
-	print("Dòng 21 ", filters)
-
 	Discussion = frappe.qb.DocType("GP Discussion")
 	Visit = frappe.qb.DocType("GP Discussion Visit")
 	Project = frappe.qb.DocType("GP Project")

@@ -424,7 +424,6 @@ def invite_member(email, teamId):
 		if not email_list:
 			return
 		existing_members = frappe.db.get_all("User", filters={"email": ["in", email_list]}, pluck="email")
-		print("Dongf 427 ", existing_members)
 		user_name = ""
 		if len(existing_members) == 0:
 			first_name = email.split("@")[0].title()
@@ -515,7 +514,6 @@ def delete_connections(reference_doctype, reference_name):
 @frappe.whitelist()
 def get_value_by_reference_doctype(reference_doctype, project=None):
 	values_by_reference = []
-	print("Dòng 512 ",project)
 	if project is not None and project != "":
 		project_info = frappe.get_doc('GP Project', project)
 		if project_info.is_private == 0:

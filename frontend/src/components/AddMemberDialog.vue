@@ -205,8 +205,7 @@ export default {
       this.$emit('reloadMember', event)
     },
     getRoleByUser(){
-      let role = this.$getRoleByUser(this.resource.doc, null);
-      console.log(role)
+      let role = this.$getRoleByUser(this.resource.doc, null)
       if (role == "member" || role == "guest") return true
       return false
     }
