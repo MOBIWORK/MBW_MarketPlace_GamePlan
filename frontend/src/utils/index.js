@@ -10,6 +10,13 @@ export function createToast(options) {
   })
 }
 
+export function dateFormat(date, format) {
+  const _format = format || 'DD-MM-YYYY HH:mm:ss'
+  return useDateFormat(date, _format).value
+}
+
+export const dateTooltipFormat = 'ddd, MMM D, YYYY h:mm A'
+
 export function timeAgo(date) {
   if(date == null || date == "") return "";
   let valueTimeAgo = useTimeAgo(date).value;
@@ -101,3 +108,8 @@ export function getRoleByUser(teamInfo=null, projectInfo=null){
     return "guest"
   }
 }
+
+export function isTouchScreenDevice() {
+	return "ontouchstart" in document.documentElement;
+}
+

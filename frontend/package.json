@@ -19,8 +19,10 @@
     "gemoji": "^7.1.0",
     "htmldiff-js": "^1.0.5",
     "socket.io-client": "^4.7.2",
+    "sortablejs": "^1.15.2",
     "vue": "^3.3.4",
-    "vue-router": "^4.2.2"
+    "vue-router": "^4.2.2",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@tailwindcss/container-queries": "^0.1.1",

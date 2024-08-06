@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col h-full">
     <router-view v-slot="{ Component, route }">
       <header
         class="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-5 py-2.5"
@@ -35,12 +35,56 @@
           </Button>
         </template>
         <template v-if="route.name=='ProjectTasks'">
-          <Button variant="solid" @click="showNewTaskDialog" v-if="!readOnlyByRole()">
-            <template #prefix>
-              <LucidePlus class="h-4 w-4" />
-            </template>
-            {{__('Add new')}}
-          </Button>
+          <div class="flex items-center">
+            <Dropdown :options="[
+              {
+                label: 'List View',
+                onClick: () => onChangeTypeView('list'),
+                icon: 'list'
+              },
+              {
+                label: 'Kanban',
+                onClick: () => onChangeTypeView('kanban'),
+                icon: 'trello'
+              }
+            ]" class="mr-3">
+              <Button class="pl-2.5" style="width: 7rem !important;justify-content: flex-start !important;">
+                <template #icon>
+                  <FeatherIcon v-if="viewTask=='list'"
+                    name="list"
+                    class="h-4 w-4"
+                  />
+                  <FeatherIcon v-if="viewTask=='kanban'"
+                    name="trello"
+                    class="h-4 w-4 justify-start"
+                  />
+                  <span v-if="viewTask=='list'">List View</span>
+                  <span v-if="viewTask=='kanban'">Kanban</span>
+                </template>
+              </Button>
+            </Dropdown>
+            <KanbanSettings v-if="viewTask=='kanban'" @update="updateKanbanSettings"
+              :columnFields="[
+                {'fieldname': 'status', 'fieldtype': 'Select', 'label': 'Status'},
+                {'fieldname': 'priority', 'fieldtype': 'Select', 'label': 'Priority'}
+              ]"
+              :titleFields="[
+                {'fieldname': 'title', 'fieldtype': 'Data', 'label': 'Title'},
+                {'fieldname': 'due_date', 'fieldtype': 'Datetime', 'label': 'Due Date'},
+                {'fieldname': 'status', 'fieldtype': 'Select', 'label': 'Status'},
+                {'fieldname': 'priority', 'fieldtype': 'Select', 'label': 'Priority'},
+                {'fieldname': 'assigned_to', 'fieldtype': 'Link', 'label': 'Assigned To'}
+              ]"
+              :columnFieldDefault="{'fieldname': 'status', 'fieldtype': 'Select', 'label': 'Status'}"
+              :titleFieldDefault="{'fieldname': 'title', 'fieldtype': 'Data', 'label': 'Title'}"
+              ></KanbanSettings>
+              <Button variant="solid" @click="showNewTaskDialog" v-if="!readOnlyByRole() && viewTask=='list'">
+                <template #prefix>
+                  <LucidePlus class="h-4 w-4" />
+                </template>
+                {{__('Add new')}}
+              </Button>
+          </div>
         </template>
         <template v-if="route.name=='ProjectPages'">
           <div class="flex items-center space-x-2">
@@ -316,6 +360,8 @@
         :is="Component"
         :class="{ 'mx-auto w-full px-5': !route.meta?.fullWidth }"
         :project="project"
+        :typeView="viewTask"
+        :paramKanbanDefault="paramKanbanDefault"
         :team="team"
         :listOptionsPage="listOptionsPage"
       />
@@ -336,7 +382,8 @@ import {
   Textarea,
   Dialog,
   getCachedListResource,
-  TextInput
+  TextInput,
+  FeatherIcon
 } from 'frappe-ui'
 import Pie from '@/components/Pie.vue'
 import IconPicker from '@/components/IconPicker.vue'
@@ -349,6 +396,7 @@ import PinIcon from '~icons/lucide/pin'
 import { useScreenSize } from '@/utils/composables'
 import { getUser } from '@/data/users'
 import ArrowDownUp from '~icons/lucide/arrow-up-down'
+import KanbanSettings from '@/components/Kanban/KanbanSettings.vue'
 
 export default {
   name: 'Project',
@@ -368,7 +416,8 @@ export default {
     Textarea,
     Breadcrumbs,
     ArrowDownUp,
-    TextInput
+    TextInput,
+    FeatherIcon
   },
   setup() {
     const size = useScreenSize()
@@ -396,7 +445,18 @@ export default {
         search: null,
         project: this.project.name
       },
-      search: ""
+      search: "",
+      viewTask: "list",
+      paramKanbanDefault: {
+        doctype: 'GP Task',
+        filters: JSON.stringify({}),
+        order_by: 'modified desc',
+        column_field: "status",
+        title_field: "title",
+        rows: JSON.stringify(["name", "title", "description", "assigned_to", "status", "priority", "project", "team"]),
+        kanban_columns: JSON.stringify([{'name': "Backlog"},{'name': "Todo"},{'name': "In Progress"},{'name': "Done"},{'name': "Canceled"}]),
+        kanban_fields: JSON.stringify(["description", "priority", "due_date", "comments_count", "assigned_to"])
+      }
     }
   },
   computed: {
@@ -603,6 +663,13 @@ export default {
     },
     reloadProjects(){
       projects_by_role.fetch()
+    },
+    onChangeTypeView(view){
+      this.viewTask = view
+    },
+    updateKanbanSettings(data){
+      this.paramKanbanDefault.column_field = data.column_field
+      this.paramKanbanDefault.title_field = data.title_field
     }
   },
   resources: {

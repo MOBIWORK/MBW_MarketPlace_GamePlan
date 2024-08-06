@@ -8,6 +8,10 @@ from frappe.utils import validate_email_address, split_emails, cstr
 from gameplan.utils import validate_type, random_config_notification, get_title_by_id_notification
 from frappe.translate import get_all_translations
 from gameplan.notification import send_manager_by_invite_guest, send_guest_by_invite_guest
+from frappe.model.document import get_controller
+from frappe.utils import make_filter_tuple
+from frappe.model import no_value_fields
+from frappe import _
 
 import json
 
@@ -510,6 +514,180 @@ def delete_connections(reference_doctype, reference_name):
 	except Exception as e:
 		return "error"
 
+def convert_filter_to_tuple(doctype, filters):
+	if isinstance(filters, dict):
+		filters_items = filters.items()
+		filters = []
+		for key, value in filters_items:
+			filters.append(make_filter_tuple(doctype, key, value))
+	return filters
+
+@frappe.whitelist()
+def get_data_kanban(
+	doctype: str,
+	filters: str,
+	order_by: str,
+	page_length=20,
+	page_length_count=20,
+	column_field=None,
+	title_field=None,
+	columns=[],
+	rows=[],
+	kanban_columns=[],
+	kanban_fields=[],
+	default_filters=None,
+):
+	filters = frappe.parse_json(filters)
+	rows = frappe.parse_json(rows or "[]")
+	columns = frappe.parse_json(columns or "[]")
+	kanban_fields = frappe.parse_json(kanban_fields or "[]")
+	kanban_columns = frappe.parse_json(kanban_columns or "[]")
+	for key in filters:
+		value = filters[key]
+		if isinstance(value, list):
+			if "@me" in value:
+				value[value.index("@me")] = frappe.session.user
+			elif "%@me%" in value:
+				index = [i for i, v in enumerate(value) if v == "%@me%"]
+				for i in index:
+					value[i] = "%" + frappe.session.user + "%"
+		elif value == "@me":
+			filters[key] = frappe.session.user
+
+	if default_filters:
+		default_filters = frappe.parse_json(default_filters)
+		filters.update(default_filters)
+
+	is_default = True
+	data = []
+	_list = get_controller(doctype)
+	if hasattr(_list, "default_list_data"):
+		rows = _list.default_list_data().get("rows")
+	if kanban_columns and column_field:
+		field_meta = frappe.get_meta(doctype).get_field(column_field)
+		if field_meta.fieldtype == "Link":
+			kanban_columns = frappe.get_all(
+				field_meta.options,
+				fields=["name"],
+				order_by="modified asc",
+			)
+		elif field_meta.fieldtype == "Select":
+			kanban_columns = [{"name": option} for option in field_meta.options.split("\n") if option != ""]
+		if not title_field:
+			title_field = "name"
+			if hasattr(_list, "default_kanban_settings"):
+				title_field = _list.default_kanban_settings().get("title_field")
+		if title_field not in rows:
+			rows.append(title_field)
+		if not kanban_fields:
+			kanban_fields = ["name"]
+			if hasattr(_list, "default_kanban_settings"):
+				kanban_fields = json.loads(_list.default_kanban_settings().get("kanban_fields"))
+		for field in kanban_fields:
+			if field not in rows:
+				rows.append(field)
+		print("Dòng 589 ", kanban_columns)
+		for kc in kanban_columns:
+			column_filters = { column_field: kc.get('name') }
+			order = kc.get("order")
+			if column_field in filters and filters.get(column_field) != kc.name or kc.get('delete'):
+				column_data = []
+			else:
+				column_filters.update(filters.copy())
+				page_length = 20
+				if kc.get("page_length"):
+					page_length = kc.get("page_length")
+				if order:
+					column_data = get_records_based_on_order(doctype, rows, column_filters, page_length, order)
+				else:
+					column_data = frappe.get_list(
+						doctype,
+						fields=rows,
+						filters=convert_filter_to_tuple(doctype, column_filters),
+						order_by=order_by,
+						page_length=page_length,
+					)
+				new_filters = filters.copy()
+				new_filters.update({ column_field: kc.get('name') })
+				all_count = len(frappe.get_list(doctype, filters=convert_filter_to_tuple(doctype, new_filters)))
+				kc["all_count"] = all_count
+				kc["count"] = len(column_data)
+			if order:
+				column_data = sorted(
+					column_data, key=lambda x: order.index(x.get("name"))
+					if x.get("name") in order else len(order)
+				)
+			data.append({"column": kc, "fields": kanban_fields, "data": column_data})
+	fields = frappe.get_meta(doctype).fields
+	fields = [field for field in fields if field.fieldtype not in no_value_fields]
+	fields = [
+		{
+			"label": _(field.label),
+			"type": field.fieldtype,
+			"value": field.fieldname,
+			"options": field.options,
+		}
+		for field in fields
+		if field.label and field.fieldname
+	]
+	std_fields = [
+		{"label": "Name", "type": "Data", "value": "name"},
+		{"label": "Created On", "type": "Datetime", "value": "creation"},
+		{"label": "Last Modified", "type": "Datetime", "value": "modified"},
+		{
+			"label": "Modified By",
+			"type": "Link",
+			"value": "modified_by",
+			"options": "User",
+		},
+		{"label": "Assigned To", "type": "Text", "value": "_assign"},
+		{"label": "Owner", "type": "Link", "value": "owner", "options": "User"},
+		{"label": "Like", "type": "Data", "value": "_liked_by"},
+	]
+	for field in std_fields:
+		if field.get('value') not in rows:
+			rows.append(field.get('value'))
+		if field not in fields:
+			field["label"] = _(field["label"])
+			fields.append(field)
+	return {
+		"data": data,
+		"columns": columns,
+		"rows": rows,
+		"fields": fields,
+		"column_field": column_field,
+		"title_field": title_field,
+		"kanban_columns": kanban_columns,
+		"kanban_fields": kanban_fields,
+		"page_length": page_length,
+		"page_length_count": page_length_count,
+		"total_count": len(frappe.get_list(doctype, filters=filters)),
+		"row_count": len(data)
+	}
+
+@frappe.whitelist(methods=["DELETE"])
+def delete_task_by_id(name):
+	try:
+		task_info = frappe.get_doc('GP Task', name)
+		if task_info.custom_fields is not None and task_info.custom_fields != "":
+			custom_fields = json.loads(task_info.custom_fields)
+			if custom_fields['id_reminder'] is not None and custom_fields['id_reminder'] != "":
+				reminder_info = frappe.get_doc('GP Reminder', custom_fields['id_reminder'])
+				reminder_info.delete()
+		notifications = frappe.db.get_list('GP Notification',
+			filters={
+				'task': name
+			},
+			fields=['name']
+		)
+		for notification in notifications:
+			notification_info = frappe.get_doc('GP Notification', notification.name)
+			notification_info.delete()
+		task_info.delete()
+		frappe.db.commit()
+		return {'status': "ok", 'message': None}
+	except Exception as e:
+		return {'status': "error", 'message': str(e)}
 
 @frappe.whitelist()
 def get_value_by_reference_doctype(reference_doctype, project=None):
