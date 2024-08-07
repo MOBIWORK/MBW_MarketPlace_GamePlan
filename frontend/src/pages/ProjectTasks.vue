@@ -1,8 +1,60 @@
 <template>
-  <div class="py-6" v-if="typeView == 'list'">
-    <TaskList :listOptions="listOptions" :groupByStatus="true" />
+  <div class="w-full pt-3 px-4 flex items-center justify-between">
+        <div class="w-1/2">
+          <TextInput type="text" class="w-full" :placeholder="__('Search task')" :debounce="600" v-model="txtSearch" variant="outline">
+            <template #prefix>
+              <FeatherIcon
+                class="w-4"
+                name="search"
+              />
+            </template>
+          </TextInput>
+        </div>
+        <div class="flex items-center">
+          <Dropdown :options="[
+            {
+              label: 'List View',
+              onClick: () => onChangeTypeView('list'),
+              icon: 'list'
+            },
+            {
+              label: 'Kanban by Status',
+              onClick: () => onChangeTypeView('kanban_by_status'),
+              icon: 'trello'
+            },
+            {
+              label: 'Kanban by Priority',
+              onClick: () => onChangeTypeView('kanban_by_priority'),
+              icon: 'trello'
+            }
+          ]" class="mr-3">
+            <Button class="px-2.5 w-full" style="justify-content: flex-start !important;">
+              <template #icon>
+                <FeatherIcon v-if="typeView=='list'"
+                  name="list"
+                  class="h-4 w-4"
+                />
+                <FeatherIcon v-if="typeView=='kanban_by_status' || typeView=='kanban_by_priority'"
+                  name="trello"
+                  class="h-4 w-4 justify-start"
+                />
+                <span v-if="typeView=='list'">List View</span>
+                <span v-if="typeView=='kanban_by_status'">Kanban by Status</span>
+                <span v-if="typeView=='kanban_by_priority'">Kanban by Priority</span>
+              </template>
+            </Button>
+          </Dropdown>
+          <SortBy :fields="[
+            { value: 'modified', label: __('Modified') },
+            { value: 'creation', label: __('Creation') },
+            { value: 'priority', label: __('Priority') }
+          ]" @update="(data) => onUpdateSort(data)"></SortBy>
+        </div>
+      </div>
+  <div class="pt-3 px-4" v-if="typeView == 'list'">
+    <TaskList :listOptions="listOptions" :groupByStatus="true" ref="lstTask"/>
   </div>
-  <div class="pt-6" style="height: calc(100% - 49px);" v-if="typeView == 'kanban'">
+  <div class="pt-3 pl-2" style="height: calc(100% - 90px);" v-if="typeView == 'kanban_by_status' || typeView == 'kanban_by_priority'">
     <KanbanView :kanban="dataByKanban" :options="{
       onNewClick: (column) => createTask(column),
     }" @update="(data) => updateKanban(data)" @update_assign_task="(data) => onUpdateAssign(data)">
@@ -69,7 +121,7 @@
   </div>
 </template>
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import KanbanView from '@/components/Kanban/KanbanView.vue'
 import TaskStatusIcon from '@/components/icons/TaskStatusIcon.vue'
 import TaskPriorityIcon from '@/components/icons/TaskPriorityIcon.vue'
@@ -80,28 +132,39 @@ import {
   createResource,
   createListResource,
   Dropdown,
-  Avatar
+  Avatar,
+  TextInput,
+  FeatherIcon,
+  Button
 } from 'frappe-ui'
 import router from '@/router'
 import { getUser } from '@/data/users'
+import SortBy from '@/components/SortBy.vue'
 
 const props = defineProps({
   project: {
     type: Object,
     required: true,
-  },
-  typeView: {
-    type: String
-  },
-  paramKanbanDefault: {
-    type: Object
   }
+})
+
+let paramKanbanDefault = ref({
+  doctype: 'GP Task',
+  filters: JSON.stringify({}),
+  order_by: 'modified desc',
+  column_field: "status",
+  title_field: "title",
+  rows: JSON.stringify(["name", "title", "description", "assigned_to", "status", "priority", "project", "team"]),
+  kanban_columns: JSON.stringify([{'name': "Backlog"},{'name': "Todo"},{'name': "In Progress"},{'name': "Done"},{'name': "Canceled"}]),
+  kanban_fields: JSON.stringify(["description", "priority", "due_date", "comments_count", "assigned_to"]),
+  text_search: "",
+  is_my_task: "false"
 })
 
 let dataByKanban = createResource({
   url: "gameplan.api.get_data_kanban",
   method: 'GET',
-  params: props.paramKanbanDefault,
+  params: paramKanbanDefault.value,
   auto: true
 })
 
@@ -136,11 +199,16 @@ let listOptions = computed(() => ({
   filters: {
     project: props.project.name,
   },
+  orderBy: "creation desc"
 }))
 
 let newTaskDialog = ref(null)
 let showDialogDelete = ref(false)
 let nameTaskDelete = ref("")
+let txtSearch = ref("")
+let lstTask = ref(null)
+let typeView = ref("list")
+
 const rows = computed(() => {
   if (!dataByKanban.data?.data) return []
 
@@ -230,6 +298,23 @@ function updateKanban(data) {
   }
 }
 
+function onReloadData(){
+  if(typeView.value == "list"){
+    lstTask.value.onReloadTasks()
+  } 
+  else dataByKanban.fetch()
+}
+
+function onChangeTypeView(view){
+  if(view == "kanban_by_status"){
+    paramKanbanDefault.value.column_field = "status"
+    dataByKanban.fetch()
+  }else if(view == "kanban_by_priority"){
+    paramKanbanDefault.value.column_field = "priority"
+    dataByKanban.fetch()
+  }
+  typeView.value = view
+}
 
 
 function actions(name) {
@@ -249,5 +334,25 @@ function onConfirmDeleteTask() {
   deleteTaskResource.submit({ name: nameTaskDelete.value })
   showDialogDelete.value = false
 }
+
+function onUpdateSort(querySort){
+  paramKanbanDefault.value.order_by = querySort != null && querySort != ""? querySort : "creation desc"
+  listOptions.value['orderBy'] = querySort != null && querySort != ""? querySort : "creation desc"
+  if(typeView.value == "list"){
+    lstTask.value.onReloadTasks()
+  } 
+  else dataByKanban.fetch()
+}
+
+watch(txtSearch, async(newSearch, oldSearch) => {
+  paramKanbanDefault.value.text_search = txtSearch.value
+  listOptions.value.filters['title'] = ['like', `%${txtSearch.value}%`]
+  if(typeView.value == "list"){
+    lstTask.value.onReloadTasks()
+  } 
+  else dataByKanban.fetch()
+})
+
+defineExpose({ onReloadData })
 
 </script>

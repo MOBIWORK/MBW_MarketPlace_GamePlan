@@ -52,9 +52,6 @@ def send_reminders():
 		pluck="name",
 	)
     
-	doc_test = frappe.new_doc('GP Doc Test')
-	doc_test.label = "Dòng 56 " + str(pending_reminders) + str(upper_threshold) + str(lower_threshold)
-	doc_test.save()
 	for reminder_name in pending_reminders:
 		send_notify_for_reminder(reminder_name)
 
@@ -65,14 +62,14 @@ def send_notify_for_reminder(name):
 	reminder_info = frappe.get_doc('GP Reminder', name)
 	if reminder_info.reminder_doctype == "GP Task":
 		doc_task = frappe.get_doc('GP Task', reminder_info.reminder_docname)
- 		project_info = frappe.db.get_value('GP Project', doc_task.project, ['title', 'team'], as_dict=1)
+		project_info = frappe.db.get_value('GP Project', doc_task.project, ['title', 'team'], as_dict=1)
 		teamId = None
 		if project_info is not None:
 			teamId = project_info.team
 		unit = "phút"
-		if self.remind_unit == "hour":
+		if doc_task.remind_unit == "hour":
 			unit = "giờ"
-		elif self.remind_unit == "day":
+		elif doc_task.remind_unit == "day":
 			unit = "ngày"
 		notification_text_task = f"""
 			<div class="mb-2 leading-5 text-gray-600">
@@ -102,31 +99,31 @@ def send_notify_for_reminder(name):
 			if project_info is not None and values_notify.project is not None and values_notify.project != "":
 				link_btn = frappe.utils.get_url(f'/g/{values_notify.team}/projects/{values_notify.project}/task/{doc_task.name}')
 				content_email = f"""
- 				<div class="mb-2 leading-5 text-gray-600">
- 				<div>
- 				<span>Dự án </span>
- 				<span>{project_info.title}</span>
- 				</div>
- 				<div>Nhiệm vụ {task_info.title} sẽ đến hạn trong {doc_task.remind_times} {unit} nữa</div>
- 				</div>
- 				<p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
- 				"""
+				<div class="mb-2 leading-5 text-gray-600">
+				<div>
+				<span>Dự án </span>
+				<span>{project_info.title}</span>
+				</div>
+				<div>Nhiệm vụ {doc_task.title} sẽ đến hạn trong {doc_task.remind_times} {unit} nữa</div>
+				</div>
+				<p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
+				"""
 			else:
- 				link_btn = frappe.utils.get_url(f'/g/task/{doc_task.name}')
- 				content_email = f"""
- 				<div class="mb-2 leading-5 text-gray-600">
- 				<div>Nhiệm vụ {task_info.title} sẽ đến hạn trong {doc_task.remind_times} {unit} nữa</div>
- 				</div>
- 				<p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
- 				"""
- 			make(
- 				doctype="GP Task",
- 				name=doc_task.name,
- 				content = content_email,
- 				recipients = user_recipient.email,
- 				send_email = True,
- 				sender = user_sender.email,
- 				sender_full_name = user_sender.full_name,
- 				subject = f'[TEAM] Nhiệm vụ {task_info.title} sắp đến hạn'
- 			)
- 			frappe.db.commit()
+				link_btn = frappe.utils.get_url(f'/g/task/{doc_task.name}')
+				content_email = f"""
+				<div class="mb-2 leading-5 text-gray-600">
+				<div>Nhiệm vụ {doc_task.title} sẽ đến hạn trong {doc_task.remind_times} {unit} nữa</div>
+				</div>
+				<p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
+				"""
+			make(
+				doctype="GP Task",
+				name=doc_task.name,
+				content = content_email,
+				recipients = user_recipient.email,
+				send_email = True,
+				sender = user_sender.email,
+				sender_full_name = user_sender.full_name,
+				subject = f'[TEAM] Nhiệm vụ {doc_task.title} sắp đến hạn'
+			)
+			frappe.db.commit()

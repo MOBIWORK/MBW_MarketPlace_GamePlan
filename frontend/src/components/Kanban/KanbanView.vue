@@ -210,7 +210,7 @@ function checkDeadLine(dateText){
     const date = new Date(dateText)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if(date > today) return true
+    if(date <= today) return true
     else return false
 }
 

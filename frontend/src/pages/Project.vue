@@ -36,49 +36,7 @@
         </template>
         <template v-if="route.name=='ProjectTasks'">
           <div class="flex items-center">
-            <Dropdown :options="[
-              {
-                label: 'List View',
-                onClick: () => onChangeTypeView('list'),
-                icon: 'list'
-              },
-              {
-                label: 'Kanban',
-                onClick: () => onChangeTypeView('kanban'),
-                icon: 'trello'
-              }
-            ]" class="mr-3">
-              <Button class="pl-2.5" style="width: 7rem !important;justify-content: flex-start !important;">
-                <template #icon>
-                  <FeatherIcon v-if="viewTask=='list'"
-                    name="list"
-                    class="h-4 w-4"
-                  />
-                  <FeatherIcon v-if="viewTask=='kanban'"
-                    name="trello"
-                    class="h-4 w-4 justify-start"
-                  />
-                  <span v-if="viewTask=='list'">List View</span>
-                  <span v-if="viewTask=='kanban'">Kanban</span>
-                </template>
-              </Button>
-            </Dropdown>
-            <KanbanSettings v-if="viewTask=='kanban'" @update="updateKanbanSettings"
-              :columnFields="[
-                {'fieldname': 'status', 'fieldtype': 'Select', 'label': 'Status'},
-                {'fieldname': 'priority', 'fieldtype': 'Select', 'label': 'Priority'}
-              ]"
-              :titleFields="[
-                {'fieldname': 'title', 'fieldtype': 'Data', 'label': 'Title'},
-                {'fieldname': 'due_date', 'fieldtype': 'Datetime', 'label': 'Due Date'},
-                {'fieldname': 'status', 'fieldtype': 'Select', 'label': 'Status'},
-                {'fieldname': 'priority', 'fieldtype': 'Select', 'label': 'Priority'},
-                {'fieldname': 'assigned_to', 'fieldtype': 'Link', 'label': 'Assigned To'}
-              ]"
-              :columnFieldDefault="{'fieldname': 'status', 'fieldtype': 'Select', 'label': 'Status'}"
-              :titleFieldDefault="{'fieldname': 'title', 'fieldtype': 'Data', 'label': 'Title'}"
-              ></KanbanSettings>
-              <Button variant="solid" @click="showNewTaskDialog" v-if="!readOnlyByRole() && viewTask=='list'">
+              <Button variant="solid" @click="showNewTaskDialog" v-if="!readOnlyByRole()">
                 <template #prefix>
                   <LucidePlus class="h-4 w-4" />
                 </template>
@@ -356,6 +314,7 @@
       </header>
 
       <component
+        ref="comp"
         v-if="project"
         :is="Component"
         :class="{ 'mx-auto w-full px-5': !route.meta?.fullWidth }"
@@ -435,6 +394,7 @@ export default {
       showArchiveProjectDialog: false,
       showUnArchiveProjectDialog: false,
       newTaskDialog: null,
+      comp: null,
       listOptions:{
         filters: {
           project: this.project.name
@@ -447,16 +407,7 @@ export default {
       },
       search: "",
       viewTask: "list",
-      paramKanbanDefault: {
-        doctype: 'GP Task',
-        filters: JSON.stringify({}),
-        order_by: 'modified desc',
-        column_field: "status",
-        title_field: "title",
-        rows: JSON.stringify(["name", "title", "description", "assigned_to", "status", "priority", "project", "team"]),
-        kanban_columns: JSON.stringify([{'name': "Backlog"},{'name': "Todo"},{'name': "In Progress"},{'name': "Done"},{'name': "Canceled"}]),
-        kanban_fields: JSON.stringify(["description", "priority", "due_date", "comments_count", "assigned_to"])
-      }
+      
     }
   },
   computed: {
@@ -646,10 +597,8 @@ export default {
           assigned_to: getUser('sessionUser').name,
         },
         onSuccess: () => {
-          let tasks = getCachedListResource(['Tasks', this.listOptions])
-          if (tasks) {
-            tasks.reload()
-          }
+          console.log(this.$refs.comp)
+          this.$refs.comp.onReloadData()
         },
       })
     },

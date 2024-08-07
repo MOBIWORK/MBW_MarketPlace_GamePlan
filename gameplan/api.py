@@ -526,6 +526,8 @@ def convert_filter_to_tuple(doctype, filters):
 def get_data_kanban(
 	doctype: str,
 	filters: str,
+	text_search: str,
+	is_my_task: str,
 	order_by: str,
 	page_length=20,
 	page_length_count=20,
@@ -586,7 +588,6 @@ def get_data_kanban(
 		for field in kanban_fields:
 			if field not in rows:
 				rows.append(field)
-		print("Dòng 589 ", kanban_columns)
 		for kc in kanban_columns:
 			column_filters = { column_field: kc.get('name') }
 			order = kc.get("order")
@@ -595,21 +596,42 @@ def get_data_kanban(
 			else:
 				column_filters.update(filters.copy())
 				page_length = 20
+				or_filters = []
 				if kc.get("page_length"):
 					page_length = kc.get("page_length")
 				if order:
 					column_data = get_records_based_on_order(doctype, rows, column_filters, page_length, order)
 				else:
-					column_data = frappe.get_list(
-						doctype,
-						fields=rows,
-						filters=convert_filter_to_tuple(doctype, column_filters),
-						order_by=order_by,
-						page_length=page_length,
-					)
+					if text_search is not None and text_search != "":
+						if is_my_task == "true":
+							projects = frappe.get_list('GP Project', filters={'title': ['like', f'%{text_search}%']},fields=['name', 'title'])
+							for project in projects:
+								or_filters.append(['project', '=', project.name])
+							or_filters.append(['title', 'like', f'%{text_search}%'])
+						else:
+							or_filters.append(['title', 'like', f'%{text_search}%'])
+						column_data = frappe.get_list(
+							doctype,
+							fields=rows,
+							filters=convert_filter_to_tuple(doctype, column_filters),
+							order_by=order_by,
+							page_length=page_length,
+							or_filters=or_filters
+						)
+					else:
+						column_data = frappe.get_list(
+							doctype,
+							fields=rows,
+							filters=convert_filter_to_tuple(doctype, column_filters),
+							order_by=order_by,
+							page_length=page_length
+						)
 				new_filters = filters.copy()
 				new_filters.update({ column_field: kc.get('name') })
-				all_count = len(frappe.get_list(doctype, filters=convert_filter_to_tuple(doctype, new_filters)))
+				if len(or_filters) > 0:
+					all_count = len(frappe.get_list(doctype, filters=convert_filter_to_tuple(doctype, new_filters), or_filters=or_filters))
+				else:
+					all_count = len(frappe.get_list(doctype, filters=convert_filter_to_tuple(doctype, new_filters)))
 				kc["all_count"] = all_count
 				kc["count"] = len(column_data)
 			if order:

@@ -196,10 +196,12 @@ export default {
           'team.title as team_title',
         ],
         filters: this.listOptions.filters,
-        orderBy: this.listOptions.orderBy || 'creation desc',
+        orderBy: this.listOptions.orderBy,
         pageLength: this.listOptions.pageLength || 20,
         auto: true,
-        realtime: true
+        realtime: true,
+        txt_search: "Thi",
+        is_my_task: "true"
       }
     },
   },
@@ -223,10 +225,7 @@ export default {
           assigned_to: getUser('sessionUser').name,
         },
         onSuccess: () => {
-          let tasks = getCachedListResource(['Tasks', this.listOptions])
-          if (tasks) {
-            tasks.reload()
-          }
+          this.onReloadTasks()
         },
       })
     },
@@ -234,6 +233,13 @@ export default {
       let role = this.$getRoleByUser(null, null)
       if(role == "guest") return true
       return false
+    },
+    onReloadTasks(){
+      this.$resources.tasks.update({
+        filters: this.listOptions.filters,
+        orderBy: this.listOptions.orderBy
+      })
+      this.$resources.tasks.fetch()
     }
   },
   computed: {

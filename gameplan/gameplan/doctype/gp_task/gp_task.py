@@ -162,7 +162,7 @@ class GPTask(HasMentions, HasActivity, Document):
 		GPNotification.clear_notifications(task=self.name)
 
 @frappe.whitelist()
-def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit=20, group_by=None, parent=None, debug=False):
+def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit=20, group_by=None, parent=None, debug=False, txt_search=None, is_my_task=None):
 	doctype = 'GP Task'
 	check_permissions(doctype, parent)
 	assigned_or_owner = filters.pop('assigned_or_owner', None)
@@ -175,6 +175,19 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 		limit=limit,
 		group_by=group_by,
 	)
+	if txt_search is not None and txt_search != "":
+		if is_my_task == "true":
+			projects = frappe.get_list('GP Project', filters={'title': ['like', f'%{txt_search}%']},fields=['name', 'title'])
+			query = query.where(
+				" | ".join([
+					f"(project == {project.name})"
+					for project in projects
+				])
+			)
+			query = query.where((Task.title.like('%{txt_search}%')))
+		else:
+			 query = query.where((Task.title.like('%{txt_search}%')))
+				
 	if assigned_or_owner:
 		Task = frappe.qb.DocType(doctype)
 		query = query.where(

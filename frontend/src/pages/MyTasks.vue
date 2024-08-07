@@ -8,34 +8,7 @@
         :items="[{ label: __('My Tasks'), route: { name: 'MyTasks' } }]"
       />
       <div class="flex items-center">
-        <Dropdown :options="[
-          {
-            label: 'List View',
-            onClick: () => onChangeTypeView('list'),
-            icon: 'list'
-          },
-          {
-            label: 'Kanban',
-            onClick: () => onChangeTypeView('kanban'),
-            icon: 'trello'
-          }
-        ]" class="mr-3">
-          <Button class="pl-2.5" style="width: 7rem !important;justify-content: flex-start !important;">
-            <template #icon>
-              <FeatherIcon v-if="viewTask=='list'"
-                name="list"
-                class="h-4 w-4"
-              />
-              <FeatherIcon v-if="viewTask=='kanban'"
-                name="trello"
-                class="h-4 w-4 justify-start"
-              />
-              <span v-if="viewTask=='list'">List View</span>
-              <span v-if="viewTask=='kanban'">Kanban</span>
-            </template>
-          </Button>
-        </Dropdown>
-        <KanbanSettings v-if="viewTask=='kanban'" @update="updateKanbanSettings"
+        <!-- <KanbanSettings v-if="viewTask=='kanban'" @update="updateKanbanSettings"
           :columnFields="[
             {'fieldname': 'status', 'fieldtype': 'Select', 'label': 'Status'},
             {'fieldname': 'priority', 'fieldtype': 'Select', 'label': 'Priority'}
@@ -49,8 +22,8 @@
           ]"
           :columnFieldDefault="{'fieldname': 'status', 'fieldtype': 'Select', 'label': 'Status'}"
           :titleFieldDefault="{'fieldname': 'title', 'fieldtype': 'Data', 'label': 'Title'}"
-          ></KanbanSettings>
-        <Button variant="solid" @click="showNewTaskDialog" v-if="!readOnlyByRole() && viewTask=='list'">
+          ></KanbanSettings> -->
+        <Button variant="solid" @click="showNewTaskDialog" v-if="!readOnlyByRole()">
           <template #prefix>
             <LucidePlus class="h-4 w-4" />
           </template>
@@ -59,10 +32,62 @@
       </div>
     </header>
 
-    <div class="mx-auto w-full px-5" style="height: calc(100% - 49px);">
-      <div class="pt-6 h-full">
+    <div class="mx-auto w-full px-5" style="height: calc(100% - 90px);">
+      <div class="w-full pt-3 flex items-center justify-between">
+        <div class="w-1/2">
+          <TextInput type="text" class="w-full" :placeholder="__('Search task, project')" :debounce="600" v-model="txtSearch" variant="outline">
+            <template #prefix>
+              <FeatherIcon
+                class="w-4"
+                name="search"
+              />
+            </template>
+          </TextInput>
+        </div>
+        <div class="flex items-center">
+          <Dropdown :options="[
+            {
+              label: 'List View',
+              onClick: () => onChangeTypeView('list'),
+              icon: 'list'
+            },
+            {
+              label: 'Kanban by Status',
+              onClick: () => onChangeTypeView('kanban_by_status'),
+              icon: 'trello'
+            },
+            {
+              label: 'Kanban by Priority',
+              onClick: () => onChangeTypeView('kanban_by_priority'),
+              icon: 'trello'
+            }
+          ]" class="mr-3">
+            <Button class="px-2.5 w-full" style="justify-content: flex-start !important;">
+              <template #icon>
+                <FeatherIcon v-if="viewTask=='list'"
+                  name="list"
+                  class="h-4 w-4"
+                />
+                <FeatherIcon v-if="viewTask=='kanban_by_status' || viewTask=='kanban_by_priority'"
+                  name="trello"
+                  class="h-4 w-4 justify-start"
+                />
+                <span v-if="viewTask=='list'">List View</span>
+                <span v-if="viewTask=='kanban_by_status'">Kanban by Status</span>
+                <span v-if="viewTask=='kanban_by_priority'">Kanban by Priority</span>
+              </template>
+            </Button>
+          </Dropdown>
+          <SortBy :fields="[
+            { value: 'modified', label: __('Modified') },
+            { value: 'creation', label: __('Creation') },
+            { value: 'priority', label: __('Priority') }
+          ]" @update="(data) => onUpdateSort(data)"></SortBy>
+        </div>
+      </div>
+      <div class="pt-3 h-full">
         <KanbanView
-          v-if="viewTask=='kanban'"
+          v-if="viewTask=='kanban_by_status' || viewTask=='kanban_by_priority'"
           :kanban="dataByKanban"
           :options="{
             onNewClick: (column) => createTask(column),
@@ -117,7 +142,7 @@
             </div>
           </template>
         </KanbanView>
-        <TaskList v-if="viewTask=='list'" :listOptions="listOptions" :groupByStatus="true" />
+        <TaskList v-if="viewTask=='list'" :listOptions="listOptions" :groupByStatus="true" ref="lstTask"/>
         <NewTaskDialog ref="newTaskDialog" />
       </div>
     </div>
@@ -136,7 +161,7 @@
   </div>
 </template>
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { 
   getCachedListResource,
   usePageMeta, 
@@ -149,7 +174,8 @@ import {
   Button,
   createResource,
   Dialog,
-  createListResource
+  createListResource,
+  TextInput
 } from 'frappe-ui'
 import { getUser } from '@/data/users'
 import {getRoleByUser} from '@/utils'
@@ -159,17 +185,22 @@ import TaskStatusIcon from '@/components/icons/TaskStatusIcon.vue'
 import TaskPriorityIcon from '@/components/icons/TaskPriorityIcon.vue'
 import { dateFormat, dateTooltipFormat, timeAgo, createToast } from '@/utils'
 import router from '@/router'
+import SortBy from '@/components/SortBy.vue'
 
 let defaultParamsKanban = ref({
   doctype: 'GP Task',
   filters: JSON.stringify({}),
-  order_by: 'modified desc',
+  order_by: 'creation desc',
   column_field: "status",
   title_field: "title",
   rows: JSON.stringify(["name", "title", "description", "assigned_to", "status", "priority", "project", "team", "due_date", "comments_count"]),
   kanban_columns: JSON.stringify([{'name': "Backlog"},{'name': "Todo"},{'name': "In Progress"},{'name': "Done"},{'name': "Canceled"}]),
-  kanban_fields: JSON.stringify(["description", "priority", "due_date", "comments_count", "assigned_to"])
+  kanban_fields: JSON.stringify(["description", "priority", "due_date", "comments_count", "assigned_to"]),
+  text_search: "",
+  is_my_task: "true"
 })
+
+let txtSearch = ref("")
 
 let dataByKanban = createResource({
   url: "gameplan.api.get_data_kanban",
@@ -205,9 +236,19 @@ let tasksListResource = createListResource({
 })
 
 let newTaskDialog = ref(null)
+let lstTask = ref(null)
 let viewTask = ref("list")
 let showDialogDelete = ref(false)
 let nameTaskDelete = ref("")
+
+function onUpdateSort(querySort){
+  defaultParamsKanban.value.order_by = querySort != null && querySort != ""? querySort : "modified desc"
+  listOptions.value['orderBy'] = querySort != null && querySort != ""? querySort : "modified desc"
+  if(viewTask.value == "list"){
+    lstTask.value.onReloadTasks()
+  } 
+  else dataByKanban.fetch()
+}
 
 const rows = computed(() => {
   if (!dataByKanban.data?.data) return []
@@ -249,6 +290,9 @@ function parseRows(rows) {
 
 let listOptions = computed(() => ({
   filters: { assigned_or_owner: getUser('sessionUser').name },
+  orderBy: "creation desc",
+  txt_search: "",
+  is_my_task: "true"
 }))
 
 async function updateKanbanSettings(data){
@@ -264,10 +308,8 @@ function showNewTaskDialog() {
       assigned_to: getUser('sessionUser').name,
     },
     onSuccess: () => {
-      let tasks = getCachedListResource(['Tasks', listOptions.value])
-      if (tasks) {
-        tasks.reload()
-      }
+      if(viewTask.value == "list") lstTask.value.onReloadTasks()
+      else dataByKanban.fetch()
     },
   })
 }
@@ -291,6 +333,13 @@ function getRow(name, field) {
 }
 
 function onChangeTypeView(view){
+  if(view == "kanban_by_status"){
+    defaultParamsKanban.value.column_field = "status"
+    dataByKanban.fetch()
+  }else if(view == "kanban_by_priority"){
+    defaultParamsKanban.value.column_field = "priority"
+    dataByKanban.fetch()
+  }
   viewTask.value = view
 }
 
@@ -339,8 +388,6 @@ function onUpdateAssign(data){
   tasksListResource.setValue.submit(objSubmit)
 }
 
-
-
 function actions(name) {
   return [
     {
@@ -364,6 +411,15 @@ function readOnlyByRole(){
   if(role == "guest") return true
   return false
 }
+
+watch(txtSearch, async(newSearch, oldSearch) => {
+  defaultParamsKanban.value.text_search = txtSearch.value
+  listOptions.value.filters['title'] = ['like', `%${txtSearch.value}%`]
+  if(viewTask.value == "list"){
+    lstTask.value.onReloadTasks()
+  } 
+  else dataByKanban.fetch()
+})
 
 usePageMeta(() => {
   return {
