@@ -72,7 +72,7 @@ def send_notify_for_reminder(name):
 		elif doc_task.remind_unit == "day":
 			unit = "ngày"
 		notification_text_task = f"""
-			<div class="mb-2 leading-5 text-gray-600">
+			<div class="mb-2 leading-5 text-gray-600 text-sm">
 				<span>Nhiệm vụ </span>
 				<span class="font-medium text-gray-900"> {doc_task.title} </span>
 				<span>sẽ đến hạn trong {doc_task.remind_times} {unit} nữa</span>

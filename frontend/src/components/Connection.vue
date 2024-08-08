@@ -151,7 +151,7 @@ export default {
                     reference_doctype: this.reference_doctype_select,
                     project: this.project != null && this.project != ""? this.project : ""
                 },
-                auto: true,
+                auto: false,
                 onSuccess(data){
                     this.datas_reference_name = data
                 }
@@ -191,6 +191,7 @@ export default {
             this.show_confirm_deleteing = true
         },
         onAddConnection(){
+            this.$resources.values_by_reference.fetch()
             this.show_adding_connection = true
         },
         onDeleteConnection(connection){
@@ -274,6 +275,10 @@ export default {
     watch: {
         reference_doctype_select(newVal, oldVal){
             this.reference_name_select = ""
+            this.$resources.values_by_reference.params = {
+                reference_doctype: newVal,
+                project: this.project != null && this.project != ""? this.project : ""
+            }
             this.$resources.values_by_reference.fetch()
         }
     },

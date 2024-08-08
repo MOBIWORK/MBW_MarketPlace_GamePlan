@@ -130,7 +130,8 @@ export default{
             numAttach: 0,
             show_confirm_deleteing: false,
             show_confirm_delete_attachment: false,
-            name_attachment_delete: ""
+            name_attachment_delete: "",
+            csrf_token: ""
         }
     },
     components: {
@@ -200,6 +201,16 @@ export default{
                     }
                 }
             }
+        },
+        get_csrf_token(){
+            return {
+                url: "gameplan.api.get_token",
+                method: "GET",
+                auto: true,
+                onSuccess(data){
+                    this.csrf_token = data
+                }
+            }
         }
     },
     methods: {
@@ -234,7 +245,10 @@ export default{
             formData.append('docname', this.reference_name)
             const response = await fetch('/api/method/upload_file', {
                 method: 'POST',
-                body: formData
+                body: formData,
+                headers: {
+                    'X-Frappe-CSRF-Token': this.csrf_token
+                }
             });
             const responseData = await response.json();
             if(responseData.message != null && responseData.message.name != null) this.$resources.doc_info.fetch()

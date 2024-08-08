@@ -1159,6 +1159,10 @@ def search(query, start=0):
 		"duration": result.duration,
 	}
 
+@frappe.whitelist()
+def get_token():
+	return frappe.sessions.get_csrf_token()
+
 @frappe.whitelist(allow_guest=True)
 def get_translations():
 	if frappe.session.user != "Guest":

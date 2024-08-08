@@ -21,11 +21,12 @@ class HasMentions:
 				to_user=mention.email,
 			)
 			title = ""
+			print("Dòng 24 ", self.doctype)
 			if self.doctype == "GP Discussion":
 				values.discussion = self.name
 				discussion_info = frappe.get_doc('GP Discussion', self.name)
 				title = discussion_info.title
-			if self.doctype == "GP Task":
+			elif self.doctype == "GP Task":
 				values.task = self.name
 				values.project = self.project
 				task_info = frappe.get_doc('GP Task', self.name)
@@ -33,15 +34,20 @@ class HasMentions:
 			elif self.doctype == "GP Comment":
 				values.comment = self.name
 				if self.reference_doctype == "GP Discussion":
+					discussion_info = frappe.get_doc('GP Discussion', self.reference_name)
 					values.discussion = self.reference_name
+					title = discussion_info.title
 				elif self.reference_doctype == "GP Task":
+					task_info = frappe.get_doc('GP Task', self.reference_name)
 					values.task = self.reference_name
-					values.project = frappe.db.get_value("GP Task", self.reference_name, "project")
+					values.project = task_info.project
+					title = task_info.title
 
 			if frappe.db.exists("GP Notification", values):
 				continue
 			notification = frappe.get_doc(doctype='GP Notification')
 			if "GP Task" in [self.doctype, self.get('reference_doctype')]:
+				print("Dòng 45 title: ", title)
 				notification.message = f"""
 					<div class="text-gray-700 text-sm">
 						<span class="font-medium text-gray-900">{ get_fullname(self.owner) }</span>

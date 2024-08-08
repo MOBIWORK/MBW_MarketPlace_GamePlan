@@ -733,7 +733,7 @@ def add_comment_followed_discussion(arr_user, discussionId, commentId):
                             <span>Dự án </span>
                             <span>{project_doc.title}</span>
                         </div>
-                        <div>{get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discusson_doc.title} với nội dung chi tiết như sau:</div>
+                        <div>{get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discussion_doc.title} với nội dung chi tiết như sau:</div>
                         <div>{comment_doc.content}</div>
                     </div>
                     <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
@@ -746,7 +746,7 @@ def add_comment_followed_discussion(arr_user, discussionId, commentId):
                     send_email = True,
                     sender = user_sender.email,
                     sender_full_name = user_sender.full_name,
-                    subject = f'[TEAM] {get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discusson_doc.title}'
+                    subject = f'[TEAM] {get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discussion_doc.title}'
                 )
                 frappe.db.commit()
 
