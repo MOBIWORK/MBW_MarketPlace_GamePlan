@@ -687,6 +687,35 @@ def get_data_kanban(
 		"row_count": len(data)
 	}
 
+@frappe.whitelist(methods=["POST"])
+def get_attachments(doctype, name):
+	attachments = []
+	try:
+		attachments = frappe.get_all(
+			"File",
+			fields=["name", "file_name", "file_url", "creation", "file_type"],
+			filters={"attached_to_name": name, "attached_to_doctype": doctype},
+		)
+		return attachments
+	except Exception as e:
+		return attachments
+
+@frappe.whitelist(methods=["POST"])
+def delete_attachments(doctype, name):
+	try:
+		attachments = frappe.get_all(
+			"File",
+			fields=["name", "file_name"],
+			filters={"attached_to_name": name, "attached_to_doctype": doctype},
+		)
+		for attachment in attachments:
+			attachment_info = frappe.get_doc('File', attachment.name)
+			attachment_info.delete()
+		frappe.db.commit()
+		return "ok"
+	except Exception as e:
+		return "error"
+
 @frappe.whitelist(methods=["DELETE"])
 def delete_task_by_id(name):
 	try:

@@ -66,7 +66,10 @@
             :readOnly="readOnlyControl">
           </Connection>
         </div>
-
+        <div class="w-full mb-6 mt-1">
+          <Attachment :reference_doctype="'GP Task'" :reference_name="taskId" :readOnly="readOnlyControl">
+          </Attachment>
+        </div>
         <div class="mt-8 flex flex-wrap items-center gap-2 sm:hidden">
           <ng-template v-if="!readOnlyControl">
             <Autocomplete :placeholder="__('Assign a user')" :options="assignableUsers"
@@ -224,6 +227,7 @@ import CommentsList from '@/components/CommentsList.vue'
 import TaskStatusIcon from '@/components/icons/TaskStatusIcon.vue'
 import TaskPriorityIcon from '@/components/icons/TaskPriorityIcon.vue'
 import Connection from '@/components/Connection.vue'
+import Attachment from '@/components/Attachment.vue'
 import { activeUsers } from '@/data/users'
 import { activeTeams, getTeamInfo } from '@/data/teams'
 import { getTeamProjects, getProject } from '@/data/projects'
