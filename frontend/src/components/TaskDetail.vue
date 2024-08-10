@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full flex-1" v-if="$resources.task.doc">
     <div class="w-full flex-1">
-      <div class="relative p-6">
+      <div class="relative p-6 border-r">
         <div class="absolute right-0 top-0 p-6" v-show="$resources.task.setValueDebounced.loading">
           <LoadingText v-if="!$resources.task.setValueDebounced.error" :text="__('Saving...')" />
           <ErrorMessage :message="$resources.task.setValueDebounced.error" />
@@ -70,6 +70,9 @@
           <Attachment :reference_doctype="'GP Task'" :reference_name="taskId" :readOnly="readOnlyControl">
           </Attachment>
         </div>
+        <div class="w-full mb-6 mt-1">
+          <CheckList :reference_name="taskId" :readOnly="readOnlyControl"></CheckList>
+        </div>
         <div class="mt-8 flex flex-wrap items-center gap-2 sm:hidden">
           <ng-template v-if="!readOnlyControl">
             <Autocomplete :placeholder="__('Assign a user')" :options="assignableUsers"
@@ -131,22 +134,23 @@
         </template>
       </div>
     </div>
-    <div class="hidden w-[20rem] shrink-0 border-l sm:block">
+    <div class="hidden w-[20rem] shrink-0 sm:block">
       <div class="grid grid-cols-2 items-center gap-y-6 p-6 text-base text-gray-700" v-if="!readOnlyControl">
         <div>{{ __('Assignee') }}</div>
-        <div>
-          <Autocomplete :placeholder="__('Assign a user')" :options="assignableUsers"
+        <div class="w-full">
+          <Autocomplete :placeholder="__('Assign a user')" :options="assignableUsers" class="truncate"
             v-model="$resources.task.doc.assigned_to" @update:modelValue="changeUserAssign" />
         </div>
         <div>{{ __('Due Date') }}</div>
         <div>
-          <DateTimePicker class="datepicker" icon-left="calendar" :value="$resources.task.doc.due_date" @change="(val) => ($resources.task.setValue.submit({
+          <DateTimePicker class="datepicker" icon-left="calendar" :value="$resources.task.doc.due_date" 
+            @change="(val) => ($resources.task.setValue.submit({
             due_date: val,
           }))" :placeholder="__('Due date')" input-class="border-none" />
         </div>
         <div>{{ __('Project') }}</div>
-        <div>
-          <Autocomplete :placeholder="__('Select project')" :options="projectOptions"
+        <div class="w-full">
+          <Autocomplete :placeholder="__('Select project')" :options="projectOptions" class="truncate"
             v-model="$resources.task.doc.project" @update:modelValue="changeProject" />
         </div>
         <div>{{ __('Status') }}</div>
@@ -228,6 +232,7 @@ import TaskStatusIcon from '@/components/icons/TaskStatusIcon.vue'
 import TaskPriorityIcon from '@/components/icons/TaskPriorityIcon.vue'
 import Connection from '@/components/Connection.vue'
 import Attachment from '@/components/Attachment.vue'
+import CheckList from '@/components/CheckList.vue'
 import { activeUsers } from '@/data/users'
 import { activeTeams, getTeamInfo } from '@/data/teams'
 import { getTeamProjects, getProject } from '@/data/projects'
@@ -256,6 +261,10 @@ export default {
           trackVisit: 'track_visit',
         },
         setValue: {
+          onSuccess(){
+            console.log(this.$resources.reload)
+            this.$resources.task.reload()
+          },
           onError(e) {
             let message = e.messages ? e.messages.join('\n') : e.message
             this.$toast({
@@ -387,7 +396,9 @@ export default {
     TaskStatusIcon,
     LoadingText,
     TaskPriorityIcon,
-    Connection
+    Connection,
+    Attachment,
+    CheckList
   }
 }
 </script>

@@ -8,7 +8,7 @@
           readonly
           type="text"
           :placeholder="placeholder"
-          :value="value && formatter ? formatter(value) : value"
+          :value="formatDateTime(value)"
           @focus="!readonly ? togglePopover() : null"
           :class="inputClass"
           v-bind="$attrs"
@@ -352,6 +352,12 @@
         this.second = date.getSeconds()
         this.selectDate(date, true)
       },
+      formatDateTime(datetime){
+        if(datetime == null || datetime == "") return ""
+        const parts = datetime.split(" ")[0].split("-");
+        const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        return formattedDate
+      }
     },
   }
   </script>

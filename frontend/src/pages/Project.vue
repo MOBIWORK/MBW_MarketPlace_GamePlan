@@ -430,12 +430,12 @@ export default {
     breadcrumbs() {
       let items = [
         {
-          label: this.team.doc.title,
+          label: this.truncateString(this.team.doc.title),
           icon: this.team.doc.icon,
           route: { name: 'Team', params: { teamId: this.team.doc.name } },
         },
         {
-          label: this.project.doc.title,
+          label: this.truncateString(this.project.doc.title),
           route: {
             name: 'Project',
             params: {
@@ -619,6 +619,12 @@ export default {
     updateKanbanSettings(data){
       this.paramKanbanDefault.column_field = data.column_field
       this.paramKanbanDefault.title_field = data.title_field
+    },
+    truncateString(txtOrigin){
+      if (txtOrigin.length > 15) {
+        return txtOrigin.substring(0, 15) + '...';
+      }
+      return txtOrigin;
     }
   },
   resources: {

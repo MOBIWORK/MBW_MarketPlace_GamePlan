@@ -19,7 +19,7 @@
           ]"
           v-model="newTeam.is_private"
         />
-        <!-- <ErrorMessage :message="teams.insert.error?.messages" /> -->
+        <ErrorMessage :message="teams.insert.error?.messages" />
       </div>
     </template>
     <template #actions>

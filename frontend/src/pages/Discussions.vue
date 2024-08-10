@@ -7,9 +7,9 @@
         class="h-7 mr-5"
         :items="[{ label: __('Discussions'), route: { name: 'Discussions' } }]"
       />
-      <TextInput class="w-96 border-none" type="text" variant="outline" size="sm" placeholder="Tìm kiếm bài viết, tác giả, nhóm hoặc dự án" 
+      <TextInput class="w-96 border-none" type="text" size="sm" :placeholder="__('Search discussion, author, team or project')" 
         v-model="searchDiscussion" :debounce="debounceSearchDiscussion">
-        <template #prefix>
+        <template #suffix>
           <FeatherIcon
             class="w-4"
             name="search"

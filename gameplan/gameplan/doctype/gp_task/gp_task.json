@@ -24,7 +24,8 @@
   "remind_unit",
   "notify_browser",
   "notify_email",
-  "custom_fields"
+  "custom_fields",
+  "checklists"
  ],
  "fields": [
   {
@@ -138,11 +139,17 @@
    "fieldname": "notify_email",
    "fieldtype": "Check",
    "label": "Notify Email"
+  },
+  {
+   "fieldname": "checklists",
+   "fieldtype": "Table",
+   "label": "CheckLists",
+   "options": "GP CheckList"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-01 15:46:47.057933",
+ "modified": "2024-08-09 08:34:31.911695",
  "modified_by": "Administrator",
  "module": "Gameplan",
  "name": "GP Task",

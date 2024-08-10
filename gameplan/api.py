@@ -716,6 +716,23 @@ def delete_attachments(doctype, name):
 	except Exception as e:
 		return "error"
 
+@frappe.whitelist()
+def delete_all_checklist(task_id):
+	try:
+		checklists = frappe.get_list('GP CheckList',
+			filters={
+				'parent': task_id
+			},
+			fields=['name', 'label']
+		)
+		for checklist in checklists:
+			checklist_doc = frappe.get_doc('GP CheckList', checklist.name)
+			checklist_doc.delete()
+		frappe.db.commit()
+		return "ok"
+	except Exception as e:
+		return "error"
+
 @frappe.whitelist(methods=["DELETE"])
 def delete_task_by_id(name):
 	try:

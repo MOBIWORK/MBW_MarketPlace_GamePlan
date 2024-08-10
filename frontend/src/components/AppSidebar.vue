@@ -162,8 +162,8 @@
               inactive="hover:bg-gray-100"
             >
               <template v-slot="{ link: project }">
-                <span class="inline-flex items-center space-x-2">
-                  <span class="text-sm">{{ project.title }}</span>
+                <span class="inline-flex items-center space-x-2 w-full">
+                  <span class="text-sm truncate w-full">{{ project.title }}</span>
                   <LucideLock v-if="project.is_private" class="h-3 w-3" />
                 </span>
               </template>

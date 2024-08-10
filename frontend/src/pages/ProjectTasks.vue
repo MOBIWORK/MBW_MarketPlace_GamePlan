@@ -1,8 +1,8 @@
 <template>
   <div class="w-full pt-3 px-4 flex items-center justify-between">
         <div class="w-1/2">
-          <TextInput type="text" class="w-full" :placeholder="__('Search task')" :debounce="600" v-model="txtSearch" variant="outline">
-            <template #prefix>
+          <TextInput type="text" class="w-full" :placeholder="__('Search task')" :debounce="600" v-model="txtSearch">
+            <template #suffix>
               <FeatherIcon
                 class="w-4"
                 name="search"
@@ -27,7 +27,7 @@
               onClick: () => onChangeTypeView('kanban_by_priority'),
               icon: 'trello'
             }
-          ]" class="mr-3">
+          ]" class="mr-3" style="font-size: 14px;">
             <Button class="px-2.5 w-full" style="justify-content: flex-start !important;">
               <template #icon>
                 <FeatherIcon v-if="typeView=='list'"

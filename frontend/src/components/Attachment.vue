@@ -7,7 +7,7 @@
         <div class="flex items-center" v-if="!readOnly">
             <Button class="mr-2" :variant="'outline'" theme="red" size="sm" :loading="false" @click="onDeleteAll()">{{__('Delete all')}}</Button>
             <Button :variant="'outline'" theme="gray" size="sm" :loading="false" @click="onAddAttachment()">{{__('New attachment')}}</Button>
-            <input type="file" ref="fileInput" @change="handleFileChange" class="hidden">
+            <input type="file" ref="fileInput" @change="handleFileChange" class="hidden" multiple>
         </div>
     </div>
     <div class="flex mt-1 flex-wrap" v-if="numAttach>0">
@@ -224,8 +224,8 @@ export default{
             this.$refs.fileInput.click();
         },
         handleFileChange(evt){
-            if (evt.target.files[0]) {
-                this.readFileAsBinary(evt.target.files[0]);
+            for(let i = 0; i < evt.target.files.length; i++){
+                this.readFileAsBinary(evt.target.files[i]);
             }
         },
         readFileAsBinary(file) {
