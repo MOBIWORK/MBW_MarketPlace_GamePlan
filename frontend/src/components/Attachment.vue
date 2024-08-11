@@ -5,14 +5,14 @@
             <div class="w-6 h-6 rounded-full p-2 bg-gray-200 text-sm flex justify-center items-center text-gray-800">{{numAttach}}</div>
         </div>
         <div class="flex items-center" v-if="!readOnly">
-            <Button class="mr-2" :variant="'outline'" theme="red" size="sm" :loading="false" @click="onDeleteAll()">{{__('Delete all')}}</Button>
+            <Button class="mr-2" :variant="'outline'" theme="red" size="sm" :loading="false" @click="onDeleteAll()" v-if="numAttach>0">{{__('Delete all')}}</Button>
             <Button :variant="'outline'" theme="gray" size="sm" :loading="false" @click="onAddAttachment()">{{__('New attachment')}}</Button>
             <input type="file" ref="fileInput" @change="handleFileChange" class="hidden" multiple>
         </div>
     </div>
     <div class="flex mt-1 flex-wrap" v-if="numAttach>0">
         <div class="w-56 h-44 shadow-gray-900 rounded-lg border mr-3 mt-2" v-for="attach in arrAttach">
-            <div class="w-full h-28 flex items-center justify-center relative">
+            <div class="w-full h-28 group flex items-center justify-center relative">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#FFF" stroke-miterlimit="10" stroke-width="2" viewBox="0 0 96 96" style="width: 95px;" v-if="attach.file_type=='DOCX'">
                     <path stroke="#979593" d="M67.1716 7H27c-1.1046 0-2 .8954-2 2v78c0 1.1046.8954 2 2 2h58c1.1046 0 2-.8954 2-2V26.8284c0-.5304-.2107-1.0391-.5858-1.4142L68.5858 7.5858C68.2107 7.2107 67.702 7 67.1716 7z"/>
                     <path fill="none" stroke="#979593" d="M67 7v18c0 1.1046.8954 2 2 2h18"/>
@@ -35,7 +35,7 @@
                         <path fill="#2c2c2c" d="M-20.930423 167.83862h2.364986q1.133514 0 1.840213.2169.706698.20991 1.189489.9446.482795.72769.482795 1.75625 0 .94459-.391832 1.6233-.391833.67871-1.056548.97958-.65772.30087-2.02913.30087h-.818651v3.72941h-1.581322zm1.581322 1.22447v3.33058h.783664q1.049552 0 1.44838-.39184.405826-.39183.405826-1.27345 0-.65772-.265887-1.06355-.265884-.41282-.587747-.50378-.314866-.098-1.000572-.098zm5.50664-1.22447h2.148082q1.560333 0 2.4909318.55276.9375993.55276 1.4133973 1.6443.482791 1.09153.482791 2.42096 0 1.3994-.4338151 2.49793-.4268149 1.09153-1.3154348 1.76324-.8816233.67172-2.5189212.67172h-2.267031zm1.581326 1.26645v7.018h.657715q1.378411 0 2.001144-.9516.6227329-.95858.6227329-2.5539 0-3.5125-2.6238769-3.5125zm6.4722254-1.26645h5.30372941v1.26645H-4.2075842v2.85478h2.9807225v1.26646h-2.9807225v4.16322h-1.5813254z" font-family="Franklin Gothic Medium Cond" letter-spacing="0" style="line-height:125%;-inkscape-font-specification:'Franklin Gothic Medium Cond'" word-spacing="4.26000023"/>
                     </g>
                 </svg>
-                <img :src="attach.file_url" class="w-full h-full" v-else-if="attach.file_type=='PNG' || attach.file_type=='JPG' || attach.file_type=='SVG'">
+                <img :src="attach.file_url" class="w-full h-full object-cover" v-else-if="attach.file_type=='PNG' || attach.file_type=='JPG' || attach.file_type=='SVG'">
                 <svg width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#000000" style="width: 90px;height: 90px;" v-else>
                     <g id="SVGRepo_bgCarrier" stroke-width="0"/>
                     <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
@@ -69,10 +69,21 @@
                         </Button>
                     </Dropdown>
                 </div>
+                <div class="hidden group-hover:block absolute top-1/2 cursor-pointer" style="left: 45%;" v-if="attach.file_type=='PNG' || attach.file_type=='JPG'" @click="onFileImage(attach)">
+                    <div class="w-6 h-6 rounded-full bg-white flex justify-center items-center">
+                        <FeatherIcon
+                            name="eye"
+                            class="h-4 w-4"
+                        />
+                    </div>
+                </div>
             </div>
             <div class="text-base font-medium ml-2 mt-2 w-10/12 truncate">{{attach.file_name}}</div>
             <div class="text-sm text-gray-500 ml-2 mt-1">{{formatTimeAgo(attach.creation)}}</div>
         </div>
+    </div>
+    <div v-if="previewVisible" class="preview-overlay cursor-pointer" @click="closePreview">
+      <img :src="srcImage" alt="Preview" class="preview-image" />
     </div>
     <Dialog
         :options="{
@@ -131,7 +142,9 @@ export default{
             show_confirm_deleteing: false,
             show_confirm_delete_attachment: false,
             name_attachment_delete: "",
-            csrf_token: ""
+            csrf_token: "",
+            previewVisible: false,
+            srcImage: ""
         }
     },
     components: {
@@ -214,6 +227,10 @@ export default{
         }
     },
     methods: {
+        onFileImage(attach){
+            this.previewVisible = true
+            this.srcImage = attach.file_url
+        },
         onDeleteAll(){
             this.show_confirm_deleteing = true
         },
@@ -274,9 +291,31 @@ export default{
                 'dt': this.reference_doctype,
                 'dn': this.reference_name
             })
+        },
+        closePreview(){
+            this.previewVisible = false;
+            this.srcImage = ""
         }
     }
 }
 </script>
 <style scoped>
+.preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.preview-image {
+  max-width: 90%;
+  max-height: 90%;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
 </style>

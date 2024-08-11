@@ -467,8 +467,8 @@ def add_discussion_of_project(projectId, discussionId, user_creation):
         if len(guest_filter) == 0:
             arr_received_users.append(guest.user)
     for user_received in arr_received_users:
-        user_received_info = frappe.get_doc('User', user_received)
-        if user_received != user_creation:
+        if user_received is not None and user_received != "" and user_received != user_creation:
+            user_received_info = frappe.get_doc('User', user_received)
             notify_text = f"""
                 <div class="text-gray-700 text-sm">
                     <span class="font-medium text-gray-900">{ get_fullname(user_creation) }</span>
@@ -540,7 +540,7 @@ def add_page_of_project(projectId, pageId, user_creation):
         if len(guest_filter) == 0:
             arr_received_users.append(guest.user)
     for received_user in arr_received_users:
-        if received_user != user_creation:
+        if received_user is not None and received_user != "" and received_user != user_creation:
             received_user_info = frappe.get_doc('User', received_user)
             notify_text=f"""
                 <div class="text-gray-700 text-sm">

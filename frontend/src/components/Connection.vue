@@ -7,7 +7,7 @@
             </div>
         </div>
         <div class="flex items-center" v-if="!readOnly">
-            <Button class="mr-2" :variant="'outline'" theme="red" size="sm" :loading="false" @click="onDeleteAll()">{{__('Delete all')}}</Button>
+            <Button class="mr-2" :variant="'outline'" theme="red" size="sm" :loading="false" @click="onDeleteAll()" v-if="num_connection > 0">{{__('Delete all')}}</Button>
             <Button :variant="'outline'" theme="gray" size="sm" :loading="false" @click="onAddConnection()">{{__('New connection')}}</Button>
         </div>
     </div>
@@ -69,6 +69,22 @@
             </template>
         </Button>
     </div>
+    <Dialog
+        :options="{
+            title: __('Delete connection?'),
+            message: __('This action can not be undone'),
+            size: 'xl',
+            actions: [
+                {
+                    label: __('Delete'),
+                    variant: 'solid',
+                    theme: 'red',
+                    onClick: () => onConfirmDeleteConnection()
+                }
+            ],
+        }"
+        v-model="show_confirm_delete_single"
+    />
 </template>
 <script>
 import { Button, TextInput, Tooltip, Select, Dialog, Badge } from 'frappe-ui'
@@ -98,7 +114,9 @@ export default {
             reference_doctype_select: "GP Task",
             reference_name_select: "",
             datas_reference_name: [],
-            show_confirm_deleteing: false
+            show_confirm_deleteing: false,
+            show_confirm_delete_single: false,
+            name_connection_single: ""
         }
     },
     components: {
@@ -118,7 +136,21 @@ export default {
                 auto: false,
                 delete: {
                     onSuccess(){
+                        createToast({
+                            title: __('Delete successfully link'),
+                            icon: 'check',
+                            iconClasses: 'text-green-600'
+                        })
+                        this.show_confirm_delete_single = false
+                        this.name_connection_single = ""
                         this.$resources.lst_connection.fetch()
+                    },
+                    onError(){
+                        createToast({
+                            title: __('Delete failed link'),
+                            icon: 'x',
+                            iconClasses: 'text-red-600',
+                        })
                     }
                 },
                 insert: {
@@ -195,7 +227,11 @@ export default {
             this.show_adding_connection = true
         },
         onDeleteConnection(connection){
-            this.$resources.connections.delete.submit(connection.name)
+            this.show_confirm_delete_single = true
+            this.name_connection_single = connection.name
+        },
+        onConfirmDeleteConnection(){
+            this.$resources.connections.delete.submit(this.name_connection_single)
         },
         onLinkConnection(event, connection){
             event.stopPropagation()

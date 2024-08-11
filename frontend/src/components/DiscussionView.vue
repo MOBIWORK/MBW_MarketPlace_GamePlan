@@ -70,7 +70,7 @@
           </span>
         </div>
         <template v-if="discussion.conclusion != '' && discussion.conclusion != null">
-          <div class="flex mt-4 mb-2">
+          <div class="flex mt-4">
             <div class="text-1xl font-semibold">Conclusion</div>
             <div class="ml-auto flex space-x-2">
             <Button
@@ -93,7 +93,7 @@
           </div>
           </div>
           <TextEditor
-            class="mt-1 mb-4 border-b"
+            class="mb-4 border-b pb-3"
             editor-class="rounded-b-lg max-w-[unset] prose-sm overflow-auto w-100"
             :content="discussion.conclusion"
             :editable="false"
@@ -167,6 +167,13 @@
             v-model:reactions="discussion.reactions"
           />
         </div>
+
+        <div class="w-full mb-6 mt-1">
+          <Connection :reference_doctype="'GP Discussion'" :reference_name="discussion.name" :project="discussion.project"
+            :readOnly="readOnlyMode">
+          </Connection>
+        </div>
+
         <div class="text-1xl font-semibold mb-2">Activity</div>
         <div class="flex items-center">
           <span class="text-sm">{{__('Show')}}:</span>
@@ -411,6 +418,7 @@ import { activeTeams } from '@/data/teams'
 import { getTeamProjects } from '@/data/projects'
 import { getUser } from '@/data/users'
 import TextEditorFixedMenu from 'frappe-ui/src/components/TextEditor/TextEditorFixedMenu.vue'
+import Connection from '@/components/Connection.vue'
 
 export default {
   name: 'DiscussionView',
@@ -431,7 +439,8 @@ export default {
     DiscussionMeta,
     DiscussionBreadcrumbs,
     RevisionsDialog,
-    TextEditorFixedMenu
+    TextEditorFixedMenu,
+    Connection
   },
   resources: {
     discussion() {

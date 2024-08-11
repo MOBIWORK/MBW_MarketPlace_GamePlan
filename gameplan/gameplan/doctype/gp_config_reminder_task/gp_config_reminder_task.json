@@ -1,0 +1,62 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-08-11 15:27:04.447995",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "remind_times",
+  "remind_unit",
+  "notify_browser",
+  "notify_email",
+  "id_reminder"
+ ],
+ "fields": [
+  {
+   "fieldname": "remind_times",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Remind Times"
+  },
+  {
+   "fieldname": "remind_unit",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Remind Unit",
+   "options": "minute\nhour\nday"
+  },
+  {
+   "default": "0",
+   "fieldname": "notify_browser",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Notify Browser"
+  },
+  {
+   "default": "0",
+   "fieldname": "notify_email",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Notify Email"
+  },
+  {
+   "fieldname": "id_reminder",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Id Reminder"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-08-11 15:31:06.897511",
+ "modified_by": "Administrator",
+ "module": "Gameplan",
+ "name": "GP Config Reminder Task",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

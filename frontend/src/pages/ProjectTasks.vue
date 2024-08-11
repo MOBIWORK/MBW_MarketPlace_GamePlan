@@ -45,6 +45,7 @@
             </Button>
           </Dropdown>
           <SortBy :fields="[
+            { value: 'due_date', label: __('Due Date') },
             { value: 'modified', label: __('Modified') },
             { value: 'creation', label: __('Creation') },
             { value: 'priority', label: __('Priority') }

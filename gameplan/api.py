@@ -307,6 +307,34 @@ def get_user_system_by_filter(txtSearch=None):
 	)
 	return users
 
+@frappe.whitelist(methods=["POST"])
+def create_team(title, is_private, arr_member):
+	try:
+		team_doc = frappe.new_doc('GP Team')
+		team_doc.title = title,
+		team_doc.is_private = is_private
+		team_doc.insert()
+		frappe.db.commit()
+		for member in arr_member:
+			if member['id'] is not None and member['id'] != "":
+				add_role_member_by_id(team_doc.name, "team", member['id'])
+			else:
+				first_name = member['email'].split("@")[0].title()
+				user = frappe.get_doc(
+					doctype="User",
+					user_type="Website User",
+					email=member['email'],
+					send_welcome_email=0,
+					first_name=first_name,
+				).insert(ignore_permissions=True)
+				user.append_roles("Gameplan Member")
+				user.save(ignore_permissions=True)
+				frappe.db.commit()
+				add_role_member_by_id(team_doc.name, "team", user.name)
+		return {'status': "ok", 'message': team_doc}
+	except Exception as e:
+		return {'status': "error", 'message': null}
+
 @frappe.whitelist()
 def get_teams_by_role():
 	user_doc = frappe.get_doc("User", frappe.session.user)

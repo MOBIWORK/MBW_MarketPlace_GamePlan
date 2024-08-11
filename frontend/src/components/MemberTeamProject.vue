@@ -36,7 +36,7 @@
     <div class="mt-1 text-gray-600 text-sm" v-if="readOnly==false">Enter name or email addess to add new invitation</div>
     <ul role="list" class="mt-2 divide-y overflow-y-auto" v-bind:class="[readOnly? 'max-h-64': 'max-h-56']">
         <li class="flex w-full items-center py-2" v-for="member in arrMember" :key="member.id">
-            <UserAvatar :user="member.id_user" />
+            <UserAvatar :user="member.id_user" v-if="member.id_user != null"/>
             <div class="ml-3">
                 <div class="text-base font-medium text-gray-800 truncate w-52">
                     {{ member.full_name }}

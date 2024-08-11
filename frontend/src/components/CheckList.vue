@@ -7,7 +7,7 @@
             </div>
         </div>
         <div class="flex items-center" v-if="!readOnly">
-            <Button class="mr-2" :variant="'outline'" theme="red" size="sm" :loading="false" @click="onDeleteAll()">{{__('Delete all')}}</Button>
+            <Button class="mr-2" :variant="'outline'" theme="red" size="sm" :loading="false" @click="onDeleteAll()" v-if="numCheckList > 0">{{__('Delete all')}}</Button>
             <Button :variant="'outline'" theme="gray" size="sm" :loading="false" @click="onAddChecklist()">{{__('Add checklist')}}</Button>
         </div>
     </div>
