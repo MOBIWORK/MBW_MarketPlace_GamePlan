@@ -294,7 +294,7 @@ function onUpdateAssign(data){
 function updateKanban(data) {
   if (data.item != null && data.item != "" && data.to != null && data.to != "") {
     let objSubmit = { name: data.item }
-    objSubmit[props.paramKanbanDefault.column_field] = data.to
+    objSubmit[paramKanbanDefault.value.column_field] = data.to
     tasksListResource.setValue.submit(objSubmit)
   }
 }

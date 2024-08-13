@@ -9,7 +9,8 @@
         placeholder="Enter name or email address"
         autocomplete="off"
         modelValue=""
-        v-model="nameOrEmailMember" @focus="onFocusInputUser()" @keydown.enter.prevent="onEnterInputUser($event)"
+        v-model="nameOrEmailMember" @keyup="onKeyUp()" @focus="onFocusInputUser()" @keydown.enter.prevent="onEnterInputUser($event)"
+        :disabled="loadingFrm"
     />
     <div ref="result_user" class="max-h-50 overflow-y-auto absolute z-50 mt-1 rounded-lg bg-white text-base shadow-2xl" style="width: 91%;"
         v-if="displayUserSystem">
@@ -30,7 +31,18 @@
             </ul>
         </template>
         <template v-else>
-            <div class="m-2 text-sm text-gray-700">Không có dữ liệu</div>
+            <div class="m-2 text-sm text-gray-700" v-if="showBtnAddMember==false">Không có dữ liệu</div>
+            <Button
+                class="my-1 mx-3"
+                :variant="'subtle'"
+                theme="gray"
+                size="sm"
+                :loading="loadingFrm"
+                @click="onCreateMember()"
+                v-if="showBtnAddMember"
+            >
+                {{__('Create member')}}
+            </Button>
         </template>
     </div>
     <div class="mt-1 text-gray-600 text-sm" v-if="readOnly==false">Enter name or email addess to add new invitation</div>
@@ -60,7 +72,7 @@
                         value: 'remove',
                     },
                 ]" size="sm" variant="subtle" :disabled="readOnly==true" v-model="member.role"
-                    @change="onChangeRole(member)" />
+                    @change="onChangeRole(member)"/>
             </div>
         </li>
     </ul>
@@ -75,7 +87,7 @@
                     variant: 'solid',
                     theme: 'red',
                     onClick: () => onRemoveMember()
-                },
+                }   
             ],
         }"
         v-model="showDialogRemove"
@@ -84,13 +96,13 @@
 
 <script>
 
-import { FormControl, createResource } from 'frappe-ui'
+import { FormControl, createResource, Button } from 'frappe-ui'
 import { onClickOutside } from '@vueuse/core'
 import { createToast } from '@/utils'
 
 export default {
     name: 'MemberTeamProject',
-    components: [FormControl],
+    components: [FormControl, Button],
     props: ["idTeamProject", "typeParent", "readOnly"],
     emits: ["addMember", "changeRole"],
     resources: {
@@ -156,7 +168,9 @@ export default {
             displayUserSystem: false,
             arrUserSystem: [],
             target: null,
-            result_user: null
+            result_user: null,
+            loadingFrm: false,
+            showBtnAddMember: false
         }
     },
     computed: {
@@ -198,6 +212,9 @@ export default {
             }
             let arrMemberTrigger = this.arrMember.filter(x => x.id != this.memberAction.id)
             this.$emit('changeRole', arrMemberTrigger)
+        },
+        onCancelDeleteMember(){
+            console.log("Dòng 208 cancel")
         },
         onFocusInputUser(){
             this.displayUserSystem = true
@@ -247,6 +264,7 @@ export default {
         },
         onEnterInputUser(event){
             var me = this
+            this.loadingFrm = true
             event.stopPropagation();
             const regular_email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if(!regular_email.test(this.nameOrEmailMember)){
@@ -279,16 +297,64 @@ export default {
                             'id': member_info.id
                         })
                         me.$emit('addMember', me.arrMember)
+                        me.loadingFrm = false
                     }else{
                         createToast({
                             title: __('Lỗi khi thêm thành viên vào nhóm'),
                             icon: 'x',
                             iconClasses: 'text-red-600',
                         })
+                        me.loadingFrm = false
                     }
                 }
             })
             resourceAddMemberNotExist.submit({email: this.nameOrEmailMember, teamId: this.idTeamProject})
+        },
+        onCreateMember(){
+            var me = this
+            this.loadingFrm = true
+            let resourceAddMemberNotExist = createResource({
+                url: "gameplan.api.invite_member",
+                method: 'POST',
+                auto: false,
+                onSuccess(data){
+                    if(data.status == "ok"){
+                        me.nameOrEmailMember = ""
+                        me.displayUserSystem = false
+                        createToast({
+                            title: __('Thêm thành viên vào nhóm thành công'),
+                            icon: 'check',
+                            iconClasses: 'text-green-600'
+                        })
+                        let member_info = data.message
+                        me.arrMember.push({
+                            'id_user': member_info.id_user,
+                            'full_name': member_info.full_name,
+                            'email': member_info.email,
+                            'role': "member",
+                            'id': member_info.id
+                        })
+                        me.$emit('addMember', me.arrMember)
+                        me.loadingFrm = false
+                    }else{
+                        createToast({
+                            title: __('Lỗi khi thêm thành viên vào nhóm'),
+                            icon: 'x',
+                            iconClasses: 'text-red-600',
+                        })
+                        me.loadingFrm = false
+                    }
+                }
+            })
+            resourceAddMemberNotExist.submit({email: this.nameOrEmailMember, teamId: this.idTeamProject})
+        },
+        onKeyUp(){
+            const regular_email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if(!regular_email.test(this.nameOrEmailMember)){
+                this.showBtnAddMember = false
+            }else{
+                this.showBtnAddMember = true
+            }
         }
     },
     watch: {

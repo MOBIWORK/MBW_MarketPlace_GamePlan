@@ -272,6 +272,18 @@ function updateColumn(d) {
     if (toColumn != fromColumn) {
         data = { item: itemName, to: toColumn, kanban_columns: _columns }
     }
+    if(d.type == "end"){
+        for(let i = 0; i < columns.value.length; i++){
+            if(columns.value[i].column.name == toColumn){
+                for(let j = 0; j < columns.value[i].data.length; j++){
+                    if(columns.value[i].data[j].name == itemName){
+                        columns.value[i].data[j].status = toColumn
+                        break
+                    }
+                }
+            }
+        }
+    }
     emit('update', data)
 }
 
