@@ -4,6 +4,7 @@ from frappe.core.doctype.communication.email import make
 from datetime import datetime
 from gameplan.utils import get_config_notification_by_user
 import json
+from gameplan.fcm_manager import send_notification_to_user
 
 
 def send_manager_by_invite_guest(type_notifys, idGuest, idProject):
@@ -51,6 +52,10 @@ def send_manager_by_invite_guest(type_notifys, idGuest, idProject):
             subject = f'[TEAM] {get_fullname(idGuest)} đã tham gia dự án {project_doc.title}'
         )
         frappe.db.commit()
+    if "browser" in type_notifys:
+        title_browser = ""
+        body_browser = f'{get_fullname(idGuest)} đã tham gia dự án {project_doc.title} vào lúc {datetime.now()}'
+        send_notification_to_user(title_browser, body_browser)
 
 def send_invite_guest(emailGuest, type_reference, name_reference):
     user_send = frappe.get_doc('User', frappe.session.user)
@@ -161,6 +166,10 @@ def send_guest_by_invite_guest(type_notifys, idGuest, type_reference, name_refer
                 subject = f'[TEAM] {get_fullname(frappe.session.user)} đã thêm bạn vào {type_joining} {name_joining}'
             )
             frappe.db.commit()
+        if "browser" in type_notifys:
+            title_browser = ""
+            body_browser = f'{ get_fullname(frappe.session.user) } đã thêm bạn vào {type_joining} {name_joining} với vai trò {role_of_received}'
+            send_notification_to_user(title_browser, body_browser)
 
 def change_limit_project_team(type_reference, name_reference, newLimit):
     type_joining = ""
@@ -261,6 +270,10 @@ def change_limit_project_team(type_reference, name_reference, newLimit):
                     subject = f'[TEAM] {get_fullname(frappe.session.user)} đã thay đổi {type_joining} {name_joining}'
                 )
                 frappe.db.commit()
+            if "browser" in type_notifys:
+                title_browser = ""
+                body_browser = f'{ get_fullname(frappe.session.user) } đã thay đổi {type_joining} {name_joining} thành {type_joining} {limit}'
+                send_notification_to_user(title_browser, body_browser)
 
 def change_archived_project_team(type_reference, name_reference, idUserActor):
     arr_member = []
@@ -353,6 +366,10 @@ def change_archived_project_team(type_reference, name_reference, idUserActor):
                     subject = f'[TEAM] {get_fullname(idUserActor)} đã lưu trữ {type_joining} {name_joining}'
                 )
                 frappe.db.commit()
+            if "browser" in type_notifies:
+                title_browser = ""
+                body_browser = f'{ get_fullname(idUserActor) } đã lưu trữ {type_joining} {name_joining}'
+                send_notification_to_user(title_browser, body_browser)
 
 def change_name_project_team(type_reference, name_reference, title_older, title_new):
     type_joining = ""
@@ -445,6 +462,10 @@ def change_name_project_team(type_reference, name_reference, title_older, title_
                     subject = f'[TEAM] {get_fullname(frappe.session.user)} đã thay đổi {type_joining} {title_new}'
                 )
                 frappe.db.commit()
+            if "browser" in type_notifies:
+                title_browser = ""
+                body_browser = f'{ get_fullname(frappe.session.user) } đã đổi tên {type_joining} {title_older} thành {title_new}'
+                send_notification_to_user(title_browser, body_browser)
 
 def add_discussion_of_project(projectId, discussionId, user_creation):
     arr_received_users = []
@@ -516,6 +537,10 @@ def add_discussion_of_project(projectId, discussionId, user_creation):
                     subject = f'[TEAM] {get_fullname(user_creation)} đã tạo thảo luận mới {discussion_doc.title}'
                 )
                 frappe.db.commit()
+            if "browser" in type_notifies:
+                title_browser = ""
+                body_browser = f'{get_fullname(user_creation)} đã tạo thảo luận mới {discussion_doc.title}'
+                send_notification_to_user(title_browser, body_browser)
 
 def add_page_of_project(projectId, pageId, user_creation):
     arr_member = []
@@ -588,6 +613,10 @@ def add_page_of_project(projectId, pageId, user_creation):
                     subject = f'[TEAM] {get_fullname(user_creation)} đã tạo trang mới {page_doc.title}'
                 )
                 frappe.db.commit()
+            if "browser" in type_notifies:
+                title_browser = ""
+                body_browser = f'{get_fullname(user_creation)} đã tạo trang mới {page_doc.title}'
+                send_notification_to_user(title_browser, body_browser)
 
 def add_comment_owner_discussion(type_notifies, discussionId, commentId):
     discusson_doc = frappe.get_doc('GP Discussion', discussionId)
@@ -638,6 +667,10 @@ def add_comment_owner_discussion(type_notifies, discussionId, commentId):
                 subject = f'[TEAM] {get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discusson_doc.title}'
             )
             frappe.db.commit()
+        if "browser" in type_notifies:
+            title_browser = ""
+            body_browser = f'{get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discusson_doc.title}'
+            send_notification_to_user(title_browser, body_browser)
 
 def add_reaction_owner_discussion(discussionId, userReactionId, nameReaction):
     discussion_doc = frappe.get_doc('GP Discussion', discussionId)
@@ -692,6 +725,10 @@ def add_reaction_owner_discussion(discussionId, userReactionId, nameReaction):
                 subject = f'[TEAM] {get_fullname(userReactionId)} thả cảm xúc về thảo luận {discussion_doc.title}'
             )
             frappe.db.commit()
+        if "browser" in type_notifies:
+            title_browser = ""
+            body_browser = f'{get_fullname(userReactionId)} đã thả cảm xúc {nameReaction} vào thảo luân {discussion_doc.title}'
+            send_notification_to_user(title_browser, body_browser)
 
 def add_comment_followed_discussion(arr_user, discussionId, commentId):
     discussion_doc = frappe.get_doc('GP Discussion', discussionId)
@@ -749,6 +786,10 @@ def add_comment_followed_discussion(arr_user, discussionId, commentId):
                     subject = f'[TEAM] {get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discussion_doc.title}'
                 )
                 frappe.db.commit()
+            if "browser" in type_notifies:
+                title_browser = ""
+                body_browser = f'{get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discussion_doc.title}'
+                send_notification_to_user(title_browser, body_browser)
 
 def add_poll_followed_discussion(arr_user, discussionId, pollId):
     discussion_doc = frappe.get_doc('GP Discussion', discussionId)
@@ -813,6 +854,10 @@ def add_poll_followed_discussion(arr_user, discussionId, pollId):
                     subject = f'[TEAM] {get_fullname(poll_doc.owner)} đã tạo cuộc bình chọn trong thảo luận {discussion_doc.title}'
                 )
                 frappe.db.commit()
+            if "browser" in type_notifies:
+                title_browser = ""
+                body_browser = f'{get_fullname(poll_doc.owner)} đã tạo cuộc bình chọn trong thảo luận {discussion_doc.title}'
+                send_notification_to_user(title_browser, body_browser)
 
 def close_conclusion_followed_discussion(arr_user, discussionId):
     discussion_doc = frappe.get_doc('GP Discussion', discussionId)
@@ -869,6 +914,10 @@ def close_conclusion_followed_discussion(arr_user, discussionId):
                     subject = f'[TEAM] Thảo luận {discussion_doc.title} đã đóng và có kết luận'
                 )
                 frappe.db.commit()
+            if "browser" in type_notifies:
+                title_browser = ""
+                body_browser = f'Thảo luận {discussion_doc.title} đã đóng và có kết luận'
+                send_notification_to_user(title_browser, body_browser)
 
 def assign_to_someone_task(projectId, taskId, assigner, recipient, title_task):
     notify_text = f"""
@@ -939,6 +988,10 @@ def assign_to_someone_task(projectId, taskId, assigner, recipient, title_task):
             subject = subject
         )
         frappe.db.commit()
+    if "browser" in type_notifies:
+        title_browser = ""
+        body_browser = f'{get_fullname(assigner)} đã giao cho bạn nhiệm vụ {title_task}'
+        send_notification_to_user(title_browser, body_browser)
 
 def change_status_owner_task(taskId, userChange, statusNew):
     task_info = frappe.db.get_value('GP Task', taskId, ['title', 'status', 'project', 'owner'], as_dict=1)
@@ -1010,6 +1063,10 @@ def change_status_owner_task(taskId, userChange, statusNew):
             subject = f'[TEAM] {get_fullname(userChange)} đã cập nhật trạng thái nhiệm vụ'
         )
         frappe.db.commit()
+    if "browser" in type_notifies:
+        title_browser = ""
+        body_browser = f'{get_fullname(userChange)} đã cập nhật trạng thái nhiệm vụ {task_info.title} từ {task_info.status} qua {statusNew}'
+        send_notification_to_user(title_browser, body_browser)
 
 def change_assignee_to_older(taskId, new_assignee):
     task_info = frappe.db.get_value('GP Task', taskId, ['title', 'assigned_to', 'project', 'owner'], as_dict=1)
@@ -1073,6 +1130,10 @@ def change_assignee_to_older(taskId, new_assignee):
             subject = f'[TEAM] Nhiệm vụ {task_info.title} thay đổi người phụ trách'
         )
         frappe.db.commit()
+    if "browser" in type_notifies:
+        title_browser = ""
+        body_browser = f'Nhiệm vụ {task_info.title} thay đổi người phụ trách từ bạn qua {get_fullname(new_assignee)}'
+        send_notification_to_user(title_browser, body_browser)
 
 def change_due_date_to_assignee(taskId, newDueDate):
     task_info = frappe.db.get_value('GP Task', taskId, ['title', 'assigned_to', 'project', 'owner', 'due_date'], as_dict=1)
@@ -1143,6 +1204,10 @@ def change_due_date_to_assignee(taskId, newDueDate):
             subject = f'[TEAM] Nhiệm vụ {task_info.title} thay đổi hạn chót'
         )
         frappe.db.commit()
+    if "browser" in type_notifies:
+        title_browser = ""
+        body_browser = f'Nhiệm vụ {task_info.title} thay đổi hạn chót từ {task_info.due_date} qua {newDueDate}'
+        send_notification_to_user(title_browser, body_browser)
 
 def change_priority_to_assignee(taskId, newPriority):
     task_info = frappe.db.get_value('GP Task', taskId, ['title', 'assigned_to', 'project', 'owner', 'priority'], as_dict=1)
@@ -1189,6 +1254,7 @@ def change_priority_to_assignee(taskId, newPriority):
         type_notifies.append("email")
     if config_notification[4]["arr_permission"][4]["browser"] == True:
         type_notifies.append("browser")
+    body_browser = ""
     if "email" in type_notifies:
         link_btn = ""
         content_email = ""
@@ -1197,10 +1263,12 @@ def change_priority_to_assignee(taskId, newPriority):
             sub_content_email = f"""
                 <div>Nhiệm vụ {task_info.title} thay đổi mức ưu tiên từ {task_info.priority} qua {newPriority}</div>
             """
+            body_browser = f'Nhiệm vụ {task_info.title} thay đổi mức ưu tiên từ {task_info.priority} qua {newPriority}'
         else:
             sub_content_email = f"""
                 <div>Nhiệm vụ {task_info.title} thay đổi mức ưu tiên thành {newPriority}</div>
             """
+            body_browser = f'Nhiệm vụ {task_info.title} thay đổi mức ưu tiên thành {newPriority}'
         if project_info is not None and values_notify.project is not None and values_notify.project != "":
             link_btn = frappe.utils.get_url(f'/g/{values_notify.team}/projects/{values_notify.project}/task/{taskId}')
             content_email = f"""
@@ -1232,6 +1300,9 @@ def change_priority_to_assignee(taskId, newPriority):
             subject = f'[TEAM] Nhiệm vụ {task_info.title} thay đổi mức ưu tiên'
         )
         frappe.db.commit()
+    if "browser" in type_notifies:
+        title_browser = ""
+        send_notification_to_user(title_browser, body_browser)
 
 def vote_poll_by_someone(pollId, userVote, option):
     poll_info = frappe.db.get_value('GP Poll', pollId, ['title', 'discussion', 'owner'], as_dict=1)
@@ -1292,6 +1363,10 @@ def vote_poll_by_someone(pollId, userVote, option):
             subject = f'[TEAM] {get_fullname(userVote)} đã tham gia cuộc bình chọn {poll_info.title}'
         )
         frappe.db.commit()
+    if "browser" in type_notifies:
+        title_browser = ""
+        body_browser = f'{get_fullname(userVote)} đã bình chọn {option}'
+        send_notification_to_user(title_browser, body_browser)
 
 def close_poll(pollId):
     poll_doc = frappe.get_doc('GP Poll', pollId)
@@ -1352,6 +1427,10 @@ def close_poll(pollId):
                     subject = f'[TEAM] Cuộc bình chọn {poll_doc.title} đã đóng và có kết quả'
                 )
                 frappe.db.commit()
+            if "browser" in type_notifies:
+                title_browser = ""
+                body_browser = f'Cuộc bình chọn {poll_doc.title} đã đóng và có kết quả'
+                send_notification_to_user(title_browser, body_browser)
 
 def send_notify_by_value(value_notify):
     if frappe.db.exists('GP Notification', value_notify):

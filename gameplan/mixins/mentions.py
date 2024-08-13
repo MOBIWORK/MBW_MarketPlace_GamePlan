@@ -7,6 +7,7 @@ from frappe.utils import get_fullname
 from gameplan.utils import extract_mentions
 from frappe.core.doctype.communication.email import make
 from gameplan.utils import get_config_notification_by_user
+from gameplan.fcm_manager import send_notification_to_user
 
 class HasMentions:
 	def notify_mentions(self):
@@ -134,3 +135,7 @@ class HasMentions:
 					subject = f'[TEAM] {get_fullname(self.owner)} đã nhắc đến bạn'
 				)
 				frappe.db.commit()
+			if "browser" in type_notifys:
+				title_browser = ""
+				body_browser = f'{get_fullname(self.owner)} đã nhắc đến bạn'
+				send_notification_to_user(title_browser, body_browser)

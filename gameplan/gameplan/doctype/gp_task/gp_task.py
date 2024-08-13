@@ -57,6 +57,8 @@ class GPTask(HasMentions, HasActivity, Document):
 	def insert_reminder(self):
 		if self.remind_times is None or self.remind_times == "" or self.remind_times == 0:
 			return
+		if self.due_date is None or self.due_date == "":
+			return
 		reminder = frappe.new_doc("GP Reminder")
 		unit = "phút"
 		remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S')

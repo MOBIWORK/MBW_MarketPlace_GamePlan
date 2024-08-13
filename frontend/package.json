@@ -15,6 +15,7 @@
     "@vueuse/integrations": "^10.11.0",
     "dayjs": "^1.10.7",
     "feather-icons": "^4.28.0",
+    "firebase": "^10.12.5",
     "frappe-ui": "^0.1.57",
     "fuzzysort": "^2.0.4",
     "gemoji": "^7.1.0",

@@ -1,0 +1,82 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-08-12 09:56:35.350917",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "apikey",
+  "authdomain",
+  "projectid",
+  "storagebucket",
+  "messagingsenderid",
+  "appid",
+  "measurementid",
+  "vapid_key"
+ ],
+ "fields": [
+  {
+   "fieldname": "apikey",
+   "fieldtype": "Data",
+   "label": "Api Key"
+  },
+  {
+   "fieldname": "authdomain",
+   "fieldtype": "Data",
+   "label": "Auth Domain"
+  },
+  {
+   "fieldname": "projectid",
+   "fieldtype": "Data",
+   "label": "Project Id"
+  },
+  {
+   "fieldname": "storagebucket",
+   "fieldtype": "Data",
+   "label": "Storage Bucket"
+  },
+  {
+   "fieldname": "messagingsenderid",
+   "fieldtype": "Data",
+   "label": "Messaging Sender Id"
+  },
+  {
+   "fieldname": "appid",
+   "fieldtype": "Data",
+   "label": "App Id"
+  },
+  {
+   "fieldname": "measurementid",
+   "fieldtype": "Data",
+   "label": "Measurement Id"
+  },
+  {
+   "fieldname": "vapid_key",
+   "fieldtype": "Text",
+   "label": "Vapid Key"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-08-12 11:04:04.464185",
+ "modified_by": "Administrator",
+ "module": "Gameplan",
+ "name": "GP FCM App",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

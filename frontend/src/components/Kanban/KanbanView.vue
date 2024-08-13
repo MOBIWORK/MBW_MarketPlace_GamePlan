@@ -82,7 +82,7 @@
                                             >{{fields['priority']}}</div>
                                         </div>
                                         <div class="flex items-center justify-between">
-                                            <div class="flex items-center" :class="{'text-red-600': checkDeadLine(fields['due_date']) == true}">
+                                            <div class="flex items-center" :class="{'text-red-600': checkDeadLine(fields['due_date'], fields['status']) == true}">
                                                 <FeatherIcon name="briefcase" class="w-4 mr-1" v-if="fields['due_date'] != null && fields['due_date'] != ''" />
                                                 <div class="text-sm" v-if="fields['due_date'] != null && fields['due_date'] != ''">{{renderDateText(fields['due_date'])}}</div>
                                             </div>
@@ -206,11 +206,11 @@ function renderDateText(dateText){
     return `${day}/${month}/${year}`
 }
 
-function checkDeadLine(dateText){
+function checkDeadLine(dateText, status){
     const date = new Date(dateText)
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    if(date <= today) return true
+    if(date <= today && status != 'Done') return true
     else return false
 }
 

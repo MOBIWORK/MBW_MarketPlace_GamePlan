@@ -70,6 +70,21 @@ def url_safe_slug(text):
 	slug = re.sub('[-]+', '-', slug)
 	return slug
 
+def init_config_fcm_admin():
+	return {
+		'type': "service_account",
+		'project_id': "gameplan-fcm",
+		'private_key_id': "4b80d1266f4fd274913d3e9bd9845f701c8601ff",
+		'private_key': "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC54N102fcKV81q\ns+KMTcGg7SW8XOr9NedukJ5OSBen1Kv91iVjU/e55OP1Uaxf3Q0oernhmidFdKxB\nrLf9NX1AE7fs+Q5JACaet3MGNdnt+aftRXfJvj35buxnPymcaU1kcrZIEgSKMCqa\nXTj+eMGvohg12bnCSjm0whS18eqXWZdkkWmRJDyjdbw8eUAKO5jYOEtpTt5mrzzX\n32Z8ScA9Wb/ZtzzAcn5kofpgmbSuJIHuhGnNdsZtPIoSbHqhKkrHffLvJzjtMTJq\nSx5/gRQ7sjrgS8vSG6A8XwfSRh1A0UDkbk3gGxzWG99fLdKzqL1Pdi2+USdCFa0o\nWgoiRkHZAgMBAAECggEAJt3JgJ745G1Ckw6lDtBNbgBYVSAatLJ6P2i26UhyxdGW\n2v9VlwTeNj0Rm2CmCe93SmELEAzDLGc+g4cBe80c8PKOkVrsbUA+Uw6p2wEUngmH\nXvoZF5KTc94JSXdwFHgCSkAgNEasM1bp+ZgHjFIksbxTkqMBkAokMdMpMHgypM2n\noHMqDanZGRXiRN0tSlLmanHlWzCJYemXpKmMiiI/Aguc/N4nvUaqO7OalCksZhHS\nAOfpoD68bliZzbns7XvpxnMbaWnyVCKXCIvP0XtPBGDvBtJ9mSur/i3IHHpZwHwm\nP9dybnxR0XTEBJfeKNBB2BORrMRBwJsz4QhnvV7wLwKBgQD00bMDg9BDFZZVDRP9\n6a4jFivkO5Gbt+Usd0B7jSOTHE3h5lMlaCU1FryNrHPiaxnvqLQ/gQGrwkcRqGyz\nfujJ6ml01xe3XPaflh36zh+pDJmsnlJx3M6CARQPd7mue2WOjvEWJ1ZymTXLPk2q\nbzdOU3vRe4+cFzFd1Iq/RnlJ0wKBgQDCXg95eXxP9Otcooeeqk4sIz3iY9VK7nl7\nG83s8sb9+zIWo8JPAd/XaBJiqrfhY6VAbOowEXk/hkvNsDfUEoURqlWXIGntvuCv\nXxM7HSQ/ITw6wbBWOAtw0x7W3zI+gGnhUVaUWsJJaqXX39RKN6N6WuGCbgrBaVNm\nGtqznlXuIwKBgD0GSGkH4lHWf7KTn/ga151HWYl6j8ERBb8fuqMRe1ygIYm9r9wT\nKbMiB74IzpoRuFVU6BksPw5hTvXH1dCoQb6S/9ZwByldstv0v2RVHO82hNfSXxqi\nv5cITcfNQCuN9rKiTtYG2DWYmyAeV520O0T66lI9Sn7OCTAqWqtzFaihAoGAB+RT\n0oXZQ1HZgKBky0907xvbNmcBURKPwizl1pog9E0PwpWRnS2hThi+rlzqLG+kVRJX\nC+6ZsrecOlTOX4EFACufYAyD4JBghR5iJINRZnLOBEC7DTUnWcRouybC3oDOS8TG\ntC1fOCXpZ/OBpiXOMHiiMW6QZzwEk9/BQ4vJR2sCgYA78dPLsg/B23lrR1jEq8xm\nfr08JO7BMrdxvhvGxZuYkvX+jf8Z7oZDFZlOa1NCa/oUTZG1K3N8+A1SrazOI+SL\nDDDARtMoCgIJ6QWQAPQ8O/A6Hkkph8lbahZWVYx6JWbjfmbhL5N210ElboIsj7i6\nTXg+kkL44cZN3Vo8Tjt86Q==\n-----END PRIVATE KEY-----\n",
+		'client_email': "firebase-adminsdk-0hdr8@gameplan-fcm.iam.gserviceaccount.com",
+		'client_id': "109446071591036998026",
+		'auth_uri': "https://accounts.google.com/o/oauth2/auth",
+		'token_uri': "https://oauth2.googleapis.com/token",
+		'auth_provider_x509_cert_url': "https://www.googleapis.com/oauth2/v1/certs",
+		'client_x509_cert_url': "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-0hdr8%40gameplan-fcm.iam.gserviceaccount.com",
+		'universe_domain': "googleapis.com"
+	}
+
 def random_config_notification():
 	config_notifications = [
 		{

@@ -12,8 +12,8 @@ from frappe.model.document import get_controller
 from frappe.utils import make_filter_tuple
 from frappe.model import no_value_fields
 from frappe import _
-
 import json
+from gameplan.fcm_manager import send_notification_to_user
 
 @frappe.whitelist(allow_guest=True)
 def get_user_info(user=None):
@@ -1216,3 +1216,57 @@ def get_translations():
 		language = frappe.db.get_single_value("System Settings", "language")
 
 	return get_all_translations(language)
+
+@frappe.whitelist()
+def get_config_app_firebase():
+	apikey_fcm = frappe.db.get_single_value('GP FCM App', 'apikey')
+	authdomain_fcm = frappe.db.get_single_value('GP FCM App', 'authdomain')
+	projectid_fcm = frappe.db.get_single_value('GP FCM App', 'projectid')
+	storagebucket_fcm = frappe.db.get_single_value('GP FCM App', 'storagebucket')
+	messagingsenderid_fcm = frappe.db.get_single_value('GP FCM App', 'messagingsenderid')
+	appid_fcm = frappe.db.get_single_value('GP FCM App', 'appid')
+	measurementid_fcm = frappe.db.get_single_value('GP FCM App', 'measurementid')
+	if apikey_fcm is not None and authdomain_fcm is not None and projectid_fcm is not None and storagebucket_fcm is not None and messagingsenderid_fcm is not None and appid_fcm is not None and measurementid_fcm is not None and apikey_fcm != "" and authdomain_fcm != "" and projectid_fcm != "" and storagebucket_fcm != "" and messagingsenderid_fcm != "" and appid_fcm != "" and measurementid_fcm != "":
+		return {
+			'apiKey': apikey_fcm,
+			'authDomain': authdomain_fcm,
+			'projectId': projectid_fcm,
+			'storageBucket': storagebucket_fcm,
+			'messagingSenderId': messagingsenderid_fcm,
+			'appId': appid_fcm,
+			'measurementId': measurementid_fcm
+		}
+	else:
+		return None
+
+@frappe.whitelist()
+def get_vapid_key_firebase():
+	vapid_key_fcm = frappe.db.get_single_value('GP FCM App', 'vapid_key')
+	if vapid_key_fcm is not None and vapid_key_fcm != "":
+		return vapid_key_fcm
+	else:
+		return None
+
+@frappe.whitelist()
+def is_exist_token():
+	tokens = frappe.db.get_list('GP FCM Token',
+        filters = {
+            'owner': frappe.session.user
+        },
+        fields=['token', 'owner']
+    )
+	if len(tokens) > 0:
+		return 1
+	else:
+		return 0
+
+@frappe.whitelist(methods=["POST"])
+def token_firebase(token):
+	token_doc = frappe.new_doc('GP FCM Token')
+	token_doc.token = token
+	token_doc.insert()
+	frappe.db.commit()
+
+@frappe.whitelist(methods=["GET"])
+def test_notification(title, body):
+	send_notification_to_user(title, body)
