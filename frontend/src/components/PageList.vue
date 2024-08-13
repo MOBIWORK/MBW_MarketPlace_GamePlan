@@ -36,7 +36,7 @@
     v-else
   >
     <div class="text-base text-gray-600">{{__('No pages')}}</div>
-    <Button v-if="!readOnlyByRole()" class="mt-1" :variant="'solid'" theme="gray" @click="() => onAddPage()">{{ __('Add page') }}</Button>
+    <Button v-if="!readOnlyByRole()" class="mt-1" :variant="'solid'" :loading="isloadingAddPage" theme="gray" @click="() => onAddPage()">{{ __('Add page') }}</Button>
   </div>
 </template>
 <script setup>
@@ -53,8 +53,11 @@ let props = defineProps({
 })
 let emits = defineEmits(['load_data'])
 
+let isloadingAddPage = false
+
 function onAddPage(){
   let me = this;
+  isloadingAddPage.value = true
   let newPage = createResource({
     url: 'frappe.client.insert',
     params: {
@@ -70,6 +73,7 @@ function onAddPage(){
         name: 'ProjectPage',
         params: { pageId: doc.name },
       })
+      isloadingAddPage.value = false
     }
   })
   newPage.submit();

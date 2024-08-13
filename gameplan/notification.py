@@ -80,8 +80,8 @@ def send_invite_guest(emailGuest, type_reference, name_reference):
             <span class="font-medium">{ get_fullname(frappe.session.user) }</span>
             <span> đã thêm bạn vào {type_joining} {name_joining} với vai trò Guest</span>
         </div>
-        <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
     """
+    
     make(
         doctype=doctype_reference,
         name=name_reference,
@@ -581,7 +581,8 @@ def add_page_of_project(projectId, pageId, user_creation):
                 doctype="GP Notification",
                 project=page_doc.project,
                 team=page_doc.team,
-                type="Page"
+                type="Page",
+                page=pageId
             )
             send_notify_by_value(values_notify)
             type_notifies = []
@@ -591,7 +592,7 @@ def add_page_of_project(projectId, pageId, user_creation):
             if config_notification[2]["arr_permission"][1]["browser"] == True:
                 type_notifies.append("browser")
             if "email" in type_notifies:
-                link_btn = frappe.utils.get_url(f'/g/{values_notify.team}/projects/{values_notify.project}/pages')
+                link_btn = frappe.utils.get_url(f'/g/{values_notify.team}/projects/{values_notify.project}/pages/{pageId}')
                 content_email = f"""
                     <div class="mb-2 leading-5 text-gray-600">
                         <div>

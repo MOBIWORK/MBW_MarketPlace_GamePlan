@@ -26,6 +26,7 @@ class GPTask(HasMentions, HasActivity, Document):
 		self.update_tasks_count(1)
 		if frappe.session.user != self.assigned_to:
 			assign_to_someone_task(self.project, self.name, frappe.session.user, self.assigned_to, self.title)
+		print("Dòng 29 thêm mới task :", self.reminders_config)
 		self.insert_reminder()
 
 	def on_update(self):
@@ -55,77 +56,72 @@ class GPTask(HasMentions, HasActivity, Document):
 					change_priority_to_assignee(self.name, self.priority)
 
 	def insert_reminder(self):
-		if self.remind_times is None or self.remind_times == "" or self.remind_times == 0:
-			return
 		if self.due_date is None or self.due_date == "":
 			return
-		reminder = frappe.new_doc("GP Reminder")
-		unit = "phút"
-		remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S')
-		if self.remind_unit == "minute":
-			delta_minutes = timedelta(minutes=int(self.remind_times))
-			remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_minutes
-		elif self.remind_unit == "hour":
-			unit = "giờ"
-			delta_hours = timedelta(hours=int(self.remind_times))
-			remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_hours
-		elif self.remind_unit == "day":
-			unit = "ngày"
-			delta_days = timedelta(days=int(self.remind_times))
-			remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_days
-		reminder.description = f"Nhiệm vụ {self.title} sẽ đến hạn trong {self.remind_times} {unit} nữa"
-		reminder.remind_at = remind_at
-		reminder.user = self.assigned_to
-		reminder.reminder_doctype = "GP Task"
-		reminder.reminder_docname = self.name
-		reminder.notified = 0
-		reminder.insert()
-		custom_field = {'id_reminder': reminder.name}
-		frappe.db.set_value('GP Task', self.name, 'custom_fields', json.dumps(custom_field))
-		frappe.db.commit()
+		for config_reminder_task in self.reminders_config:
+			if config_reminder_task.remind_times is not None and config_reminder_task.remind_times != "" and config_reminder_task.remind_times != 0:
+				reminder = frappe.new_doc("GP Reminder")
+				unit = "phút"
+				remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S')
+				if config_reminder_task.remind_unit == "minute":
+					delta_minutes = timedelta(minutes=int(config_reminder_task.remind_times))
+					remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_minutes
+				elif config_reminder_task.remind_unit == "hour":
+					unit = "giờ"
+					delta_hours = timedelta(hours=int(config_reminder_task.remind_times))
+					remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_hours
+				elif config_reminder_task.remind_unit == "day":
+					unit = "ngày"
+					delta_days = timedelta(days=int(config_reminder_task.remind_times))
+					remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_days
+				reminder.description = f"Nhiệm vụ {self.title} sẽ đến hạn trong {config_reminder_task.remind_times} {unit} nữa"
+				reminder.remind_at = remind_at
+				reminder.user = self.assigned_to
+				reminder.reminder_doctype = "GP Task"
+				reminder.reminder_docname = self.name
+				reminder.notified = 0
+				reminder.insert()
+				frappe.db.set_value('GP Config Reminder Task', config_reminder_task.name, 'id_reminder', reminder.name)
+				frappe.db.commit()
 
 	def update_reminder(self):
 		if self.due_date is None or self.due_date == "":
 			return
-		if self.remind_times is None or self.remind_times == "" or self.remind_times == 0:
-			return
-		if isinstance(self.due_date, str):
-			date_due_date = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S')
-		else:
-			date_due_date = self.due_date
-		is_exist_remind = False
-		if self.get('custom_fields') is not None:
-			obj_customer = json.loads(self.get('custom_fields'))
-			id_reminder = obj_customer.get('id_reminder')
-			if frappe.db.exists('GP Reminder', id_reminder) is not None:
-				is_exist_remind = True
-		if is_exist_remind == True and date_due_date > datetime.now():
-			obj_customer = json.loads(self.get('custom_fields'))
-			id_reminder = obj_customer.get('id_reminder')
-			doc_reminder = frappe.get_doc('GP Reminder', id_reminder)
-			unit = "phút"
-			remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S')
-			if self.remind_unit == "minute":
-				delta_minutes = timedelta(minutes=int(self.remind_times))
-				remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_minutes
-			elif self.remind_unit == "hour":
-				unit = "giờ"
-				delta_hours = timedelta(hours=int(self.remind_times))
-				remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_hours
-			elif self.remind_unit == "day":
-				unit = "ngày"
-				delta_days = timedelta(days=int(self.remind_times))
-				remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_days
-			doc_reminder.description = f"Nhiệm vụ {self.title} sẽ đến hạn trong {self.remind_times} {unit} nữa"
-			doc_reminder.remind_at = remind_at
-			doc_reminder.user = self.assigned_to
-			doc_reminder.reminder_doctype = "GP Task"
-			doc_reminder.reminder_docname = self.name
-			doc_reminder.notified = 0
-			doc_reminder.save()
-			frappe.db.commit()
-		elif is_exist_remind == False and date_due_date > datetime.now():
-			self.insert_reminder()
+		for reminder_config in self.reminders_config:
+			if reminder_config.remind_times is not None and reminder_config.remind_times != "" and reminder_config.remind_times != 0:
+				if isinstance(self.due_date, str):
+					date_due_date = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S')
+				else:
+					date_due_date = self.due_date
+				is_exist_remind = False
+				if reminder_config.id_reminder is not None and reminder_config.id_reminder != "":
+					is_exist_remind = True
+				if is_exist_remind == True and date_due_date > datetime.now():
+					id_reminder = reminder_config.id_reminder
+					doc_reminder = frappe.get_doc('GP Reminder', id_reminder)
+					unit = "phút"
+					remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S')
+					if reminder_config.remind_unit == "minute":
+						delta_minutes = timedelta(minutes=int(reminder_config.remind_times))
+						remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_minutes
+					elif reminder_config.remind_unit == "hour":
+						unit = "giờ"
+						delta_hours = timedelta(hours=int(reminder_config.remind_times))
+						remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_hours
+					elif reminder_config.remind_unit == "day":
+						unit = "ngày"
+						delta_days = timedelta(days=int(reminder_config.remind_times))
+						remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_days
+					doc_reminder.description = f"Nhiệm vụ {self.title} sẽ đến hạn trong {reminder_config.remind_times} {unit} nữa"
+					doc_reminder.remind_at = remind_at
+					doc_reminder.user = self.assigned_to
+					doc_reminder.reminder_doctype = "GP Task"
+					doc_reminder.reminder_docname = self.name
+					doc_reminder.notified = 0
+					doc_reminder.save()
+					frappe.db.commit()
+				elif is_exist_remind == False and date_due_date > datetime.now():
+					self.insert_reminder()
 
 	def log_value_updates(self):
 		fields = ['title', 'description', 'status', 'priority', 'assigned_to', 'due_date', 'project']

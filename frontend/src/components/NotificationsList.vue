@@ -220,18 +220,38 @@ export default {
                     }
                 })
             }else if(notification.type == "Page"){
-                if(notification.project != null && notification.team != null){
-                    this.$router.push({
-                        name: 'ProjectPages',
-                        params: {
-                            teamId: notification.team,
-                            projectId: notification.project
-                        }
-                    })
+                if(notification.page != null && notification.page != ""){
+                    if(notification.project != null && notification.team != null){
+                        this.$router.push({
+                            name: 'ProjectPage',
+                            params: {
+                                teamId: notification.team,
+                                projectId: notification.project,
+                                pageId: notification.page
+                            }
+                        })
+                    }else{
+                        this.$router.push({
+                            name: 'Page',
+                            params: {
+                                pageId: notification.page
+                            }
+                        })
+                    }
                 }else{
-                    this.$router.push({
-                        name: 'MyPages'
-                    })
+                    if(notification.project != null && notification.team != null){
+                        this.$router.push({
+                            name: 'ProjectPages',
+                            params: {
+                                teamId: notification.team,
+                                projectId: notification.project
+                            }
+                        })
+                    }else{
+                        this.$router.push({
+                            name: 'MyPages'
+                        })
+                    }
                 }
             }else if(notification.type == "Project"){
                 this.$router.push({

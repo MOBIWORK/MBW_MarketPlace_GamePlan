@@ -29,7 +29,7 @@
               placeholder="Enter name or email address"
               autocomplete="off"
               modelValue=""
-              v-model="nameOrEmailMember" @focus="onFocusInputUser()" @keydown.enter.prevent="onEnterInputUser($event)"
+              v-model="nameOrEmailMember" @keyup="onKeyUp()" @focus="onFocusInputUser()" @keydown.enter.prevent="onEnterInputUser($event)"
           />
           <div ref="result_user" class="max-h-50 overflow-y-auto absolute z-50 mt-1 rounded-lg bg-white text-base shadow-2xl" style="width: 91%;"
               v-if="displayUserSystem">
@@ -50,7 +50,17 @@
                   </ul>
               </template>
               <template v-else>
-                  <div class="m-2 text-sm text-gray-700">Không có dữ liệu</div>
+                  <div class="m-2 text-sm text-gray-700" v-if="showBtnCreateMember == false">Không có dữ liệu</div>
+                  <Button
+                      class="my-1 mx-3"
+                      :variant="'subtle'"
+                      theme="gray"
+                      size="sm"
+                      @click="onCreateMember()"
+                      v-if="showBtnCreateMember"
+                  >
+                      {{__('Create member')}}
+                  </Button>
               </template>
           </div>
           <div class="mt-1 text-gray-600 text-sm">Enter name or email addess to add new invitation</div>
@@ -105,11 +115,15 @@ import { teams, teams_by_role } from '@/data/teams'
 import { onClickOutside } from '@vueuse/core'
 import { createToast } from '@/utils'
 import { getUser } from '@/data/users'
+import { Button } from 'frappe-ui'
 
 export default {
   name: 'AddTeamDialog',
   props: ['show'],
   emits: ['success', 'update:show'],
+  components: [
+    Button
+  ],
   data() {
     return {
       newTeam: { title: '', is_private: 0 },
@@ -127,7 +141,8 @@ export default {
         }
       ],
       target: null,
-      result_user: null
+      result_user: null,
+      showBtnCreateMember: false
     }
   },
   resources: {
@@ -169,8 +184,6 @@ export default {
   },
   methods: {
     createTeam() {
-      console.log(this.newTeam);
-      console.log(this.arrMember);
       let objPost = {
         'title': this.newTeam.title,
         'is_private': this.newTeam.is_private,
@@ -218,6 +231,29 @@ export default {
           'role': "member",
           'id': this.nameOrEmailMember
         })
+      }
+      this.nameOrEmailMember = ""
+    },
+    onCreateMember(){
+      this.displayUserSystem = false
+      let memberFilter = this.arrMember.filter(x => x.id == this.nameOrEmailMember)
+      if(memberFilter.length == 0){
+        this.arrMember.push({
+          'id_user': null,
+          'full_name': this.nameOrEmailMember,
+          'email': this.nameOrEmailMember,
+          'role': "member",
+          'id': this.nameOrEmailMember
+        })
+      }
+      this.nameOrEmailMember = ""
+    },
+    onKeyUp(){
+      const regular_email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if(!regular_email.test(this.nameOrEmailMember)){
+        this.showBtnCreateMember = false
+      }else{
+        this.showBtnCreateMember = true
       }
     },
     onClickAddMember(item){
@@ -270,6 +306,9 @@ export default {
   },
   watch: {
     nameOrEmailMember(newVal){
+      this.$resources.userSystem.params = {
+        txtSearch: this.nameOrEmailMember
+      }
       this.$resources.userSystem.fetch()
     } 
   },

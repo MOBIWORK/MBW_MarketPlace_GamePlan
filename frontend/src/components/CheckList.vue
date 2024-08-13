@@ -238,6 +238,7 @@ export default{
                 'label': this.txtNewChecklist,
                 'is_check': false
             })
+            this.showFrmAddingChecklist = false
         },
         onDeleteChecklist(checklist){
             this.showDialogFrmDeletingChecklist = true

@@ -43,7 +43,8 @@
           </template>
         </Links>
         <button id="notifications-btn"
-          class="flex w-full items-center rounded px-2 py-1 text-gray-800"
+          class="flex w-full items-center rounded px-2 py-1 text-gray-800 "
+          :class="[activeNotification? 'bg-white shadow-sm' : '']"
           @click="onToggleNotification()"  
         >
           <div class="flex w-full items-center">
@@ -286,15 +287,7 @@ export default {
           },
           isActive: /People|PersonProfile/g.test(this.$route.name),
           condition: () => this.$user().isNotGuest,
-        },
-        // {
-        //   name: 'Notifications',
-        //   icon: LucideInbox,
-        //   route: {
-        //     name: 'Notifications',
-        //   },
-        //   count: unreadNotifications.data || 0,
-        // },
+        }
       ].filter((nav) => (nav.condition ? nav.condition() : true))
     },
     activeTeams() {
@@ -316,6 +309,9 @@ export default {
       });
       return activeTeamsNew;
     },
+    activeNotification(){
+      return /Notifications/g.test(this.$route.name)
+    }
   },
   methods: {
     onToggleNotification(){

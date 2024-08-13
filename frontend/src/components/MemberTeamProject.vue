@@ -213,9 +213,6 @@ export default {
             let arrMemberTrigger = this.arrMember.filter(x => x.id != this.memberAction.id)
             this.$emit('changeRole', arrMemberTrigger)
         },
-        onCancelDeleteMember(){
-            console.log("Dòng 208 cancel")
-        },
         onFocusInputUser(){
             this.displayUserSystem = true
         },
@@ -359,6 +356,9 @@ export default {
     },
     watch: {
         nameOrEmailMember(newVal){
+            this.$resources.userSystem.params = {
+                txtSearch: this.nameOrEmailMember
+            }
             this.$resources.userSystem.fetch()
         } 
     }

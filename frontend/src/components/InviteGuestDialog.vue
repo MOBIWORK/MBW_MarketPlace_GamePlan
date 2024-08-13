@@ -85,6 +85,7 @@ let inviteGuestDialog = computed({
 let email = ref('')
 
 function invite() {
+  console.log(props.project)
   props.project.inviteGuest.submit(
     { email: email.value },
     {

@@ -20,12 +20,9 @@
   "team",
   "assigned_to",
   "comments_count",
-  "remind_times",
-  "remind_unit",
-  "notify_browser",
-  "notify_email",
   "custom_fields",
-  "reminders_config"
+  "reminders_config",
+  "checklists"
  ],
  "fields": [
   {
@@ -118,38 +115,21 @@
    "label": "Custom Fields"
   },
   {
-   "fieldname": "remind_times",
-   "fieldtype": "Int",
-   "label": "Remind Times"
-  },
-  {
-   "fieldname": "remind_unit",
-   "fieldtype": "Select",
-   "label": "Remind Unit",
-   "options": "minute\nhour\nday"
-  },
-  {
-   "default": "0",
-   "fieldname": "notify_browser",
-   "fieldtype": "Check",
-   "label": "Notify Browser"
-  },
-  {
-   "default": "0",
-   "fieldname": "notify_email",
-   "fieldtype": "Check",
-   "label": "Notify Email"
-  },
-  {
    "fieldname": "reminders_config",
    "fieldtype": "Table",
    "label": "Reminders Config",
    "options": "GP Config Reminder Task"
+  },
+  {
+   "fieldname": "checklists",
+   "fieldtype": "Table",
+   "label": "CheckLists",
+   "options": "GP CheckList"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-11 15:32:18.051383",
+ "modified": "2024-08-13 15:44:51.150617",
  "modified_by": "Administrator",
  "module": "Gameplan",
  "name": "GP Task",

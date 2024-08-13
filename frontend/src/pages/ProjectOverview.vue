@@ -40,7 +40,7 @@
           <div class="mb-3 flex items-center justify-between">
             <h2 class="text-xl font-semibold">{{ __('Pages') }}</h2>
             <div class="flex items-center" v-if="displayControlPage">
-              <Button :variant="'outline'" theme="gray" @click="() => onAddPage()" v-if="!readOnlyByRole()">{{ __('Add page') }}</Button>
+              <Button :variant="'outline'" theme="gray" :loading="isLoadingAddPage" @click="() => onAddPage()" v-if="!readOnlyByRole()">{{ __('Add page') }}</Button>
               <Button class="ml-3" :variant="'solid'" theme="gray" :route="{ name: 'ProjectPages' }">{{ __('View all') }}</Button>
             </div>
           </div>
@@ -81,7 +81,8 @@ export default {
       },
       displayControlDiscussion: false,
       displayControlTask: false,
-      displayControlPage: false
+      displayControlPage: false,
+      isLoadingAddPage: false
     }
   },
   methods:{
@@ -102,6 +103,7 @@ export default {
     },
     onAddPage(){
       let me = this;
+      this.isLoadingAddPage = true
       let newPage = createResource({
         url: 'frappe.client.insert',
         params: {
@@ -117,9 +119,10 @@ export default {
             name: 'ProjectPage',
             params: { pageId: doc.name },
           })
+          me.isLoadingAddPage = false
         }
       })
-      newPage.submit();
+      newPage.fetch();
     },
     onLoadDataDiscussion(data){
       if(data.length > 0) this.displayControlDiscussion = true;

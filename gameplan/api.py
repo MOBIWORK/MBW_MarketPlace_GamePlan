@@ -151,7 +151,6 @@ def invite_by_email(emails: str, role: str, projects: list = None):
 		filters={"email": ["in", email_list], "role": ["in", ["Gameplan Admin", "Gameplan Member"]]},
 		pluck="email",
 	)
-
 	if role == "Gameplan Guest":
 		to_invite = list(set(email_list) - set(existing_invites))
 	else:
@@ -159,7 +158,6 @@ def invite_by_email(emails: str, role: str, projects: list = None):
 
 	if projects:
 		projects = frappe.as_json(projects, indent=None)
-
 	for email in to_invite:
 		frappe.get_doc(doctype="GP Invitation", email=email, role=role, projects=projects).insert(ignore_permissions=True)
 
@@ -180,7 +178,7 @@ def get_notifications_by_filter(status):
 		filter_noiti["read"] = 0
 	notifications = frappe.db.get_list('GP Notification', 
 		filters = filter_noiti, 
-		fields=['type', 'message', 'comment','discussion','task','project','team','read',"from_user","creation","name","is_assign_task"],
+		fields=['type', 'message', 'comment','discussion','task','project','team','read',"from_user","creation","name","is_assign_task", "page"],
 		order_by='creation desc'
 	)
 	for notification in notifications:
@@ -366,25 +364,17 @@ def get_teams_by_role():
 					if len(team_filter) == 0:
 						arr_team_res.append(team)
 	if "Gameplan Guest" in arr_role:
-		for team in teams:
-			projects = frappe.get_all('GP Project',
-				filters = {
-					'team': team.name
-				},
-				fields=['guests']
-			)
-			for project in projects:
-				guest_access = frappe.get_all('GP Guest Access',
-					filters={
-						'project': project.name,
-						'user': frappe.session.user
-					}
-				)
-				if len(guest_access) > 0:
-					team_filter = [team_fil.name for team_fil in arr_team_res if team_fil.name == team.name]
-					if len(team_filter) == 0:
-						arr_team_res.append(team)
-						break
+		teams_guest = frappe.get_all('GP Guest Access', 
+			filters = {
+				'user': frappe.session.user
+			},
+			fields=['name', 'team']
+		)
+		for team_guest in teams_guest:
+			team_filter = [team_fil.name for team_fil in arr_team_res if team_fil.name == team_guest.team]
+			if len(team_filter) == 0:
+				team_source = [team_fil for team_fil in teams if team_fil.name == team_guest.team]
+				arr_team_res.append(team_source[0])
 	return arr_team_res
 
 @frappe.whitelist()
@@ -541,6 +531,7 @@ def delete_connections(reference_doctype, reference_name):
 		return "ok"
 	except Exception as e:
 		return "error"
+
 
 def convert_filter_to_tuple(doctype, filters):
 	if isinstance(filters, dict):
@@ -890,6 +881,10 @@ def get_mypages_by_filter(order_by, search=None, project=None):
 			)
 	return pages
 
+@frappe.whitelist()
+def read_only_task(task):
+	return false
+
 @frappe.whitelist(allow_guest=True)
 @validate_type
 def accept_invitation(key: str = None):
@@ -922,6 +917,7 @@ def accept_invitation(key: str = None):
 		)
 		config_notification = []
 		type_notify = []
+		print("Dòng 924 ", len(config_notifications))
 		if len(config_notifications) == 0:
 			configs = random_config_notification()
 			doc_config_notification = frappe.new_doc('GP Config Notification')
@@ -936,7 +932,7 @@ def accept_invitation(key: str = None):
 			type_notify.append("email")
 		if config_notification[0]["arr_permission"][0]["browser"] == True:
 			type_notify.append('browser')
-		send_manager_by_invite_guest(type_notify, user_info.name, objProject[0])
+		#send_manager_by_invite_guest(type_notify, user_info.name, objProject[0])
 
 		frappe.local.login_manager.login_as(invitation.email)
 		frappe.local.response["type"] = "redirect"

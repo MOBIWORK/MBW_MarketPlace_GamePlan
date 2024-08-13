@@ -59,53 +59,63 @@
             />
           </div>
         </div>
-        <div class="flex items-end">
-          <div class="mr-3 w-1/3">
-            <div class="mb-1.5 text-sm text-gray-600">{{ __('Reminder') }}</div>
-            <TextInput
-              :type="'number'"
-              size="sm"
-              variant="subtle"
-              placeholder="Nhập thời gian nhắc nhở"
-              v-model="newTask.remind_times"
-            />
+        <div>
+          <div class="mb-1.5 text-sm text-gray-600">{{ __('Reminder') }}</div>
+          <div class="flex items-center mb-2" v-for="(reminder_config, index) in newTask.reminders_config">
+            <div class="mr-2 w-1/3">
+              <TextInput
+                :type="'number'"
+                size="sm"
+                variant="subtle"
+                placeholder="Nhập thời gian nhắc nhở"
+                v-model="reminder_config.remind_times"
+              />
+            </div>
+            <div class="mr-2 w-1/3">
+              <Select
+                :placeholder="'Chọn đơn vị'"
+                :options="[
+                  {
+                    label: 'minutes',
+                    value: 'minute',
+                  },
+                  {
+                    label: 'hours',
+                    value: 'hour',
+                  },
+                  {
+                    label: 'days',
+                    value: 'day',
+                  }
+                ]"
+                v-model="reminder_config.remind_unit"
+              />
+            </div>
+            <div class="mr-3">
+              <Checkbox
+                size="sm"
+                v-model="reminder_config.notify_browser"
+                label="Browser"
+              />
+            </div>
+            <div class="mr-3">
+              <Checkbox
+                size="sm"
+                v-model="reminder_config.notify_email"
+                label="Email"
+              />
+            </div>
+            <div class="w-4 h-4 cursor-pointer" @click="onRemoveReminder(index)">
+              <FeatherIcon
+                name="x"
+                class="h-4 w-4"
+              />
+            </div>
           </div>
-          <div class="mr-3 w-1/3">
-            <Select
-              :placeholder="'Chọn đơn vị'"
-              :options="[
-                {
-                  label: 'minutes',
-                  value: 'minute',
-                },
-                {
-                  label: 'hours',
-                  value: 'hour',
-                },
-                {
-                  label: 'days',
-                  value: 'day',
-                }
-              ]"
-              v-model="newTask.remind_unit"
-            />
-          </div>
-          <div class="mr-3">
-            <Checkbox
-              size="sm"
-              :value="false"
-              v-model="newTask.notify_browser"
-              label="Browser"
-            />
-          </div>
-          <div>
-            <Checkbox
-              size="sm"
-              :value="false"
-              v-model="newTask.notify_email"
-              label="Email"
-            />
-          </div>
+          <Button variant="outline" @click="onNewReminder()">
+            <template #prefix><LucidePlus class="h-4 w-4" /></template>
+            {{__('Add reminder')}}
+          </Button>
         </div>
         <ErrorMessage class="mt-2" :message="createTask.error" />
       </div>
@@ -121,9 +131,9 @@ import {
   Dropdown,
   TextInput,
   createResource,
-  DatePicker,
   Select,
-  Checkbox
+  Checkbox,
+  FeatherIcon
 } from 'frappe-ui'
 import TaskStatusIcon from './icons/TaskStatusIcon.vue'
 import { activeUsers } from '@/data/users'
@@ -149,8 +159,7 @@ const initialData = {
   status: 'Backlog',
   assigned_to: null,
   project: null,
-  remind_times: '30',
-  remind_unit: 'minute'
+  reminders_config: []
 }
 
 const newTask = ref(initialData)
@@ -165,6 +174,19 @@ function statusOptions({ onClick }) {
       }
     }
   )
+}
+
+function onNewReminder(){
+  newTask.value.reminders_config.push({
+    remind_times: '30',
+    remind_unit: 'minute',
+    notify_browser: false,
+    notify_email: false
+  })
+}
+
+function onRemoveReminder(index){
+  newTask.value.reminders_config.splice(index, 1)
 }
 
 function onChangeUserAssign(option){
@@ -182,12 +204,16 @@ const assignableUsers = computed(() => {
 
 let _onSuccess
 function show({ defaults, onSuccess } = {}) {
+  defaults['reminders_config'] = []
   newTask.value = { ...initialData, ...(defaults || {}) }
   showDialog.value = true
   _onSuccess = onSuccess
 }
 
 function onCreateClick(close) {
+  for(let i = 0; i < newTask.value.reminders_config.length; i++){
+    if(newTask.value.reminders_config[i].remind_times == "") newTask.value.reminders_config.splice(i, 1)
+  }
   createTask
     .submit(newTask.value, {
       validate() {

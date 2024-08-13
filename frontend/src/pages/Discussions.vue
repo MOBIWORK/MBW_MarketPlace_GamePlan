@@ -216,12 +216,12 @@ export default {
           disabled: true,
         },
         {
-          label: __('Last post'),
-          value: 'last_post_at desc',
+          label: __('Last created'),
+          value: 'creation desc',
         },
         {
-          label: __('Created'),
-          value: 'creation desc',
+          label: __('Last updated'),
+          value: 'last_post_at desc',
         },
         {
           label: __('Comments'),

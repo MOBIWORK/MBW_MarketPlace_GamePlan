@@ -11,7 +11,7 @@
         </div>
     </div>
     <div class="flex mt-1 flex-wrap" v-if="numAttach>0">
-        <div class="w-56 h-44 shadow-gray-900 rounded-lg border mr-3 mt-2" v-for="attach in arrAttach">
+        <div class="w-56 shadow-gray-900 rounded-lg border mr-3 mt-2" style="height: 10.5rem;" v-for="attach in arrAttach">
             <div class="w-full h-28 group flex items-center justify-center relative">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#FFF" stroke-miterlimit="10" stroke-width="2" viewBox="0 0 96 96" style="width: 95px;" v-if="attach.file_type=='DOCX'">
                     <path stroke="#979593" d="M67.1716 7H27c-1.1046 0-2 .8954-2 2v78c0 1.1046.8954 2 2 2h58c1.1046 0 2-.8954 2-2V26.8284c0-.5304-.2107-1.0391-.5858-1.4142L68.5858 7.5858C68.2107 7.2107 67.702 7 67.1716 7z"/>
