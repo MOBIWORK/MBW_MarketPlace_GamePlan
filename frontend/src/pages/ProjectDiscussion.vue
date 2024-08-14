@@ -3,7 +3,7 @@
     <DiscussionView
       class="w-full"
       :postId="postId"
-      :read-only-mode="isReadOnlyMode(project) || $readOnlyMode"
+      :read-only-mode="isReadOnlyMode || $readOnlyMode"
     />
   </div>
 </template>
@@ -39,23 +39,29 @@ export default {
       },
     },
   },
-  methods: {
-    isActive(update) {
-      return Number(this.$route.params.postId) === update.name
-    },
-    isReadOnlyMode(project){
-      if(project.doc.owner == getUser('sessionUser').name) return false;
-      else{
-        let roleProject = this.$getRoleByUser(null, this.project.doc)
-        if(roleProject != null) {
-          if(roleProject == "manager") return false
-        }else{  
-          let roleTeam = this.$getRoleByUser(this.team.doc, null)
-          if (roleTeam == "member" || roleTeam == "guest") return true
-          return false
-        }
+  resources: {
+    permission_discussion(){
+      return {
+        url: "gameplan.api.permission_discussion",
+        method: "GET",
+        params: {
+          discussion: this.postId
+        },
+        auto: true
       }
     }
   },
+  methods: {
+    isActive(update) {
+      return Number(this.$route.params.postId) === update.name
+    }
+  },
+  computed: {
+    isReadOnlyMode(){
+      let perrmission = this.$resources.permission_discussion.data
+      if(perrmission == "write") return false
+      else return true
+    }
+  }
 }
 </script>

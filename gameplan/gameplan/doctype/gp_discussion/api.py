@@ -83,6 +83,7 @@ def get_discussions(filters=None, order_by=None, limit_start=None, limit_page_le
 	if is_guest:
 		GuestAccess = frappe.qb.DocType("GP Guest Access")
 		project_list = GuestAccess.select(GuestAccess.project).where(GuestAccess.user == frappe.session.user)
+		print("Dòng 87 ", project_list)
 		query = query.where(Discussion.project.isin(project_list))
 
 	discussions = query.run(as_dict=1)

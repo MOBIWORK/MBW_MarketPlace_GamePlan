@@ -83,6 +83,16 @@ export default {
         },
       }
     },
+    permission_page(){
+      return {
+        url: "gameplan.api.permission_page",
+        method: "GET",
+        params: {
+          page: this.pageId
+        },
+        auto: true
+      }
+    }
   },
   mounted() {
     document.addEventListener('keydown', this.handleKeyboardShortcuts)
@@ -231,23 +241,9 @@ export default {
       return page?.doc?.title || this.pageId
     },
     readOnlyControl(){
-      if (this.page.doc.owner == getUser('sessionUser').name) {
-        return false
-      } else if (this.page.doc.team != null && this.page.doc.project != null) {
-        let projectInfo = getProject(this.page.doc.project);
-        let teamInfo = getTeamInfo(this.page.doc.team).data;
-        let roleByProject = this.$getRoleByUser(null, projectInfo);
-        
-        if (roleByProject == "manager") {
-          return false
-        } else {
-          let roleByTeam = this.$getRoleByUser(teamInfo, null);
-          if (roleByTeam != "guest" && roleByTeam != "member") {
-            return false
-          }
-        }
-      }
-      return true
+      let permission = this.$resources.permission_page.data
+      if(permission == "write") return false
+      else return true
     }
   },
 }

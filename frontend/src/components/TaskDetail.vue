@@ -286,6 +286,16 @@ export default {
         },
       }
     },
+    permission_task(){
+      return {
+        url: "gameplan.api.permission_task",
+        method: "GET",
+        params: {
+          task: this.taskId
+        },
+        auto: true
+      }
+    }
   },
   methods: {
     changeProject(option) {
@@ -366,23 +376,9 @@ export default {
       }))
     },
     readOnlyControl(){
-      if (this.$resources.task.doc.owner == getUser('sessionUser').name || this.$resources.task.doc.assigned_to == getUser('sessionUser').name) {
-        return false;
-      } else if (this.$resources.task.doc.team != null && this.$resources.task.doc.project != null) {
-        let projectInfo = getProject(this.$resources.task.doc.project);
-        let teamInfo = getTeamInfo(this.$resources.task.doc.team).data;
-        let roleByProject = this.$getRoleByUser(null, projectInfo);
-
-        if (roleByProject == "manager") {
-          return false;
-        } else {
-          let roleByTeam = this.$getRoleByUser(teamInfo, null);
-          if (roleByTeam != "guest" && roleByTeam != "member") {
-            return false;
-          }
-        }
-      }
-      return true
+      let perrmission = this.$resources.permission_task.data
+      if(perrmission == "write") return false
+      else return true
     }
   },
   components: {

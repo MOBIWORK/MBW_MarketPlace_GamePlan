@@ -882,8 +882,84 @@ def get_mypages_by_filter(order_by, search=None, project=None):
 	return pages
 
 @frappe.whitelist()
-def read_only_task(task):
-	return false
+def permission_task(task):
+	task_doc = frappe.get_doc('GP Task', task)
+	if task_doc.owner == frappe.session.user or task_doc.assigned_to == frappe.session.user:
+		return "write"
+	elif task_doc.project is not None and task_doc.team is not None and task_doc.project != "" and task_doc.team != "":
+		user_doc = frappe.get_doc('User', frappe.session.user)
+		arr_role = [_role.role for _role in user_doc.roles]
+		if "Gameplan Admin" in arr_role:
+			return "write"
+		if "Gameplan Member" in arr_role:
+			project_doc = frappe.get_doc('GP Project', task_doc.project)
+			if project_doc.is_private == 0:
+				return "read"
+			else:
+				team_doc = frappe.get_doc('GP Team', task_doc.team)
+				members = team_doc.members
+				for member in members:
+					if member.user == frappe.session.user:
+						if member.role == "member":
+							return "read"
+						else:
+							return "write"
+		if "Gameplan Guest" in arr_role:
+			return "read"
+	return "read"
+
+@frappe.whitelist()
+def permission_discussion(discussion):
+	discussion_doc = frappe.get_doc('GP Discussion', discussion)
+	if discussion_doc.owner == frappe.session.user:
+		return "write"
+	else:
+		user_doc = frappe.get_doc('User', frappe.session.user)
+		arr_role = [_role.role for _role in user_doc.roles]
+		if "Gameplan Admin" in arr_role:
+			return "write"
+		if "Gameplan Member" in arr_role:
+			project_doc = frappe.get_doc('GP Project', task_doc.project)
+			if project_doc.is_private == 0:
+				return "read"
+			else:
+				team_doc = frappe.get_doc('GP Team', task_doc.team)
+				members = team_doc.members
+				for member in members:
+					if member.user == frappe.session.user:
+						if member.role == "member":
+							return "read"
+						else:
+							return "write"
+		if "Gameplan Guest" in arr_role:
+			return "read"
+
+@frappe.whitelist()
+def permission_page(page):
+	page_doc = frappe.get_doc('GP Page', page)
+	if page_doc.owner == frappe.session.user:
+		return "write"
+	elif page_doc.project is not None and page_doc.team is not None and page_doc.project != "" and page_doc.team != "":
+		user_doc = frappe.get_doc('User', frappe.session.user)
+		arr_role = [_role.role for _role in user_doc.roles]
+		if "Gameplan Admin" in arr_role:
+			return "write"
+		if "Gameplan Member" in arr_role:
+			project_doc = frappe.get_doc('GP Project', task_doc.project)
+			if project_doc.is_private == 0:
+				return "read"
+			else:
+				team_doc = frappe.get_doc('GP Team', task_doc.team)
+				members = team_doc.members
+				for member in members:
+					if member.user == frappe.session.user:
+						if member.role == "member":
+							return "read"
+						else:
+							return "write"
+		if "Gameplan Guest" in arr_role:
+			return "read"
+	return "read"
 
 @frappe.whitelist(allow_guest=True)
 @validate_type
@@ -917,7 +993,6 @@ def accept_invitation(key: str = None):
 		)
 		config_notification = []
 		type_notify = []
-		print("Dòng 924 ", len(config_notifications))
 		if len(config_notifications) == 0:
 			configs = random_config_notification()
 			doc_config_notification = frappe.new_doc('GP Config Notification')
