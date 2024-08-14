@@ -1,7 +1,7 @@
 <template>
     <div class="w-full flex justify-between">
         <div class="flex items-center">
-            <div class="text-1xl font-semibold mr-2">{{__('Connection')}}</div>
+            <div class="text-1xl font-semibold mr-2">{{__('Connections')}}</div>
             <div class="w-6 h-6 rounded-full p-2 bg-gray-200 text-sm flex justify-center items-center text-gray-800">
                 {{num_connection}}
             </div>

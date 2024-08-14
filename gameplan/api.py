@@ -1013,7 +1013,6 @@ def accept_invitation(key: str = None):
 		frappe.local.response["type"] = "redirect"
 		frappe.local.response["location"] = "/g"
 
-
 @frappe.whitelist()
 def get_unsplash_photos(keyword=None):
 	from gameplan.unsplash import get_list, get_by_keyword

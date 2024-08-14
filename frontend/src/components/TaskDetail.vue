@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full flex-1" v-if="$resources.task.doc">
-    <div class="w-full flex-1">
-      <div class="relative p-6 border-r">
+    <div class="w-full flex-1 border-r">
+      <div class="relative p-6">
         <div class="absolute right-0 top-0 p-6" v-show="$resources.task.setValueDebounced.loading">
           <LoadingText v-if="!$resources.task.setValueDebounced.error" :text="__('Saving...')" />
           <ErrorMessage :message="$resources.task.setValueDebounced.error" />
@@ -124,8 +124,9 @@
           <CommentsList class="mt-8" doctype="GP Task" :name="taskId" />
         </template>
         <template v-if="activeActivity == 'comment'">
-          <div class="mt-5">
-            <CommentsList class="mt-8" doctype="GP Task" :name="taskId" :typeFilter="'comment'" />
+          <div class="mt-5" style="height: 600px;">
+            <!-- <CommentsList class="mt-8" doctype="GP Task" :name="taskId" :typeFilter="'comment'" /> -->
+            <CommentList :doctype="'GP Task'" :reference_name="taskId"></CommentList>
           </div>
         </template>
         <template v-if="activeActivity == 'history'">
@@ -238,6 +239,7 @@ import { activeTeams, getTeamInfo } from '@/data/teams'
 import { getTeamProjects, getProject } from '@/data/projects'
 import { getUser } from '@/data/users'
 import DateTimePicker from '@/components/Controls/DateTimePicker.vue'
+import CommentList from '@/components/Comment/CommentList.vue'
 
 export default {
   name: 'TaskDetail',
@@ -394,7 +396,8 @@ export default {
     TaskPriorityIcon,
     Connection,
     Attachment,
-    CheckList
+    CheckList,
+    CommentList
   }
 }
 </script>

@@ -43,7 +43,7 @@
 import { createListResource, createResource } from 'frappe-ui'
 import {getRoleByUser} from '@/utils'
 import router from '@/router'
-import { watch } from 'vue';
+import { watch, ref } from 'vue';
 
 let props = defineProps({
   listOptions: {
@@ -53,7 +53,7 @@ let props = defineProps({
 })
 let emits = defineEmits(['load_data'])
 
-let isloadingAddPage = false
+let isloadingAddPage = ref(false)
 
 function onAddPage(){
   let me = this;

@@ -10,7 +10,8 @@
   "reference_doctype",
   "reference_name",
   "reactions",
-  "deleted_at"
+  "deleted_at",
+  "doc_parent"
  ],
  "fields": [
   {
@@ -42,11 +43,16 @@
    "fieldname": "deleted_at",
    "fieldtype": "Datetime",
    "label": "Deleted At"
+  },
+  {
+   "fieldname": "doc_parent",
+   "fieldtype": "Data",
+   "label": "Doc Parent"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-01-12 17:30:44.294192",
+ "modified": "2024-08-14 09:52:59.275523",
  "modified_by": "Administrator",
  "module": "Gameplan",
  "name": "GP Comment",
