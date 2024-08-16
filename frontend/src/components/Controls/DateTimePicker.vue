@@ -355,7 +355,7 @@
       formatDateTime(datetime){
         if(datetime == null || datetime == "") return ""
         const parts = datetime.split(" ")[0].split("-");
-        const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]} ` + datetime.split(" ")[1];
         return formattedDate
       }
     },

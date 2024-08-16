@@ -159,7 +159,8 @@ let paramKanbanDefault = ref({
   kanban_columns: JSON.stringify([{'name': "Backlog"},{'name': "Todo"},{'name': "In Progress"},{'name': "Done"},{'name': "Canceled"}]),
   kanban_fields: JSON.stringify(["description", "priority", "due_date", "comments_count", "assigned_to"]),
   text_search: "",
-  is_my_task: "false"
+  is_my_task: "false",
+  project: props.project.name
 })
 
 let dataByKanban = createResource({

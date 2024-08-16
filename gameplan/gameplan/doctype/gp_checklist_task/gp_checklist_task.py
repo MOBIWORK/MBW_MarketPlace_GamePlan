@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class GPCheckList(Document):
+class GPCheckListTask(Document):
 	pass

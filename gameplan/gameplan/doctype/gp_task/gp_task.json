@@ -124,12 +124,12 @@
    "fieldname": "checklists",
    "fieldtype": "Table",
    "label": "CheckLists",
-   "options": "GP CheckList"
+   "options": "GP CheckList Task"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-13 15:44:51.150617",
+ "modified": "2024-08-16 15:57:20.695524",
  "modified_by": "Administrator",
  "module": "Gameplan",
  "name": "GP Task",

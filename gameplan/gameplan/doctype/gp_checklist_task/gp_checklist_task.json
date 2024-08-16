@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2024-08-09 08:32:04.616731",
+ "creation": "2024-08-16 15:55:50.584581",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -12,25 +12,23 @@
  "fields": [
   {
    "fieldname": "label",
-   "fieldtype": "Text",
-   "in_list_view": 1,
+   "fieldtype": "Data",
    "label": "Label"
   },
   {
    "default": "0",
    "fieldname": "is_check",
    "fieldtype": "Check",
-   "in_list_view": 1,
-   "label": "Is Check"
+   "label": "Done Task"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-08-09 08:35:51.399614",
+ "modified": "2024-08-16 15:56:51.641610",
  "modified_by": "Administrator",
  "module": "Gameplan",
- "name": "GP CheckList",
+ "name": "GP CheckList Task",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "creation",

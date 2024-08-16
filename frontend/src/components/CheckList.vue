@@ -108,7 +108,7 @@ export default{
         checklists(){
             return {
                 type: 'list',
-                doctype: 'GP CheckList',
+                doctype: 'GP CheckList Task',
                 fields: ['name', 'label', 'is_check', 'owner'],
                 orderBy: 'creation asc',
                 auto: true,

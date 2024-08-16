@@ -557,6 +557,7 @@ def get_data_kanban(
 	kanban_columns=[],
 	kanban_fields=[],
 	default_filters=None,
+	project=None
 ):
 	filters = frappe.parse_json(filters)
 	rows = frappe.parse_json(rows or "[]")
@@ -629,28 +630,40 @@ def get_data_kanban(
 							or_filters.append(['title', 'like', f'%{text_search}%'])
 						else:
 							or_filters.append(['title', 'like', f'%{text_search}%'])
+						filter_column_data = convert_filter_to_tuple(doctype, column_filters)
+						if project is not None and project != "":
+							filter_column_data.append(['GP Task', 'project', '=', project])
 						column_data = frappe.get_list(
 							doctype,
 							fields=rows,
-							filters=convert_filter_to_tuple(doctype, column_filters),
+							filters= filter_column_data,
 							order_by=order_by,
 							page_length=page_length,
 							or_filters=or_filters
 						)
 					else:
+						filter_column_data = convert_filter_to_tuple(doctype, column_filters)
+						if project is not None and project != "":
+							filter_column_data.append(['GP Task', 'project', '=', project])
 						column_data = frappe.get_list(
 							doctype,
 							fields=rows,
-							filters=convert_filter_to_tuple(doctype, column_filters),
+							filters=filter_column_data,
 							order_by=order_by,
 							page_length=page_length
 						)
 				new_filters = filters.copy()
 				new_filters.update({ column_field: kc.get('name') })
 				if len(or_filters) > 0:
-					all_count = len(frappe.get_list(doctype, filters=convert_filter_to_tuple(doctype, new_filters), or_filters=or_filters))
+					filter_all_count = convert_filter_to_tuple(doctype, new_filters)
+					if project is not None and project != "":
+						filter_all_count.append(['GP Task', 'project', '=', project])
+					all_count = len(frappe.get_list(doctype, filters=filter_all_count, or_filters=or_filters))
 				else:
-					all_count = len(frappe.get_list(doctype, filters=convert_filter_to_tuple(doctype, new_filters)))
+					filter_all_count = convert_filter_to_tuple(doctype, new_filters)
+					if project is not None and project != "":
+						filter_all_count.append(['GP Task', 'project', '=', project])
+					all_count = len(frappe.get_list(doctype, filters=filter_all_count))
 				kc["all_count"] = all_count
 				kc["count"] = len(column_data)
 			if order:

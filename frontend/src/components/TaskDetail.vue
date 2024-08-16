@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full flex-1" v-if="$resources.task.doc">
-    <div class="w-full flex-1 border-r">
-      <div class="relative p-6">
+    <div class="w-full flex-1">
+      <div class="relative p-6 border-r">
         <div class="absolute right-0 top-0 p-6" v-show="$resources.task.setValueDebounced.loading">
           <LoadingText v-if="!$resources.task.setValueDebounced.error" :text="__('Saving...')" />
           <ErrorMessage :message="$resources.task.setValueDebounced.error" />
@@ -113,8 +113,8 @@
         <div class="text-1xl font-semibold mb-2">Activity</div>
         <div class="flex items-center">
           <span class="text-sm">{{ __('Show') }}:</span>
-          <div class="ml-4 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer"
-            :class="{ 'mbw-activity-active': activeActivity == 'all' }" @click="activeActivity = 'all'">All</div>
+          <!-- <div class="ml-4 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer"
+            :class="{ 'mbw-activity-active': activeActivity == 'all' }" @click="activeActivity = 'all'">All</div> -->
           <div class="ml-2 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer"
             :class="{ 'mbw-activity-active': activeActivity == 'comment' }" @click="activeActivity = 'comment'">Comments</div>
           <div class="ml-2 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer"
@@ -124,9 +124,9 @@
           <CommentsList class="mt-8" doctype="GP Task" :name="taskId" />
         </template>
         <template v-if="activeActivity == 'comment'">
-          <div class="mt-5" style="height: 600px;">
+          <div style="height: 490px;">
             <!-- <CommentsList class="mt-8" doctype="GP Task" :name="taskId" :typeFilter="'comment'" /> -->
-            <CommentList :doctype="'GP Task'" :reference_name="taskId"></CommentList>
+            <CommentList :doctype="'GP Task'" :reference_name="taskId" :show_label="false"></CommentList>
           </div>
         </template>
         <template v-if="activeActivity == 'history'">
@@ -136,67 +136,87 @@
       </div>
     </div>
     <div class="hidden w-[20rem] shrink-0 sm:block">
-      <div class="grid grid-cols-2 items-center gap-y-6 p-6 text-base text-gray-700" v-if="!readOnlyControl">
-        <div>{{ __('Assignee') }}</div>
-        <div class="w-full">
-          <Autocomplete :placeholder="__('Assign a user')" :options="assignableUsers" class="truncate"
-            v-model="$resources.task.doc.assigned_to" @update:modelValue="changeUserAssign" />
+      <div class="gap-y-6 p-6 text-base text-gray-700" v-if="!readOnlyControl">
+        <div class="w-full flex items-center mb-5">
+          <div class="w-24 mr-8">{{ __('Assignee') }}</div>
+          <div class="w-full">
+            <Autocomplete :placeholder="__('Assign a user')" :options="assignableUsers" class="truncate"
+              v-model="$resources.task.doc.assigned_to" @update:modelValue="changeUserAssign" />
+          </div>
         </div>
-        <div>{{ __('Due Date') }}</div>
-        <div>
-          <DateTimePicker class="datepicker" icon-left="calendar" :value="$resources.task.doc.due_date" 
-            @change="(val) => ($resources.task.setValue.submit({
-            due_date: val,
-          }))" :placeholder="__('Due date')" input-class="border-none" />
+        <div class="w-full flex items-center mb-5">
+          <div class="w-24 mr-8">{{ __('Due Date') }}</div>
+          <div class="w-full">
+            <DateTimePicker class="datepicker" icon-left="calendar" :value="$resources.task.doc.due_date" 
+                @change="(val) => ($resources.task.setValue.submit({
+                due_date: val,
+              }))" :placeholder="__('Due date')" input-class="border-none" />
+          </div>
         </div>
-        <div>{{ __('Project') }}</div>
-        <div class="w-full">
-          <Autocomplete :placeholder="__('Select project')" :options="projectOptions" class="truncate"
-            v-model="$resources.task.doc.project" @update:modelValue="changeProject" />
+        <div class="w-full flex items-center mb-5">
+          <div class="w-24 mr-8">{{ __('Project') }}</div>
+          <div class="w-full">
+            <Autocomplete :placeholder="__('Select project')" :options="projectOptions" class="truncate"
+                v-model="$resources.task.doc.project" @update:modelValue="changeProject" />
+          </div>
         </div>
-        <div>{{ __('Status') }}</div>
-        <div>
-          <Dropdown :options="statusOptions">
-            <Button>
-              <template #prefix>
-                <TaskStatusIcon :status="$resources.task.doc.status" />
-              </template>
-              {{ $resources.task.doc.status || __('Set status') }}
-            </Button>
-          </Dropdown>
+        <div class="w-full flex items-center mb-5">
+          <div class="w-24 mr-8">{{ __('Status') }}</div>
+          <div class="w-full">
+            <Dropdown :options="statusOptions">
+              <Button>
+                <template #prefix>
+                  <TaskStatusIcon :status="$resources.task.doc.status" />
+                </template>
+                {{ $resources.task.doc.status || __('Set status') }}
+              </Button>
+            </Dropdown>
+          </div>
         </div>
-        <div>{{ __('Priority') }}</div>
-        <div>
-          <Dropdown :options="priorityOptions">
-            <Button>
-              <template v-if="$resources.task.doc.priority" #prefix>
-                <TaskPriorityIcon :priority="$resources.task.doc.priority" />
-              </template>
-              {{ $resources.task.doc.priority || __('Set priority') }}
-            </Button>
-          </Dropdown>
+        <div class="w-full flex items-center mb-5">
+          <div class="w-24 mr-8">{{ __('Priority') }}</div>
+          <div class="w-full">
+            <Dropdown :options="priorityOptions">
+              <Button>
+                <template v-if="$resources.task.doc.priority" #prefix>
+                  <TaskPriorityIcon :priority="$resources.task.doc.priority" />
+                </template>
+                {{ $resources.task.doc.priority || __('Set priority') }}
+              </Button>
+            </Dropdown>
+          </div>
         </div>
       </div>
-      <div class="grid grid-cols-2 items-center gap-y-6 p-6 text-base text-gray-700" v-else>
-        <div>{{ __('Assignee') }}</div>
-        <div>
-          <TextInput type="text" v-model="$resources.task.doc.assigned_to" :disabled="true" />
+      <div class="gap-y-6 p-6 text-base text-gray-700" v-else>
+        <div class="w-full flex items-center mb-5">
+          <div class="w-24 mr-8">{{ __('Assignee') }}</div>
+          <div class="w-full">
+            <TextInput type="text" v-model="$resources.task.doc.assigned_to" :disabled="true" />
+          </div>
         </div>
-        <div>{{ __('Due Date') }}</div>
-        <div>
-          <TextInput type="text" v-model="$resources.task.doc.due_date" :disabled="true" />
+        <div class="w-full flex items-center mb-5">
+          <div class="w-24 mr-8">{{ __('Due Date') }}</div>
+          <div class="w-full">
+            <TextInput type="text" v-model="$resources.task.doc.due_date" :disabled="true" />
+          </div>
         </div>
-        <div>{{ __('Project') }}</div>
-        <div>
-          <TextInput type="text" v-model="$resources.task.doc.project" :disabled="true" />
+        <div class="w-full flex items-center mb-5">
+          <div class="w-24 mr-8">{{ __('Project') }}</div>
+          <div class="w-full">
+            <TextInput type="text" v-model="$resources.task.doc.project" :disabled="true" />
+          </div>
         </div>
-        <div>{{ __('Status') }}</div>
-        <div>
-          <TextInput type="text" v-model="$resources.task.doc.status" :disabled="true" />
+        <div class="w-full flex items-center mb-5">
+          <div class="w-24 mr-8">{{ __('Status') }}</div>
+          <div class="w-full">
+            <TextInput type="text" v-model="$resources.task.doc.status" :disabled="true" />
+          </div>
         </div>
-        <div>{{ __('Priority') }}</div>
-        <div>
-          <TextInput type="text" v-model="$resources.task.doc.priority" :disabled="true" />
+        <div class="w-full flex items-center mb-5">
+          <div class="w-24 mr-8">{{ __('Priority') }}</div>
+          <div class="w-full">
+            <TextInput type="text" v-model="$resources.task.doc.priority" :disabled="true" />
+          </div>
         </div>
       </div>
     </div>

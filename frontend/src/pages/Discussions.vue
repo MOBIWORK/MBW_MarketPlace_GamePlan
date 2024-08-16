@@ -45,7 +45,7 @@
         }}
       </Button>
       <Select
-        style="min-width: 7rem;"
+        style="min-width: 8rem;"
         v-if="feedType === 'recent'"
         :options="orderOptions"
         v-model="orderBy"

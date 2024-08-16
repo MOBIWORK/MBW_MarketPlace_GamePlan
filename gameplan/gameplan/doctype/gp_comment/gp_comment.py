@@ -77,3 +77,23 @@ class GPComment(HasMentions, HasReactions, Document):
 				search.remove_doc(self)
 			else:
 				search.index_doc(self)
+	
+	@frappe.whitelist()
+	def delete_comment(self):
+		print("Dòng 83 delete comment ", self.name)
+		if self.doc_parent is None or self.doc_parent == "":
+			#Remove all comment contain parent
+			comments_child = frappe.db.get_list('GP Comment',
+				filters={
+					'root_name': self.name
+				},
+				fields=['name']
+			)
+			for comment_child in comments_child:
+				comment_child_doc = frappe.get_doc('GP Comment', comment_child.name)
+				comment_child_doc.delete()
+			comment_doc = frappe.get_doc('GP Comment', self.name)
+			comment_doc.delete()
+		else:
+			comment_doc = frappe.get_doc('GP Comment', self.name)
+			comment_doc.delete()
