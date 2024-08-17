@@ -164,6 +164,8 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 	doctype = 'GP Task'
 	check_permissions(doctype, parent)
 	assigned_or_owner = filters.pop('assigned_or_owner', None)
+	title_pop = filters.pop('title', None)
+	print("Dòng 168 ", is_my_task)
 	query = frappe.qb.get_query(
 		table=doctype,
 		fields=fields,
@@ -184,7 +186,7 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 			)
 			query = query.where((Task.title.like('%{txt_search}%')))
 		else:
-			 query = query.where((Task.title.like('%{txt_search}%')))
+			query = query.where((Task.title.like('%{txt_search}%')))
 				
 	if assigned_or_owner:
 		Task = frappe.qb.DocType(doctype)

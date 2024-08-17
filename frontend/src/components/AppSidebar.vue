@@ -207,7 +207,7 @@ import Link from './Link.vue'
 import AddTeamDialog from './AddTeamDialog.vue'
 import UserDropdown from './UserDropdown.vue'
 import ChevronTriangle from './icons/ChevronTriangle.vue'
-import { activeTeams, teams } from '@/data/teams'
+import { activeTeams, teams, teams_by_role } from '@/data/teams'
 import { getTeamProjects } from '@/data/projects'
 import { unreadNotifications } from '@/data/notifications'
 import { showCommandPalette } from '@/components/CommandPalette/CommandPalette.vue'
@@ -243,6 +243,7 @@ export default {
     }
   },
   mounted() {
+    teams_by_role.fetch()
     let sidebarWidth = parseInt(localStorage.getItem('sidebarWidth') || 256)
     this.sidebarWidth = sidebarWidth
   },

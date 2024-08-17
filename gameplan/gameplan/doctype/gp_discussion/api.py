@@ -22,6 +22,7 @@ def get_discussions(filters=None, order_by=None, limit_start=None, limit_page_le
 	Project = frappe.qb.DocType("GP Project")
 	Team = frappe.qb.DocType("GP Team")
 	Member = frappe.qb.DocType("GP Member")
+	Invitation = frappe.qb.DocType("GP Invitation")
 	member_exists = (
 		frappe.qb.from_(Member)
 		.select(Member.name)

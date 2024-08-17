@@ -43,7 +43,7 @@ export let unreadItems = createResource({
 export let teams_by_role = createResource({
   url: "gameplan.api.get_teams_by_role",
   method: "GET",
-  auto: true,
+  auto: false,
   onSuccess() {
     unreadItems.fetch()
   },

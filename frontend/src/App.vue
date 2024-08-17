@@ -24,6 +24,7 @@ const DesktopLayout = defineAsyncComponent(() =>
   import('./components/DesktopLayout.vue')
 )
 const Layout = computed(() => {
+  
   if (screenSize.width < 640) {
     return MobileLayout
   } else {

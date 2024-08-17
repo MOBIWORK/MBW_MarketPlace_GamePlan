@@ -86,11 +86,13 @@
                     label: 'Remove',
                     variant: 'solid',
                     theme: 'red',
-                    onClick: () => onRemoveMember()
+                    onClick: () => onRemoveMember(),
+
                 }   
             ],
         }"
         v-model="showDialogRemove"
+        @close="onCloseConfirmDelete()"
     />
 </template>
 
@@ -126,8 +128,20 @@ export default {
                 method: "GET",
                 auto: false,
                 onSuccess(data){
+                    console.log(data)
                     if(data == "ok"){
+                        createToast({
+                            title: __('Xóa thành viên ra khỏi nhóm thành công'),
+                            icon: 'check',
+                            iconClasses: 'text-green-600'
+                        })
                         this.$resources.initMemberById.fetch()
+                    }else{
+                        createToast({
+                            title: __('Lỗi khi xóa thành viên ra khỏi nhóm'),
+                            icon: 'x',
+                            iconClasses: 'text-red-600',
+                        })
                     }
                 }
             }
@@ -196,6 +210,9 @@ export default {
                 }
                 this.$emit('changeRole', this.arrMember)
             }
+        },
+        onCloseConfirmDelete(){
+            this.$resources.initMemberById.fetch()
         },
         onRemoveMember(){
             if(this.idTeamProject != null && this.idTeamProject != ""){

@@ -168,6 +168,7 @@ export default {
   },
   resources: {
     discussions() {
+      console.log("Filter discussion ", this.listOptions.filters)
       return {
         type: 'list',
         doctype: 'GP Discussion',
