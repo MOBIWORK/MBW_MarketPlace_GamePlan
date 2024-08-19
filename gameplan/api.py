@@ -625,8 +625,11 @@ def get_data_kanban(
 					if text_search is not None and text_search != "":
 						if is_my_task == "true":
 							projects = frappe.get_list('GP Project', filters={'title': ['like', f'%{text_search}%']},fields=['name', 'title'])
+							teams = frappe.get_list('GP Team', filters={'title': ['like', f'%{text_search}%']}, fields=['name', 'title'])
 							for project in projects:
 								or_filters.append(['project', '=', project.name])
+							for team in teams:
+								or_filters.append(['team', '=', team.name])
 							or_filters.append(['title', 'like', f'%{text_search}%'])
 						else:
 							or_filters.append(['title', 'like', f'%{text_search}%'])
@@ -641,6 +644,7 @@ def get_data_kanban(
 							page_length=page_length,
 							or_filters=or_filters
 						)
+						column_data = [data_col for data_col in column_data if data_col.owner == frappe.session.user or data_col.assigned_to == frappe.session.user]
 					else:
 						filter_column_data = convert_filter_to_tuple(doctype, column_filters)
 						if project is not None and project != "":
@@ -652,6 +656,7 @@ def get_data_kanban(
 							order_by=order_by,
 							page_length=page_length
 						)
+						column_data = [data_col for data_col in column_data if data_col.owner == frappe.session.user or data_col.assigned_to == frappe.session.user]
 				new_filters = filters.copy()
 				new_filters.update({ column_field: kc.get('name') })
 				if len(or_filters) > 0:

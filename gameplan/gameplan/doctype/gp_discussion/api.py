@@ -23,6 +23,7 @@ def get_discussions(filters=None, order_by=None, limit_start=None, limit_page_le
 	Team = frappe.qb.DocType("GP Team")
 	Member = frappe.qb.DocType("GP Member")
 	Invitation = frappe.qb.DocType("GP Invitation")
+	User = frappe.qb.DocType('User')
 	member_exists = (
 		frappe.qb.from_(Member)
 		.select(Member.name)
@@ -39,6 +40,8 @@ def get_discussions(filters=None, order_by=None, limit_start=None, limit_page_le
 		.on(Discussion.project == Project.name)
 		.left_join(Team)
 		.on(Discussion.team == Team.name)
+		.inner_join(User)
+		.on(Discussion.owner == User.name)
 		.where((Project.is_private == 0) | ((Project.is_private == 1) & ExistsCriterion(member_exists)))
 		.limit(limit_page_length)
 		.offset(limit_start or 0)
@@ -50,7 +53,7 @@ def get_discussions(filters=None, order_by=None, limit_start=None, limit_page_le
 
 		if filters.get("searchDiscussion") is not None and filters.get("searchDiscussion") != "":
 			textSearch = filters.get("searchDiscussion")
-			query = query.where(Discussion.title.like(f'%{textSearch}%') | Discussion.owner.like(f'%{textSearch}%')
+			query = query.where(Discussion.title.like(f'%{textSearch}%') | User.full_name.like(f'%{textSearch}%')
 				 | Project.title.like(f'%{textSearch}%') | Team.title.like(f'%{textSearch}%'))
 
 		# order by pinned_at desc if project is selected

@@ -26,7 +26,6 @@ class GPTask(HasMentions, HasActivity, Document):
 		self.update_tasks_count(1)
 		if frappe.session.user != self.assigned_to:
 			assign_to_someone_task(self.project, self.name, frappe.session.user, self.assigned_to, self.title)
-		print("Dòng 29 thêm mới task :", self.reminders_config)
 		self.insert_reminder()
 
 	def on_update(self):
@@ -165,32 +164,45 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 	check_permissions(doctype, parent)
 	assigned_or_owner = filters.pop('assigned_or_owner', None)
 	title_pop = filters.pop('title', None)
-	print("Dòng 168 ", is_my_task)
-	query = frappe.qb.get_query(
-		table=doctype,
-		fields=fields,
-		filters=filters,
-		order_by=order_by,
-		offset=start,
-		limit=limit,
-		group_by=group_by,
-	)
-	if txt_search is not None and txt_search != "":
-		if is_my_task == "true":
-			projects = frappe.get_list('GP Project', filters={'title': ['like', f'%{txt_search}%']},fields=['name', 'title'])
-			query = query.where(
-				" | ".join([
-					f"(project == {project.name})"
-					for project in projects
-				])
-			)
-			query = query.where((Task.title.like('%{txt_search}%')))
+	search_by_project_team = filters.pop('search_by_project_team', None)
+	Task = frappe.qb.DocType(doctype)
+	if search_by_project_team is not None and search_by_project_team == True:
+		if title_pop is not None and title_pop != "":
+			Team = frappe.qb.DocType('GP Team')
+			Project = frappe.qb.DocType('GP Project')
+			query = frappe.qb.from_(Task).inner_join(Team).on(Task.team == Team.name).inner_join(Project).on(Task.project == Project.name).select(Task.name,Task.title,Task.description,Task.start_date,Task.due_date,Task.status,Task.priority,Task.is_completed,Task.completed_at,Task.completed_by,Task.project,Task.team,Task.assigned_to,Task.comments_count,Task.owner,Task.creation,Project.title.as_("project_title"),Team.title.as_("team_title"))
+			if assigned_or_owner:
+				query = query.where(
+					(Task.assigned_to == assigned_or_owner) | (Task.owner == assigned_or_owner)
+				)
+			if title_pop is not None and title_pop != "":
+				query = query.where(Task.title.like(f'%{title_pop}%') | Team.title.like(f'%{title_pop}%') | Project.title.like(f'%{title_pop}%'))
+			return query.run(as_dict=True, debug=debug)
 		else:
-			query = query.where((Task.title.like('%{txt_search}%')))
-				
-	if assigned_or_owner:
-		Task = frappe.qb.DocType(doctype)
-		query = query.where(
-			(Task.assigned_to == assigned_or_owner) | (Task.owner == assigned_or_owner)
+			query = frappe.qb.get_query(
+				table=doctype,
+				fields=fields,
+				order_by=order_by,
+				offset=start,
+				limit=limit,
+				group_by=group_by,
+			)
+			if assigned_or_owner:
+				query = query.where(
+					(Task.assigned_to == assigned_or_owner) | (Task.owner == assigned_or_owner)
+				)
+			return query.run(as_dict=True, debug=debug)
+	else:
+		project_id = filters.pop('project', None)
+		query = frappe.qb.get_query(
+			table=doctype,
+			fields=fields,
+			order_by=order_by,
+			offset=start,
+			limit=limit,
+			group_by=group_by,
 		)
-	return query.run(as_dict=True, debug=debug)
+		query = query.where(Task.project == project_id)
+		if title_pop is not None and title_pop != "":
+			query = query.where(Task.title.like(f'%{title_pop}%'))
+		return query.run(as_dict=True, debug=debug)

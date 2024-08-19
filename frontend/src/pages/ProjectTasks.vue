@@ -348,7 +348,7 @@ function onUpdateSort(querySort){
 
 watch(txtSearch, async(newSearch, oldSearch) => {
   paramKanbanDefault.value.text_search = txtSearch.value
-  listOptions.value.filters['title'] = ['like', `%${txtSearch.value}%`]
+  listOptions.value.filters['title'] = txtSearch.value
   if(typeView.value == "list"){
     lstTask.value.onReloadTasks()
   } 

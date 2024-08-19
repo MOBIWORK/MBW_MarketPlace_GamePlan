@@ -35,7 +35,7 @@
     <div class="mx-auto w-full px-5" style="height: calc(100% - 90px);">
       <div class="w-full pt-3 flex items-center justify-between">
         <div class="w-1/2">
-          <TextInput type="text" class="w-full" :placeholder="__('Search task, project')" :debounce="600" v-model="txtSearch">
+          <TextInput type="text" class="w-full" :placeholder="__('Search task, project, team')" :debounce="600" v-model="txtSearch">
             <template #suffix>
               <FeatherIcon
                 class="w-4"
@@ -290,7 +290,7 @@ function parseRows(rows) {
 }
 
 let listOptions = computed(() => ({
-  filters: { assigned_or_owner: getUser('sessionUser').name },
+  filters: { assigned_or_owner: getUser('sessionUser').name, search_by_project_team: true },
   orderBy: "creation desc",
   txt_search: "",
   is_my_task: "true"
@@ -415,7 +415,9 @@ function readOnlyByRole(){
 
 watch(txtSearch, async(newSearch, oldSearch) => {
   defaultParamsKanban.value.text_search = txtSearch.value
-  listOptions.value.filters['title'] = ['like', `%${txtSearch.value}%`]
+  listOptions.value.filters['title'] = txtSearch.value
+  listOptions.value.filters['search_by_project_team'] = true
+  //Đưa thêm thông tin tìm kiếm theo project và team
   if(viewTask.value == "list"){
     lstTask.value.onReloadTasks()
   } 

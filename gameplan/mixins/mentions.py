@@ -22,7 +22,6 @@ class HasMentions:
 				to_user=mention.email,
 			)
 			title = ""
-			print("Dòng 24 ", self.doctype)
 			if self.doctype == "GP Discussion":
 				values.discussion = self.name
 				discussion_info = frappe.get_doc('GP Discussion', self.name)
@@ -48,7 +47,6 @@ class HasMentions:
 				continue
 			notification = frappe.get_doc(doctype='GP Notification')
 			if "GP Task" in [self.doctype, self.get('reference_doctype')]:
-				print("Dòng 45 title: ", title)
 				notification.message = f"""
 					<div class="text-gray-700 text-sm">
 						<span class="font-medium text-gray-900">{ get_fullname(self.owner) }</span>
