@@ -557,7 +557,8 @@ def get_data_kanban(
 	kanban_columns=[],
 	kanban_fields=[],
 	default_filters=None,
-	project=None
+	project=None,
+	assign_task=[]
 ):
 	filters = frappe.parse_json(filters)
 	rows = frappe.parse_json(rows or "[]")
@@ -636,6 +637,8 @@ def get_data_kanban(
 						filter_column_data = convert_filter_to_tuple(doctype, column_filters)
 						if project is not None and project != "":
 							filter_column_data.append(['GP Task', 'project', '=', project])
+						if assign_task is not None and len(assign_task) > 0:
+							filter_column_data.append(['GP Task', 'assigned_to', 'in', assign_task])
 						column_data = frappe.get_list(
 							doctype,
 							fields=rows,
@@ -644,11 +647,14 @@ def get_data_kanban(
 							page_length=page_length,
 							or_filters=or_filters
 						)
-						column_data = [data_col for data_col in column_data if data_col.owner == frappe.session.user or data_col.assigned_to == frappe.session.user]
+						if is_my_task == "true":
+							column_data = [data_col for data_col in column_data if data_col.owner == frappe.session.user or data_col.assigned_to == frappe.session.user]
 					else:
 						filter_column_data = convert_filter_to_tuple(doctype, column_filters)
 						if project is not None and project != "":
 							filter_column_data.append(['GP Task', 'project', '=', project])
+						if assign_task is not None and len(assign_task) > 0:
+							filter_column_data.append(['GP Task', 'assigned_to', 'in', assign_task])
 						column_data = frappe.get_list(
 							doctype,
 							fields=rows,
@@ -656,7 +662,8 @@ def get_data_kanban(
 							order_by=order_by,
 							page_length=page_length
 						)
-						column_data = [data_col for data_col in column_data if data_col.owner == frappe.session.user or data_col.assigned_to == frappe.session.user]
+						if is_my_task == "true":
+							column_data = [data_col for data_col in column_data if data_col.owner == frappe.session.user or data_col.assigned_to == frappe.session.user]
 				new_filters = filters.copy()
 				new_filters.update({ column_field: kc.get('name') })
 				if len(or_filters) > 0:
@@ -1354,6 +1361,44 @@ def token_firebase(token):
 	token_doc.token = token
 	token_doc.insert()
 	frappe.db.commit()
+
+@frappe.whitelist(methods=["GET"])
+def get_config_view(doc):
+	try:
+		objConfig = {}
+		view_settings = frappe.get_list('GP View Settings',
+			filters={
+				'dt': doc,
+				'owner': frappe.session.user
+			},
+			fields=['name', 'dt', 'view_type']
+		)
+		if len(view_settings) == 0:
+			view_setting_doc = frappe.new_doc('GP View Settings')
+			view_setting_doc.dt = doc
+			view_setting_doc.view_type = "list"
+			view_setting_doc.insert()
+			frappe.db.commit()
+			objConfig['name'] = view_setting_doc.name
+			objConfig['view_type'] = view_setting_doc.view_type
+		else:
+			objConfig['name'] = view_settings[0].name
+			objConfig['view_type'] = view_settings[0].view_type
+		return objConfig
+	except Exception as e:
+		return None
+
+@frappe.whitelist(methods=["POST"])
+def update_config_view(name, view_type):
+	try:
+		view_setting = frappe.get_doc('GP View Settings', name)
+		view_setting.view_type = view_type
+		view_setting.save()
+		frappe.db.commit()
+		return {'status': "ok", 'message': ""}
+	except Exception as e:
+		return {'status': "error", 'message': ""}
+
 
 @frappe.whitelist(methods=["GET"])
 def test_notification(title, body):

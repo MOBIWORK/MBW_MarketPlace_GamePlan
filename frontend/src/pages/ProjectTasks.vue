@@ -1,14 +1,17 @@
 <template>
   <div class="w-full pt-3 px-4 flex items-center justify-between">
-        <div class="w-1/2">
-          <TextInput type="text" class="w-full" :placeholder="__('Search task')" :debounce="600" v-model="txtSearch">
-            <template #suffix>
-              <FeatherIcon
-                class="w-4"
-                name="search"
-              />
-            </template>
-          </TextInput>
+        <div class="flex w-1/2">
+          <div class="w-10/12 mr-3">
+            <TextInput type="text" class="w-full" :placeholder="__('Search task')" :debounce="600" v-model="txtSearch">
+              <template #suffix>
+                <FeatherIcon
+                  class="w-4"
+                  name="search"
+                />
+              </template>
+            </TextInput>
+          </div>
+          <FilterAssignTask :arrAssign="arrAssignTask" @filter_assign="(evt) => onFilterAssignTask(evt)"></FilterAssignTask>
         </div>
         <div class="flex items-center">
           <Dropdown :options="[
@@ -53,7 +56,7 @@
         </div>
       </div>
   <div class="pt-3 px-4" v-if="typeView == 'list'">
-    <TaskList :listOptions="listOptions" :groupByStatus="true" ref="lstTask"/>
+    <TaskList :listOptions="listOptions" :groupByStatus="true" ref="lstTask" @load_data="(evt) => onLoadData(evt)"/>
   </div>
   <div class="pt-3 pl-2" style="height: calc(100% - 90px);" v-if="typeView == 'kanban_by_status' || typeView == 'kanban_by_priority'">
     <KanbanView :kanban="dataByKanban" :options="{
@@ -141,6 +144,7 @@ import {
 import router from '@/router'
 import { getUser } from '@/data/users'
 import SortBy from '@/components/SortBy.vue'
+import FilterAssignTask from '@/components/FilterAssignTask.vue'
 
 const props = defineProps({
   project: {
@@ -160,7 +164,8 @@ let paramKanbanDefault = ref({
   kanban_fields: JSON.stringify(["description", "priority", "due_date", "comments_count", "assigned_to"]),
   text_search: "",
   is_my_task: "false",
-  project: props.project.name
+  project: props.project.name,
+  assign_task: []
 })
 
 let dataByKanban = createResource({
@@ -200,16 +205,46 @@ let tasksListResource = createListResource({
 let listOptions = computed(() => ({
   filters: {
     project: props.project.name,
+    assign_task: []
   },
   orderBy: "creation desc"
 }))
+
+let getConfigView = createResource({
+  url: "gameplan.api.get_config_view",
+  method: "GET",
+  params: {
+    doc: 'GP Task'
+  },
+  auto: true,
+  onSuccess(data){
+    if(data != null){
+      if(data.view_type == "kanban_by_status"){
+        paramKanbanDefault.value.column_field = "status"
+        dataByKanban.fetch()
+      }else if(data.view_type == "kanban_by_priority"){
+        paramKanbanDefault.value.column_field = "priority"
+        dataByKanban.fetch()
+      }
+      typeView.value = data.view_type
+      nameViewConfigUpdate.value = data.name
+    }
+  }
+})
+let updateConfigView = createResource({
+  url: "gameplan.api.update_config_view",
+  method: "POST",
+  auto: false
+})
 
 let newTaskDialog = ref(null)
 let showDialogDelete = ref(false)
 let nameTaskDelete = ref("")
 let txtSearch = ref("")
 let lstTask = ref(null)
-let typeView = ref("list")
+let typeView = ref("")
+let arrAssignTask = ref([])
+let nameViewConfigUpdate = ref("")
 
 const rows = computed(() => {
   if (!dataByKanban.data?.data) return []
@@ -316,8 +351,30 @@ function onChangeTypeView(view){
     dataByKanban.fetch()
   }
   typeView.value = view
+  updateConfigView.submit({
+    'name': nameViewConfigUpdate.value,
+    'view_type': view
+  })
 }
 
+function onLoadData(data){
+  for(let i = 0; i < data.length; i++){
+    if(data[i].assigned_to != null && data[i].assigned_to != ""){
+      let assignTaskFilter = arrAssignTask.value.filter(x => x == data[i].assigned_to)
+      if(assignTaskFilter.length == 0){
+        arrAssignTask.value.push(data[i].assigned_to)
+      }
+    }
+  }
+}
+
+function onFilterAssignTask(data){
+  listOptions.value.filters['assign_task'] = data
+  paramKanbanDefault.value.assign_task = data
+  if(typeView.value == "list"){
+    lstTask.value.onReloadTasks()
+  }else dataByKanban.fetch()
+}
 
 function actions(name) {
   return [

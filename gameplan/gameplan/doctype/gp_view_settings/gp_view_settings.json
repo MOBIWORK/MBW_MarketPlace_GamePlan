@@ -1,0 +1,91 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-08-21 08:46:41.608259",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "dt",
+  "view_type",
+  "project"
+ ],
+ "fields": [
+  {
+   "fieldname": "dt",
+   "fieldtype": "Link",
+   "label": "DocType",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "view_type",
+   "fieldtype": "Select",
+   "label": "ViewType",
+   "options": "list\nkanban_by_status\nkanban_by_priority"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Data",
+   "label": "Project"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-08-21 09:47:19.481418",
+ "modified_by": "Administrator",
+ "module": "Gameplan",
+ "name": "GP View Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Gameplan Admin",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Gameplan Member",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Gameplan Guest",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

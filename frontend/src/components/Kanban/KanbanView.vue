@@ -157,7 +157,7 @@ const titleField = computed(() => {
 })
 
 const columns = computed(() => {
-    let _columns = props.kanban.data.data
+    let _columns = props.kanban.data? props.kanban.data.data : []
 
     let has_color = _columns.some((column) => column.column?.color)
     if (!has_color) {

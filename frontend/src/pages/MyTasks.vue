@@ -164,14 +164,12 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { 
-  getCachedListResource,
   usePageMeta, 
   Breadcrumbs, 
   Dropdown, 
   FeatherIcon, 
   Avatar, 
   Tooltip, 
-  TextEditor, 
   Button,
   createResource,
   Dialog,
@@ -236,11 +234,39 @@ let tasksListResource = createListResource({
   auto: false
 })
 
+let getConfigView = createResource({
+  url: "gameplan.api.get_config_view",
+  method: "GET",
+  params: {
+    doc: 'GP Task'
+  },
+  auto: true,
+  onSuccess(data){
+    if(data != null){
+      if(data.view_type == "kanban_by_status"){
+        defaultParamsKanban.value.column_field = "status"
+        dataByKanban.fetch()
+      }else if(data.view_type == "kanban_by_priority"){
+        defaultParamsKanban.value.column_field = "priority"
+        dataByKanban.fetch()
+      }
+      viewTask.value = data.view_type
+      nameViewConfigUpdate.value = data.name
+    }
+  }
+})
+let updateConfigView = createResource({
+  url: "gameplan.api.update_config_view",
+  method: "POST",
+  auto: false
+})
+
 let newTaskDialog = ref(null)
 let lstTask = ref(null)
-let viewTask = ref("list")
+let viewTask = ref("")
 let showDialogDelete = ref(false)
 let nameTaskDelete = ref("")
+let nameViewConfigUpdate = ref("")
 
 function onUpdateSort(querySort){
   defaultParamsKanban.value.order_by = querySort != null && querySort != ""? querySort : "modified desc"
@@ -342,6 +368,10 @@ function onChangeTypeView(view){
     dataByKanban.fetch()
   }
   viewTask.value = view
+  updateConfigView.submit({
+    'name': nameViewConfigUpdate.value,
+    'view_type': view
+  })
 }
 
 function showTask(row){
