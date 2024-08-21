@@ -172,7 +172,16 @@ let dataByKanban = createResource({
   url: "gameplan.api.get_data_kanban",
   method: 'GET',
   params: paramKanbanDefault.value,
-  auto: true
+  auto: true,
+  onSuccess(data){
+    let dataKanban = []
+    for(let i = 0; i < data.data.length; i++){
+      for(let j = 0; j < data.data[i].data.length; j++){
+        dataKanban.push(data.data[i].data[j])
+      }
+    }
+    onLoadData(dataKanban)
+  }
 })
 
 let deleteTaskResource = createResource({

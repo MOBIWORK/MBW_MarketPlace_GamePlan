@@ -6,11 +6,11 @@ export async function initMessageFireBase(){
     let urlConfigApp = "/api/method/gameplan.api.get_config_app_firebase";
     const responseConfigApp = await fetch(urlConfigApp);
     const objResponse = await responseConfigApp.json();
-    let objConfigApp = objResponse['message'] != null ? objResponse['message'] : firebaseConfig();
+    let objConfigApp = objResponse['message'] != null ? objResponse['message'] : firebaseConfig;
     let urlVapidKey = "/api/method/gameplan.api.get_vapid_key_firebase";
     const responseVapidKey = await fetch(urlVapidKey);
     const objResponseVapidKey = await responseVapidKey.json();
-    let vapidKey = objResponseVapidKey['message'] != null? objResponseVapidKey['message'] : vapid_key();
+    let vapidKey = objResponseVapidKey['message'] != null? objResponseVapidKey['message'] : vapid_key;
     initializeApp(objConfigApp);
 
     if('serviceWorker' in navigator){
