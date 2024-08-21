@@ -311,7 +311,9 @@ def create_team(title, is_private, arr_member):
 		team_doc = frappe.new_doc('GP Team')
 		team_doc.title = title,
 		team_doc.is_private = is_private
+		print("Dòng 314 ", team_doc.name)
 		team_doc.insert()
+		print("Dòng 315 ", team_doc.name)
 		frappe.db.commit()
 		for member in arr_member:
 			if member['id'] is not None and member['id'] != "":
@@ -331,7 +333,7 @@ def create_team(title, is_private, arr_member):
 				add_role_member_by_id(team_doc.name, "team", user.name)
 		return {'status': "ok", 'message': team_doc}
 	except Exception as e:
-		return {'status': "error", 'message': null}
+		return {'status': "error", 'message': str(e)}
 
 @frappe.whitelist()
 def get_teams_by_role():

@@ -22,7 +22,9 @@ export async function initMessageFireBase(){
         Notification.requestPermission().then((permission) => {
             if (permission === 'granted'){
                 if(isExistToken == 0){
+                    console.log("Dòng 25 get token")
                     getToken(messaging, { vapidKey: vapidKey}).then((currentToken) => {
+                        console.log("Dòng 26 ", currentToken)
                         if(currentToken){
                             const myHeaders = new Headers();
                             myHeaders.append("Content-Type", "application/json");
