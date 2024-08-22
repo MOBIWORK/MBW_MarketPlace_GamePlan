@@ -177,12 +177,12 @@
         <div class="text-1xl font-semibold mb-2">Activity</div>
         <div class="flex items-center">
           <span class="text-sm">{{__('Show')}}:</span>
-          <div class="ml-4 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer" :class="{'mbw-activity-active':activeActivity=='all'}" @click="activeActivity='all'">All</div>
+          <!-- <div class="ml-4 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer" :class="{'mbw-activity-active':activeActivity=='all'}" @click="activeActivity='all'">All</div> -->
           <div class="ml-2 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer" :class="{'mbw-activity-active':activeActivity=='comment'}" @click="activeActivity='comment'">Comments</div>
           <div class="ml-2 mbw-bg-activity mbw-text-activity rounded px-2 py-1 cursor-pointer" :class="{'mbw-activity-active':activeActivity=='history'}" @click="activeActivity='history'">History</div>
         </div>
       </div>
-      <template v-if="activeActivity=='all'">
+      <!-- <template v-if="activeActivity=='all'">
         <CommentsArea
           doctype="GP Discussion"
           :name="discussion.name"
@@ -190,16 +190,20 @@
           :read-only-mode="readOnlyMode"
           :disable-new-comment="discussion.closed_at"
         />
-      </template>
+      </template> -->
       <template v-if="activeActivity=='comment'">
-        <CommentsArea
+        <div style="height: 580px;">
+          <CommentListDiscussion :doctype="'GP Discussion'" :reference_name="postId" :show_label="false"></CommentListDiscussion>
+        </div>
+        
+        <!-- <CommentsArea
           doctype="GP Discussion"
           :name="discussion.name"
           :newCommentsFrom="discussion.last_unread_comment"
           :read-only-mode="false"
           :disable-new-comment="discussion.closed_at"
           :filterType="'comment'"
-        />
+        /> -->
       </template>
       <template v-if="activeActivity=='history'">
         <CommentsArea
@@ -419,6 +423,7 @@ import { getTeamProjects } from '@/data/projects'
 import { getUser } from '@/data/users'
 import TextEditorFixedMenu from 'frappe-ui/src/components/TextEditor/TextEditorFixedMenu.vue'
 import Connection from '@/components/Connection.vue'
+import CommentListDiscussion from '@/components/CommentDiscussion/CommentListDiscussion.vue'
 
 export default {
   name: 'DiscussionView',
@@ -440,7 +445,8 @@ export default {
     DiscussionBreadcrumbs,
     RevisionsDialog,
     TextEditorFixedMenu,
-    Connection
+    Connection,
+    CommentListDiscussion
   },
   resources: {
     discussion() {
