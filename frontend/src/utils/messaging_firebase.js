@@ -14,7 +14,29 @@ export async function initMessageFireBase(){
     initializeApp(objConfigApp);
 
     if('serviceWorker' in navigator){
-        const messaging = getMessaging();
+        navigator.serviceWorker.register("./firebase-messaging-sw.js").then(
+            (registration) => {
+              console.log("Service worker registration succeeded:", registration);
+              init_token()
+            },
+            (error) => {
+              console.error(`Service worker registration failed: ${error}`);
+            },
+        );
+        onMessage(messaging, (payload) => {
+            var title = payload.data.title;
+            var options = {
+                body: payload.data.body,
+                icon: payload.data.icon,
+                image: payload.data.image
+            }
+            var myNotification = new Notification(title, options)
+        })
+    }
+}
+
+async function init_token(){
+    const messaging = getMessaging();
         let urlExistToken = "/api/method/gameplan.api.is_exist_token";
         let responseExistToken = await fetch(urlExistToken);
         let objExistToken = await responseExistToken.json();
@@ -38,14 +60,4 @@ export async function initMessageFireBase(){
                 }
             }
         });
-        onMessage(messaging, (payload) => {
-            var title = payload.data.title;
-            var options = {
-                body: payload.data.body,
-                icon: payload.data.icon,
-                image: payload.data.image
-            }
-            var myNotification = new Notification(title, options)
-        })
-    }
 }
