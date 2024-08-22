@@ -14,6 +14,7 @@ export async function initMessageFireBase(){
     initializeApp(objConfigApp);
 
     if('serviceWorker' in navigator){
+        const messaging = getMessaging();
         navigator.serviceWorker.register("./firebase-messaging-sw.js").then(
             (registration) => {
               console.log("Service worker registration succeeded:", registration);
