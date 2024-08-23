@@ -46,7 +46,7 @@ async function init_token(){
             if (permission === 'granted'){
                 if(isExistToken == 0){
                     console.log("Dòng 25 get token")
-                    getToken(messaging, { vapidKey: vapidKey}).then((currentToken) => {
+                    getToken(messaging, { vapidKey: vapid_key}).then((currentToken) => {
                         console.log("Dòng 26 ", currentToken)
                         if(currentToken){
                             const myHeaders = new Headers();
