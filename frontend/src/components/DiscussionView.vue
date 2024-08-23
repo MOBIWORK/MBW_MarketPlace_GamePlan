@@ -69,6 +69,7 @@
             }}
           </span>
         </div>
+        
         <template v-if="discussion.conclusion != '' && discussion.conclusion != null">
           <div class="flex mt-4">
             <div class="text-1xl font-semibold">Conclusion</div>
@@ -132,7 +133,9 @@
             </Button>
           </div>
         </div>
+
         <div
+          v-show="discussion.content != '' && discussion.content != null"
           :class="{
             'rounded-lg border p-4 focus-within:border-gray-400':
               editingContent,

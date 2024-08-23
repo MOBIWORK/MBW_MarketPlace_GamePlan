@@ -46,7 +46,8 @@
                 :value="newTask.due_date"
                 @change="(val) => (newTask.due_date = val)"
                 :placeholder="__('Set due date')"
-                input-class="border-none" />
+                input-class="border-none"
+                />
           </div>
           <div>
             <div class="mb-1.5 text-sm text-gray-600">{{ __('Assign to') }}</div>

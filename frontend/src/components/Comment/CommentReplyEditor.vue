@@ -82,7 +82,10 @@
       onFocusEditor(){
       },
       onSelectEmoji(data){
-        this.$emit('change', this.value + data)
+        let editor = this.$refs.textEditor.editor
+        editor.commands.insertContent(data)
+        editor.commands.focus()
+        this.$emit('change', editor.getHTML())
       }
     },
     computed: {

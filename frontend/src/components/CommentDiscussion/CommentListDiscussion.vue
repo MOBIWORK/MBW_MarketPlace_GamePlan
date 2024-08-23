@@ -312,11 +312,8 @@ export default{
     computed: {
         comments(){
             let items = []
-            console.log("Dòng 325 ", this.$resources.doc_comment.data)
-            console.log("Dòng 326 ", this.$resources.polls.data)
             if (this.$resources.doc_comment.data?.length) items = items.concat(this.$resources.doc_comment.data)
             if(this.$resources.polls.data?.length) items = items.concat(this.$resources.polls.data)
-            console.log("Dòng 327 ",items)
             return items
         }
     }
@@ -325,7 +322,7 @@ export default{
 
 <style scoped>
     .contain-new-comment{
-        height: calc(100% - 170px);
+        height: calc(100% - 250px);
         overflow-y: auto;
     }
     .without-new-comment{

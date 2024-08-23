@@ -15,7 +15,7 @@ export async function initMessageFireBase(){
 
     if('serviceWorker' in navigator){
         const messaging = getMessaging();
-        navigator.serviceWorker.register("./assets/gameplan/frontend/firebase-messaging-sw.js").then(
+        navigator.serviceWorker.register("/assets/gameplan/frontend/firebase-messaging-sw.js").then(
             (registration) => {
               console.log("Service worker registration succeeded:", registration);
               init_token()

@@ -337,9 +337,6 @@
         ]
       },
       isStopped() {
-        console.log("Dong 340 ", (
-          this._poll.stopped_at && this.$dayjs().isAfter(this._poll.stopped_at)
-        ))
         return (
           this._poll.stopped_at && this.$dayjs().isAfter(this._poll.stopped_at)
         )

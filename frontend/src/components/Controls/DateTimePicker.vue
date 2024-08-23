@@ -160,6 +160,7 @@
   
   <script>
   import { Popover, Select,Button,TextInput } from 'frappe-ui'
+
   export default {
     name: 'DateTimePicker',
     props: ['value', 'placeholder', 'formatter', 'readonly', 'inputClass'],
@@ -358,7 +359,7 @@
         const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]} ` + datetime.split(" ")[1];
         return formattedDate
       }
-    },
+    }
   }
   </script>
   
