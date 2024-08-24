@@ -18,7 +18,7 @@ export async function initMessageFireBase(){
         navigator.serviceWorker.register("/assets/gameplan/frontend/firebase-messaging-sw.js").then(
             (registration) => {
               console.log("Service worker registration succeeded:", registration);
-              init_token()
+              init_token(registration)
             },
             (error) => {
               console.error(`Service worker registration failed: ${error}`);
@@ -36,7 +36,7 @@ export async function initMessageFireBase(){
     }
 }
 
-async function init_token(){
+async function init_token(registration){
     const messaging = getMessaging();
         let urlExistToken = "/api/method/gameplan.api.is_exist_token";
         let responseExistToken = await fetch(urlExistToken);
@@ -46,7 +46,7 @@ async function init_token(){
             if (permission === 'granted'){
                 if(isExistToken == 0){
                     console.log("Dòng 25 get token")
-                    getToken(messaging, { vapidKey: vapid_key}).then((currentToken) => {
+                    getToken(messaging, { serviceWorkerRegistration: registration}).then((currentToken) => {
                         console.log("Dòng 26 ", currentToken)
                         if(currentToken){
                             const myHeaders = new Headers();
