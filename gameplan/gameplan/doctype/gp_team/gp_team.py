@@ -48,14 +48,13 @@ class GPTeam(Archivable, Document):
 		return query
 
 	def before_insert(self):
-		print("Dòng 51 ", self.title)
 		if not self.name:
 			slug = frappe.scrub(self.title).replace("_", "-")
+
 			self.name = append_number_if_name_exists("GP Team", slug)
 
 		if not self.icon:
 			self.icon = get_random_gemoji().emoji
-		print("Dòng 57 ", self.title)
 		if not self.readme:
 			self.readme = f"""
 			<h3>Welcome to the {self.title} team page!</h3>

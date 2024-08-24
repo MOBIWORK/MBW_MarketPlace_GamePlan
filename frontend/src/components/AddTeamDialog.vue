@@ -168,7 +168,6 @@ export default {
           if(data.status == "ok"){
             teams_by_role.fetch()
             this.showDialog = false
-            console.log(data.message)
             this.$emit('success', data.message)
             this.newTeam = {}
           }else{
@@ -184,26 +183,25 @@ export default {
   },
   methods: {
     createTeam() {
-      let objPost = {
-        'title': this.newTeam.title,
-        'is_private': this.newTeam.is_private,
-        'arr_member': []
-      }
-      for(let i = 0; i < this.arrMember.length; i++){
-        let objMenber = {
-          'id': this.arrMember[i].id_user,
-          'email': this.arrMember[i].email
-        }
-        objPost.arr_member.push(objMenber)
-      }
-      this.$resources.team_creation.submit(objPost)
-      return;
+      var me = this
       teams.insert.submit(this.newTeam, {
         onSuccess: (team) => {
+          let objPost = {
+            'id_doc': team.name,
+            'arr_member': []
+          }
+          for(let i = 0; i < me.arrMember.length; i++){
+            let objMenber = {
+              'id': me.arrMember[i].id_user,
+              'email': me.arrMember[i].email
+            }
+            objPost.arr_member.push(objMenber)
+          }
+          me.$resources.team_creation.submit(objPost)
           //this.$resetData('newTeam')
-          teams_by_role.fetch()
-          this.showDialog = false
-          this.$emit('success', team)
+          // teams_by_role.fetch()
+          // this.showDialog = false
+          // this.$emit('success', team)
         },
       })
     },

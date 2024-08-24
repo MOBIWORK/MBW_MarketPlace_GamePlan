@@ -306,15 +306,9 @@ def get_user_system_by_filter(txtSearch=None):
 	return users
 
 @frappe.whitelist(methods=["POST"])
-def create_team(title, is_private, arr_member):
+def create_team(id_doc, arr_member):
 	try:
-		team_doc = frappe.new_doc('GP Team')
-		team_doc.title = title,
-		team_doc.is_private = is_private
-		print("Dòng 314 ", team_doc.name)
-		team_doc.insert()
-		print("Dòng 315 ", team_doc.name)
-		frappe.db.commit()
+		team_doc = frappe.get_doc('GP Team', id_doc)
 		for member in arr_member:
 			if member['id'] is not None and member['id'] != "":
 				add_role_member_by_id(team_doc.name, "team", member['id'])

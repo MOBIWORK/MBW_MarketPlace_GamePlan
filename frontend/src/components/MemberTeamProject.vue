@@ -128,7 +128,6 @@ export default {
                 method: "GET",
                 auto: false,
                 onSuccess(data){
-                    console.log(data)
                     if(data == "ok"){
                         createToast({
                             title: __('Xóa thành viên ra khỏi nhóm thành công'),

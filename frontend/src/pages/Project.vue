@@ -597,7 +597,6 @@ export default {
           assigned_to: getUser('sessionUser').name,
         },
         onSuccess: () => {
-          console.log(this.$refs.comp)
           this.$refs.comp.onReloadData()
         },
       })

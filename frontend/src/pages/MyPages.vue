@@ -13,8 +13,9 @@
         </template>
       </TextInput>
     </div>
-    <div class="flex items-center space-x-2">
-      <Select
+    <div class="flex items-center space-x-2 ">
+      <div class="w-32">
+        <Select
         :options="[
           {
             label: __('Sort by'),
@@ -36,7 +37,9 @@
         ]"
         v-model="orderBy"
         @update:modelValue="onChangeSortBy()"
+        class="w-full"
       />
+      </div>
 
       <Button variant="solid" @click="$resources.newPage.submit()" v-if="!readOnlyByRole()">
         <template #prefix>

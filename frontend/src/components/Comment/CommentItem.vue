@@ -340,7 +340,6 @@ export default{
             data.showEdit = true
         },
         onSubmitUpdateCommentChild(data){
-            console.log("on Submit comment", data)
             let dataUpdate = {
                 'name': data.name,
                 'content': data.edit_content

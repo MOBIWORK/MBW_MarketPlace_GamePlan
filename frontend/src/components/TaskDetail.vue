@@ -284,7 +284,6 @@ export default {
         },
         setValue: {
           onSuccess(){
-            console.log(this.$resources.reload)
             this.$resources.task.reload()
           },
           onError(e) {
