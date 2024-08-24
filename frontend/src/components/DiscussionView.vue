@@ -1,6 +1,6 @@
 <template>
   <div class="relative flex h-full flex-col" v-if="postId && discussion">
-    <div class="mx-auto w-full">
+    <div class="mx-auto w-full relative h-full">
       <div class="pt-6">
         <div class="flex items-start justify-between space-x-1 min-w-0">
           <div v-if="editingTitle" class="w-full">
@@ -195,9 +195,7 @@
         />
       </template> -->
       <template v-if="activeActivity=='comment'">
-        <div style="height: 580px;">
-          <CommentListDiscussion :doctype="'GP Discussion'" :reference_name="postId" :show_label="false"></CommentListDiscussion>
-        </div>
+        <CommentListDiscussion :doctype="'GP Discussion'" :reference_name="postId" :show_label="false"></CommentListDiscussion>
         
         <!-- <CommentsArea
           doctype="GP Discussion"

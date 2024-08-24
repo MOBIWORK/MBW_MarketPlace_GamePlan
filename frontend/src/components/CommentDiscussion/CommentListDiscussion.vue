@@ -1,68 +1,53 @@
 <template>
-    <div class="w-full h-full relative">
-        <div class="flex items-center" :class="[show_label? 'justify-between' : 'justify-end']">
-            <div class="text-lg font-semibold" v-if="show_label">{{__('Comment')}}</div>
+    <div class="w-full relative max-h-[627px]">
+        <div class="flex items-center" :class="[show_label ? 'justify-between' : 'justify-end']">
+            <div class="text-lg font-semibold" v-if="show_label">{{ __('Comment') }}</div>
             <Button variant="solid" theme="gray" @click="onShowNewComment()">
-                <template #prefix><LucidePlus class="h-4 w-4" /></template>
-                {{__('New comment')}}
-          </Button>
+                <template #prefix>
+                    <LucidePlus class="h-4 w-4" />
+                </template>
+                {{ __('New comment') }}
+            </Button>
         </div>
-        <div :class="[showNewComment? 'contain-new-comment' : 'without-new-comment']">
+        <div :class="[showNewComment ? 'contain-new-comment' : 'without-new-comment']" class="max-h-[600px] min-h-[600px] overflow-y-auto" style="scrollbar-width: none;">
             <div class="mb-3" v-for="comment in comments">
-                <PollDiscussion v-if="comment.doctype=='GP Poll'"
-                    class="border-b"
-                    :ref="($poll) => setItemRef($poll, comment)"
-                    :poll="comment"
-                    :readOnlyMode="true"
-                />
+                <PollDiscussion v-if="comment.doctype == 'GP Poll'" class="border-b"
+                    :ref="($poll) => setItemRef($poll, comment)" :poll="comment" :readOnlyMode="true" />
                 <CommentItem v-else :comment_info="comment" @replyCommentParent="(evt) => onReplyCommentParent(evt)"
-                    @replyCommentChild="(evt) => onReplyCommentChild(evt)" @deleteComment="(evt) => onDeleteComment(evt)"
-                    @updateComment="(evt) => onUpdateComment(evt)"></CommentItem>
+                    @replyCommentChild="(evt) => onReplyCommentChild(evt)"
+                    @deleteComment="(evt) => onDeleteComment(evt)" @updateComment="(evt) => onUpdateComment(evt)">
+                </CommentItem>
             </div>
         </div>
-        <div
-        v-show="showNewComment"
-        class="w-full rounded-lg border bg-white p-4 focus-within:border-gray-400"
-      >
+    </div>
+    <div v-show="showNewComment"
+        class="w-full rounded-lg border bg-white p-4 focus-within:border-gray-400 absolute bottom-1">
         <div class="mb-4 flex items-center">
-          <UserAvatar :user="$user().name" size="sm" />
-          <span class="ml-2 text-base font-medium text-gray-900">
-            {{ $user().full_name }}
-          </span>
-          <TabButtons
-            class="ml-auto"
-            :buttons="[{ label: __('Comment') }, { label: 'Poll' }]"
-            v-model="newCommentType"
-          />
+            <UserAvatar :user="$user().name" size="sm" />
+            <span class="ml-2 text-base font-medium text-gray-900">
+                {{ $user().full_name }}
+            </span>
+            <TabButtons class="ml-auto" :buttons="[{ label: __('Comment') }, { label: 'Poll' }]"
+                v-model="newCommentType" />
         </div>
         <ErrorMessage :message="$resources.polls.insert.error" />
-        <CommentReplyEditor v-if="newCommentType=='Comment'"
-            :value="contentAddComment"
-            @change="contentAddComment = $event"
-            :submitButtonProps="{
+        <CommentReplyEditor v-if="newCommentType == 'Comment'" :value="contentAddComment"
+            @change="contentAddComment = $event" :submitButtonProps="{
                 onClick: () => onSubmitCommnet()
-            }"
-            :discardButtonProps="{
-                onClick: () => onImshowAddComment(),
-            }"
-        />
-        <PollEditor
-          v-show="newCommentType == 'Poll'"
-          v-model:poll="newPoll"
-          :submitButtonProps="{
+            }" :discardButtonProps="{
+                    onClick: () => onImshowAddComment(),
+                }" />
+        <PollEditor v-show="newCommentType == 'Poll'" v-model:poll="newPoll" :submitButtonProps="{
             onClick: submitPoll,
             loading: $resources.polls.insert.loading,
-          }"
-          :discardButtonProps="{
-            onClick: discardPoll,
-          }"
-        />
-      </div>
+        }" :discardButtonProps="{
+                onClick: discardPoll,
+            }" />
     </div>
 </template>
 
 <script>
-import{
+import {
     Button
 } from 'frappe-ui'
 import CommentItem from '@/components/Comment/CommentItem.vue'
@@ -71,7 +56,7 @@ import PollEditor from '@/components/PollEditor.vue'
 import TabButtons from '@/components/frappe-ui/TabButtons.vue'
 import PollDiscussion from './PollDiscussion.vue'
 
-export default{
+export default {
     name: "CommentListDiscussion",
     props: {
         doctype: {
@@ -94,7 +79,7 @@ export default{
         PollDiscussion
     ],
     resources: {
-        doc_comment(){
+        doc_comment() {
             return {
                 type: 'list',
                 doctype: 'GP Comment',
@@ -118,20 +103,20 @@ export default{
                 auto: true,
                 orderBy: 'creation desc',
                 pageLength: 99999,
-                transform(data){
+                transform(data) {
                     let arr = []
                     let arr_child = []
-                    for(let i = 0; i < data.length; i++){
-                        if(data[i].doc_parent != null && data[i].doc_parent != ""){
+                    for (let i = 0; i < data.length; i++) {
+                        if (data[i].doc_parent != null && data[i].doc_parent != "") {
                             arr_child.push(data[i])
-                        }else{
+                        } else {
                             data[i]["children"] = []
                             arr.push(data[i])
                         }
                     }
-                    for(let i = 0; i < arr_child.length; i++){
-                        for(let j = 0; j < arr.length; j++){
-                            if(arr_child[i].root_name == arr[j].name){
+                    for (let i = 0; i < arr_child.length; i++) {
+                        for (let j = 0; j < arr.length; j++) {
+                            if (arr_child[i].root_name == arr[j].name) {
                                 arr[j].children.push(arr_child[i])
                             }
                         }
@@ -139,17 +124,17 @@ export default{
                     return arr
                 },
                 runDocMethod: {
-                    onSuccess(){
+                    onSuccess() {
                         this.$resources.doc_comment.fetch()
                     }
                 },
                 setValue: {
-                    onSuccess(){
+                    onSuccess() {
                         this.$resources.doc_comment.fetch()
                     }
                 },
                 insert: {
-                    onSuccess(){
+                    onSuccess() {
                         this.onImshowAddComment()
                     }
                 }
@@ -160,16 +145,16 @@ export default{
                 type: 'list',
                 doctype: 'GP Poll',
                 fields: [
-                'name',
-                'title',
-                'anonymous',
-                'multiple_answers',
-                'creation',
-                'owner',
-                'stopped_at',
-                { options: ['name', 'title', 'idx', 'percentage'] },
-                { votes: ['user', 'option'] },
-                { reactions: ['name', 'user', 'emoji'] },
+                    'name',
+                    'title',
+                    'anonymous',
+                    'multiple_answers',
+                    'creation',
+                    'owner',
+                    'stopped_at',
+                    { options: ['name', 'title', 'idx', 'percentage'] },
+                    { votes: ['user', 'option'] },
+                    { reactions: ['name', 'user', 'emoji'] },
                 ],
                 filters: {
                     discussion: this.reference_name,
@@ -178,10 +163,10 @@ export default{
                 auto: true,
                 pageLength: 99999,
                 transform(data) {
-                for (let d of data) {
-                    d.doctype = 'GP Poll'
-                }
-                return data
+                    for (let d of data) {
+                        d.doctype = 'GP Poll'
+                    }
+                    return data
                 },
                 onSuccess() {
                     if (this.$route.query.poll) {
@@ -192,7 +177,7 @@ export default{
             }
         }
     },
-    data(){
+    data() {
         return {
             showNewComment: false,
             contentAddComment: "",
@@ -201,17 +186,17 @@ export default{
                 title: '',
                 multiple_answers: false,
                 options: [
-                { title: '', idx: 1 },
-                { title: '', idx: 2 },
+                    { title: '', idx: 1 },
+                    { title: '', idx: 2 },
                 ],
             }
         }
     },
     methods: {
-        onShowNewComment(){
+        onShowNewComment() {
             this.showNewComment = true
         },
-        onReplyCommentParent(data){
+        onReplyCommentParent(data) {
             this.$resources.doc_comment.insert.submit({
                 'content': data.content,
                 'reference_doctype': this.doctype,
@@ -221,7 +206,7 @@ export default{
                 'root_name': data.root_name
             })
         },
-        onReplyCommentChild(data){
+        onReplyCommentChild(data) {
             this.$resources.doc_comment.insert.submit({
                 'content': data.content,
                 'reference_doctype': this.doctype,
@@ -232,26 +217,26 @@ export default{
                 'root_name': data.root_name
             })
         },
-        onDeleteComment(data){
+        onDeleteComment(data) {
             this.$resources.doc_comment.runDocMethod.submit({
                 method: 'delete_comment',
                 name: data
             })
         },
-        onUpdateComment(data){
+        onUpdateComment(data) {
             this.$resources.doc_comment.setValue.submit({
                 name: data.name,
                 content: data.content
             })
         },
-        onSubmitCommnet(){
+        onSubmitCommnet() {
             this.$resources.doc_comment.insert.submit({
                 'content': this.contentAddComment,
                 'reference_doctype': this.doctype,
                 'reference_name': this.reference_name
             })
         },
-        onImshowAddComment(){
+        onImshowAddComment() {
             this.showNewComment = false
             this.contentAddComment = ""
         },
@@ -281,13 +266,13 @@ export default{
             if (this.doctype !== 'GP Discussion') return
             return this.$resources.polls.insert.submit(
                 {
-                ...this.newPoll,
-                discussion: this.reference_name,
+                    ...this.newPoll,
+                    discussion: this.reference_name,
                 },
                 {
-                onSuccess() {
-                    this.discardPoll()
-                },
+                    onSuccess() {
+                        this.discardPoll()
+                    },
                 }
             )
         },
@@ -298,8 +283,8 @@ export default{
                 title: '',
                 multiple_answers: false,
                 options: [
-                { title: '', idx: 1 },
-                { title: '', idx: 2 },
+                    { title: '', idx: 1 },
+                    { title: '', idx: 2 },
                 ],
             }
         },
@@ -310,10 +295,10 @@ export default{
         }
     },
     computed: {
-        comments(){
+        comments() {
             let items = []
             if (this.$resources.doc_comment.data?.length) items = items.concat(this.$resources.doc_comment.data)
-            if(this.$resources.polls.data?.length) items = items.concat(this.$resources.polls.data)
+            if (this.$resources.polls.data?.length) items = items.concat(this.$resources.polls.data)
             return items
         }
     }
@@ -321,11 +306,12 @@ export default{
 </script>
 
 <style scoped>
-    .contain-new-comment{
-        height: calc(100% - 250px);
-        overflow-y: auto;
-    }
-    .without-new-comment{
-        height: calc(100% - 16px);
-    }
+.contain-new-comment {
+    height: calc(100% - 250px);
+    overflow-y: auto;
+}
+
+.without-new-comment {
+    height: calc(100% - 16px);
+}
 </style>
