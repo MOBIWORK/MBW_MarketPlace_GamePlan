@@ -17,7 +17,6 @@ export async function initMessageFireBase(){
         const messaging = getMessaging();
         navigator.serviceWorker.register("/assets/gameplan/frontend/firebase-messaging-sw.js").then(
             (registration) => {
-              console.log("Service worker registration succeeded:", registration);
               init_token(registration)
             },
             (error) => {
@@ -42,15 +41,18 @@ async function init_token(registration){
         let responseExistToken = await fetch(urlExistToken);
         let objExistToken = await responseExistToken.json();
         let isExistToken = objExistToken['message'];
+        let urlCSRFToken = "/api/method/gameplan.api.get_token";
+        let responseCsrfToken = await fetch(urlCSRFToken)
+        let objCsrfToken = await responseCsrfToken.json();
+        let csrfToken = objCsrfToken['message'];
         Notification.requestPermission().then((permission) => {
             if (permission === 'granted'){
                 if(isExistToken == 0){
-                    console.log("Dòng 25 get token")
                     getToken(messaging, { serviceWorkerRegistration: registration}).then((currentToken) => {
-                        console.log("Dòng 26 ", currentToken)
                         if(currentToken){
                             const myHeaders = new Headers();
                             myHeaders.append("Content-Type", "application/json");
+                            myHeaders.append("X-Frappe-CSRF-Token", csrfToken);
                             fetch("/api/method/gameplan.api.token_firebase", {
                                 method: "POST",
                                 body: JSON.stringify({ token: currentToken }),
