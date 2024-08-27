@@ -90,7 +90,6 @@ class HasMentions:
 									{self.content}
 								</div>
 							</div>
-							<p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
 						"""
 					else:
 						link_btn = frappe.utils.get_url(f'/g/task/{task_info.name}')
@@ -104,7 +103,6 @@ class HasMentions:
 									{self.content}
 								</div>
 							</div>
-							<p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
 						"""
 				elif "GP Discussion" in [self.doctype, self.get('reference_doctype')]:
 					discussion_info = frappe.get_doc('GP Discussion', self.reference_name)
@@ -120,7 +118,6 @@ class HasMentions:
 								{self.content}
 							</div>
 						</div>
-						<p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
 					"""
 				make(
 					doctype=self.doctype,

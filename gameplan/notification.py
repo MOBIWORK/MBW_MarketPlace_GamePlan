@@ -39,7 +39,6 @@ def send_manager_by_invite_guest(type_notifys, idGuest, idProject):
         link_project = frappe.utils.get_url(f'/g/{project_doc.team}/projects/{idProject}')
         content_email = f"""
             <p>{get_fullname(idGuest)} đã tham gia dự án {project_doc.title} vào lúc {datetime.now()}</p>
-            <p><a class="btn btn-primary" href="{link_project}">Xem dự án</a></p>
         """
         make(
             doctype="GP Project",
@@ -153,7 +152,6 @@ def send_guest_by_invite_guest(type_notifys, idGuest, type_reference, name_refer
                     <span class="font-medium">{ get_fullname(frappe.session.user) }</span>
                     <span> đã thêm bạn vào {type_joining} {name_joining} với vai trò {role_of_received}</span>
                 </div>
-                <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
             make(
                 doctype=doctype_reference,
@@ -257,7 +255,6 @@ def change_limit_project_team(type_reference, name_reference, newLimit):
                         <span class="font-medium">{ get_fullname(frappe.session.user) }</span>
                         <span> đã thay đổi {type_joining} {name_joining} thành {type_joining} {limit}</span>
                     </div>
-                    <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
                 """
                 make(
                     doctype=doctype_reference,
@@ -353,7 +350,6 @@ def change_archived_project_team(type_reference, name_reference, idUserActor):
                         <span class="font-medium">{ get_fullname(idUserActor) }</span>
                         <span> đã lưu trữ {type_joining} {name_joining}</span>
                     </div>
-                    <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
                 """
                 make(
                     doctype=doctype_reference,
@@ -449,7 +445,6 @@ def change_name_project_team(type_reference, name_reference, title_older, title_
                         <span class="font-medium">{ get_fullname(frappe.session.user) }</span>
                         <span> đã đổi tên {type_joining} {title_older} thành {title_new}</span>
                     </div>
-                    <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
                 """
                 make(
                     doctype=doctype_reference,
@@ -524,7 +519,6 @@ def add_discussion_of_project(projectId, discussionId, user_creation):
                         </div>
                         <div>{get_fullname(user_creation)} đã tạo thảo luận mới {discussion_doc.title}</div>
                     </div>
-                    <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
                 """
                 make(
                     doctype="GP Discussion",
@@ -601,7 +595,6 @@ def add_page_of_project(projectId, pageId, user_creation):
                         </div>
                         <div>{get_fullname(user_creation)} đã tạo trang mới {page_doc.title}</div>
                     </div>
-                    <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
                 """
                 make(
                     doctype="GP Page",
@@ -655,7 +648,6 @@ def add_comment_owner_discussion(type_notifies, discussionId, commentId):
                     <div>{get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discusson_doc.title} với nội dung chi tiết như sau:</div>
                     <div>{comment_doc.content}</div>
                 </div>
-                <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
             make(
                 doctype="GP Comment",
@@ -713,7 +705,6 @@ def add_reaction_owner_discussion(discussionId, userReactionId, nameReaction):
                     </div>
                     <div>{get_fullname(userReactionId)} đã thả cảm xúc {nameReaction} vào thảo luân {discussion_doc.title}</div>
                 </div>
-                <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
             make(
                 doctype="GP Discussion",
@@ -774,7 +765,6 @@ def add_comment_followed_discussion(arr_user, discussionId, commentId):
                         <div>{get_fullname(comment_doc.owner)} đã bình luận trong thảo luận {discussion_doc.title} với nội dung chi tiết như sau:</div>
                         <div>{comment_doc.content}</div>
                     </div>
-                    <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
                 """
                 make(
                     doctype="GP Comment",
@@ -842,7 +832,6 @@ def add_poll_followed_discussion(arr_user, discussionId, pollId):
                         <div>{poll_doc.title}</div>
                         <ul>{option_poll_content}</ul>
                     </div>
-                    <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
                 """
                 make(
                     doctype="GP Discussion",
@@ -902,7 +891,6 @@ def close_conclusion_followed_discussion(arr_user, discussionId):
                         <div>Thảo luận {discussion_doc.title} đã đóng và có kết luận</div>
                         <div>{discussion_doc.conclusion}</div>
                     </div>
-                    <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
                 """
                 make(
                     doctype="GP Discussion",
@@ -966,7 +954,6 @@ def assign_to_someone_task(projectId, taskId, assigner, recipient, title_task):
                     </div>
                     <div>{get_fullname(assigner)} đã giao cho bạn nhiệm vụ {title_task}</div>
                 </div>
-                <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
             subject = f'[TEAM] Bạn có nhiệm vụ mới trong dự án {project_info.title}'
         else:
@@ -975,7 +962,6 @@ def assign_to_someone_task(projectId, taskId, assigner, recipient, title_task):
                 <div class="mb-2 leading-5 text-gray-600">
                     <div>{get_fullname(assigner)} đã giao cho bạn nhiệm vụ {title_task}</div>
                 </div>
-                <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
             subject = f'[TEAM] Bạn có nhiệm vụ mới'
         make(
@@ -1043,7 +1029,6 @@ def change_status_owner_task(taskId, userChange, statusNew):
                     </div>
                     <div>{get_fullname(userChange)} đã cập nhật trạng thái nhiệm vụ {task_info.title} từ {task_info.status} qua {statusNew}</div>
                 </div>
-                <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
         else:
             link_btn = frappe.utils.get_url(f'/g/task/{taskId}')
@@ -1051,7 +1036,6 @@ def change_status_owner_task(taskId, userChange, statusNew):
                 <div class="mb-2 leading-5 text-gray-600">
                     <div>{get_fullname(userChange)} đã cập nhật trạng thái nhiệm vụ {task_info.title} từ {task_info.status} qua {statusNew}</div>
                 </div>
-                <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
         make(
             doctype="GP Task",
@@ -1184,7 +1168,6 @@ def change_due_date_to_assignee(taskId, newDueDate):
                     </div>
                     <div>Nhiệm vụ {task_info.title} thay đổi hạn chót từ {task_info.due_date} qua {newDueDate}</div>
                 </div>
-                <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
         else:
             link_btn = frappe.utils.get_url(f'/g/task/{taskId}')
@@ -1192,7 +1175,6 @@ def change_due_date_to_assignee(taskId, newDueDate):
                 <div class="mb-2 leading-5 text-gray-600">
                     <div>Nhiệm vụ {task_info.title} thay đổi hạn chót từ {task_info.due_date} qua {newDueDate}</div>
                 </div>
-                <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
         make(
             doctype="GP Task",
@@ -1280,7 +1262,6 @@ def change_priority_to_assignee(taskId, newPriority):
                     </div>
                     {sub_content_email}
                 </div>
-                <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
         else:
             link_btn = frappe.utils.get_url(f'/g/task/{taskId}')
@@ -1288,7 +1269,6 @@ def change_priority_to_assignee(taskId, newPriority):
                 <div class="mb-2 leading-5 text-gray-600">
                     {sub_content_email}
                 </div>
-                <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
             """
         make(
             doctype="GP Task",
@@ -1351,7 +1331,6 @@ def vote_poll_by_someone(pollId, userVote, option):
                 </div>
                 <div>{get_fullname(userVote)} đã bình chọn {option}</div>
             </div>
-            <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
         """
         make(
             doctype="GP Discussion",
@@ -1415,7 +1394,6 @@ def close_poll(pollId):
                         </div>
                         <div>Cuộc bình chọn {poll_doc.title} đã kết thúc với kết quả như sau:</div>
                     </div>
-                    <p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
                 """
                 make(
                     doctype="GP Discussion",

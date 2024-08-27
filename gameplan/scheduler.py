@@ -106,7 +106,6 @@ def send_notify_for_reminder(name):
 				</div>
 				<div>Nhiệm vụ {doc_task.title} sẽ đến hạn trong {doc_task.remind_times} {unit} nữa</div>
 				</div>
-				<p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
 				"""
 			else:
 				link_btn = frappe.utils.get_url(f'/g/task/{doc_task.name}')
@@ -114,7 +113,6 @@ def send_notify_for_reminder(name):
 				<div class="mb-2 leading-5 text-gray-600">
 				<div>Nhiệm vụ {doc_task.title} sẽ đến hạn trong {doc_task.remind_times} {unit} nữa</div>
 				</div>
-				<p><a class="btn btn-primary" href="{link_btn}">Xem chi tiết</a></p>
 				"""
 			make(
 				doctype="GP Task",
