@@ -24,11 +24,11 @@ export async function initMessageFireBase(){
             },
         );
         onMessage(messaging, (payload) => {
-            var title = payload.data.title;
+            var title = payload.notification.title;
             var options = {
-                body: payload.data.body,
-                icon: payload.data.icon,
-                image: payload.data.image
+                body: payload.notification.body,
+                icon: payload.notification.icon,
+                image: payload.notification.image
             }
             var myNotification = new Notification(title, options)
         })
