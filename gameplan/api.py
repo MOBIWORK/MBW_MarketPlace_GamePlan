@@ -480,16 +480,17 @@ def get_connections(reference_doctype, reference_name):
 	for connection_filter in connections_filter:
 		connection_res_filter = [connecton_fil['name'] for connecton_fil in connections_res if connecton_fil['name'] == connection_filter['name']]
 		if len(connection_res_filter) == 0:
-			destination_info = frappe.get_doc(connection_filter.reference_type_destination, connection_filter.reference_name_destination)
-			connection_res = {
-				'name': connection_filter.name,
-				'doctype_destination': connection_filter.reference_type_destination,
-				'name_destination': connection_filter.reference_name_destination,
-				'title_destination': destination_info.title,
-				'team_destination': destination_info.team,
-				'project_destination': destination_info.project
-			}
-			connections_res.append(connection_res)
+			if frappe.db.exists(connection_filter.reference_type_destination, connection_filter.reference_name_destination):
+				destination_info = frappe.get_doc(connection_filter.reference_type_destination, connection_filter.reference_name_destination)
+				connection_res = {
+					'name': connection_filter.name,
+					'doctype_destination': connection_filter.reference_type_destination,
+					'name_destination': connection_filter.reference_name_destination,
+					'title_destination': destination_info.title,
+					'team_destination': destination_info.team,
+					'project_destination': destination_info.project
+				}
+				connections_res.append(connection_res)
 	connections_filter = frappe.db.get_list('GP Connection',
 		filters={
 			'reference_type_destination': reference_doctype,
@@ -500,16 +501,17 @@ def get_connections(reference_doctype, reference_name):
 	for connection_filter in connections_filter:
 		connection_res_filter = [connecton_fil['name'] for connecton_fil in connections_res if connecton_fil['name'] == connection_filter['name']]
 		if len(connection_res_filter) == 0:
-			destination_info = frappe.get_doc(connection_filter.reference_type_source, connection_filter.reference_name_source)
-			connection_res = {
-				'name': connection_filter.name,
-				'doctype_destination': connection_filter.reference_type_source,
-				'name_destination': connection_filter.reference_name_source,
-				'title_destination': destination_info.title,
-				'team_destination': destination_info.team,
-				'project_destination': destination_info.project
-			}
-			connections_res.append(connection_res)
+			if frappe.db.exists(connection_filter.reference_type_source, connection_filter.reference_name_source):
+				destination_info = frappe.get_doc(connection_filter.reference_type_source, connection_filter.reference_name_source)
+				connection_res = {
+					'name': connection_filter.name,
+					'doctype_destination': connection_filter.reference_type_source,
+					'name_destination': connection_filter.reference_name_source,
+					'title_destination': destination_info.title,
+					'team_destination': destination_info.team,
+					'project_destination': destination_info.project
+				}
+				connections_res.append(connection_res)
 	return connections_res
 
 @frappe.whitelist()
@@ -797,6 +799,25 @@ def delete_task_by_id(name):
 	except Exception as e:
 		return {'status': "error", 'message': str(e)}
 
+@frappe.whitelist(methods=["DELETE"])
+def pages(name):
+	try:
+		page_info = frappe.get_doc('GP Page', name)
+		notifications = frappe.db.get_list('GP Notification',
+			filters={
+				'page': name
+			},
+			fields=['name']
+		)
+		for notification in notifications:
+			notification_info = frappe.get_doc('GP Notification', notification.name)
+			notification_info.delete()
+		page_info.delete()
+		frappe.db.commit()
+		return {'status': "ok", 'message': None}
+	except Exception as e:
+		return {'status': "error", 'message': str(e)}
+
 @frappe.whitelist()
 def get_value_by_reference_doctype(reference_doctype, project=None):
 	values_by_reference = []
@@ -993,46 +1014,51 @@ def accept_invitation(key: str = None):
 		frappe.throw("Invalid or expired key")
 
 	invitation = frappe.get_doc("GP Invitation", result[0])
-	invitation.accept()
-	invitation.reload()
-
 	if invitation.status == "Accepted":
-		objProject = json.loads(invitation.projects)
-		strGuest = frappe.db.get_value('GP Project', objProject[0], "guests")
-		objGuest = []
-		if strGuest is not None and strGuest != "":
-			objGuest = json.loads(strGuest)
-		if invitation.email not in objGuest:
-			objGuest.append(invitation.email)
-		frappe.db.set_value('GP Project', objProject[0], "guests", json.dumps(objGuest))
-		#Gửi thông báo tới manage,admin
-		user_info = frappe.db.get_value('User', {'email': invitation.email}, ['name'], as_dict=1)
-		config_notifications = frappe.db.get_all(
-			"GP Config Notification",
-			fields=["config_notification"],
-			filters={"user": frappe.session.user}
-		)
-		config_notification = []
-		type_notify = []
-		if len(config_notifications) == 0:
-			configs = random_config_notification()
-			doc_config_notification = frappe.new_doc('GP Config Notification')
-			doc_config_notification.config_notification = json.dumps(configs)
-			doc_config_notification.user = frappe.session.user
-			doc_config_notification.insert(ignore_permissions=True)
-			frappe.db.commit()
-			config_notification = configs
-		else:
-			config_notification = json.loads(config_notifications[0].config_notification)
-		if config_notification[0]["arr_permission"][0]["email"] == True:
-			type_notify.append("email")
-		if config_notification[0]["arr_permission"][0]["browser"] == True:
-			type_notify.append('browser')
-		#send_manager_by_invite_guest(type_notify, user_info.name, objProject[0])
-
 		frappe.local.login_manager.login_as(invitation.email)
 		frappe.local.response["type"] = "redirect"
 		frappe.local.response["location"] = "/g"
+	else:
+		invitation.accept()
+		invitation.reload()
+		if invitation.status == "Accepted":
+			objProject = json.loads(invitation.projects)
+			strGuest = frappe.db.get_value('GP Project', objProject[0], "guests")
+			objGuest = []
+			if strGuest is not None and strGuest != "":
+				objGuest = json.loads(strGuest)
+			if invitation.email not in objGuest:
+				objGuest.append(invitation.email)
+			frappe.db.set_value('GP Project', objProject[0], "guests", json.dumps(objGuest))
+			#Gửi thông báo tới manage,admin
+			user_info = frappe.db.get_value('User', {'email': invitation.email}, ['name'], as_dict=1)
+			config_notifications = frappe.db.get_all(
+				"GP Config Notification",
+				fields=["config_notification"],
+				filters={"user": frappe.session.user}
+			)
+			config_notification = []
+			type_notify = []
+			if len(config_notifications) == 0:
+				configs = random_config_notification()
+				doc_config_notification = frappe.new_doc('GP Config Notification')
+				doc_config_notification.config_notification = json.dumps(configs)
+				doc_config_notification.user = frappe.session.user
+				doc_config_notification.insert(ignore_permissions=True)
+				frappe.db.commit()
+				config_notification = configs
+			else:
+				config_notification = json.loads(config_notifications[0].config_notification)
+			if config_notification[0]["arr_permission"][0]["email"] == True:
+				type_notify.append("email")
+			if config_notification[0]["arr_permission"][0]["browser"] == True:
+				type_notify.append('browser')
+			#send_manager_by_invite_guest(type_notify, user_info.name, objProject[0])
+			frappe.local.login_manager.login_as(invitation.email)
+			frappe.local.response["type"] = "redirect"
+			frappe.local.response["location"] = "/g"
+
+	
 
 @frappe.whitelist()
 def get_unsplash_photos(keyword=None):
@@ -1395,7 +1421,3 @@ def update_config_view(name, view_type):
 	except Exception as e:
 		return {'status': "error", 'message': ""}
 
-
-@frappe.whitelist(methods=["GET"])
-def test_notification(title, body):
-	send_notification_to_user(title, body)

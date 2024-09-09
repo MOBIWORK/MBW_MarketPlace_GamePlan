@@ -31,21 +31,42 @@ def get_discussions(filters=None, order_by=None, limit_start=None, limit_page_le
 		.where(Member.parent == Project.team)
 		.where(Member.user == frappe.session.user)
 	)
-	query = (
-		frappe.qb.from_(Discussion)
-		.select(Discussion.star, Visit.last_visit, Project.title.as_("project_title"), Team.title.as_("team_title"))
-		.left_join(Visit)
-		.on((Discussion.name == Visit.discussion) & (Visit.user == frappe.session.user))
-		.left_join(Project)
-		.on(Discussion.project == Project.name)
-		.left_join(Team)
-		.on(Discussion.team == Team.name)
-		.inner_join(User)
-		.on(Discussion.owner == User.name)
-		.where((Project.is_private == 0) | ((Project.is_private == 1) & ExistsCriterion(member_exists)))
-		.limit(limit_page_length)
-		.offset(limit_start or 0)
-	)
+	is_guest = gameplan.is_guest()
+	query = None
+	if is_guest:
+		GuestAccess = frappe.qb.DocType("GP Guest Access")
+		project_list = GuestAccess.select(GuestAccess.project).where(GuestAccess.user == frappe.session.user)
+		query = (
+			frappe.qb.from_(Discussion)
+			.select(Discussion.star, Visit.last_visit, Project.title.as_("project_title"), Team.title.as_("team_title"))
+			.left_join(Visit)
+			.on((Discussion.name == Visit.discussion) & (Visit.user == frappe.session.user))
+			.left_join(Project)
+			.on(Discussion.project == Project.name)
+			.left_join(Team)
+			.on(Discussion.team == Team.name)
+			.inner_join(User)
+			.on(Discussion.owner == User.name)
+			.where(Discussion.project.isin(project_list))
+			.limit(limit_page_length)
+			.offset(limit_start or 0)
+		)
+	else:
+		query = (
+			frappe.qb.from_(Discussion)
+			.select(Discussion.star, Visit.last_visit, Project.title.as_("project_title"), Team.title.as_("team_title"))
+			.left_join(Visit)
+			.on((Discussion.name == Visit.discussion) & (Visit.user == frappe.session.user))
+			.left_join(Project)
+			.on(Discussion.project == Project.name)
+			.left_join(Team)
+			.on(Discussion.team == Team.name)
+			.inner_join(User)
+			.on(Discussion.owner == User.name)
+			.where((Project.is_private == 0) | ((Project.is_private == 1) & ExistsCriterion(member_exists)))
+			.limit(limit_page_length)
+			.offset(limit_start or 0)
+		)
 	if filters:
 		for key in filters:
 			if key != "searchDiscussion":
@@ -82,13 +103,6 @@ def get_discussions(filters=None, order_by=None, limit_start=None, limit_page_le
 
 	# default order by last_post_at desc
 	query = query.orderby(Discussion[order_field], order=frappe._dict(value=order_direction))
-
-	is_guest = gameplan.is_guest()
-	if is_guest:
-		GuestAccess = frappe.qb.DocType("GP Guest Access")
-		project_list = GuestAccess.select(GuestAccess.project).where(GuestAccess.user == frappe.session.user)
-		print("Dòng 87 ", project_list)
-		query = query.where(Discussion.project.isin(project_list))
 
 	discussions = query.run(as_dict=1)
 	Poll = frappe.qb.DocType("GP Poll")

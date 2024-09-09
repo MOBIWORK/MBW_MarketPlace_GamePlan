@@ -100,7 +100,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-13 15:14:59.692708",
+ "modified": "2024-09-09 15:13:00.173881",
  "modified_by": "Administrator",
  "module": "Gameplan",
  "name": "GP Notification",
@@ -133,6 +133,7 @@
   },
   {
    "create": 1,
+   "delete": 1,
    "email": 1,
    "export": 1,
    "print": 1,

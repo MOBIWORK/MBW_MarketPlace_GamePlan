@@ -155,8 +155,8 @@
         </div>
         <div class="w-full flex items-center mb-5">
           <div class="w-24 mr-8">{{ __('Project') }}</div>
-          <div class="w-full">
-            <Autocomplete :placeholder="__('Select project')" :options="projectOptions" class="truncate"
+          <div class="w-full truncate">
+            <Autocomplete :placeholder="__('Select project')" :options="projectOptions"
                 v-model="$resources.task.doc.project" @update:modelValue="changeProject" />
           </div>
         </div>
@@ -202,7 +202,7 @@
         </div>
         <div class="w-full flex items-center mb-5">
           <div class="w-24 mr-8">{{ __('Project') }}</div>
-          <div class="w-full">
+          <div class="w-full truncate">
             <TextInput type="text" v-model="$resources.task.doc.project" :disabled="true" />
           </div>
         </div>

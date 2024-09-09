@@ -195,7 +195,7 @@
         />
       </template> -->
       <template v-if="activeActivity=='comment'">
-        <CommentListDiscussion :doctype="'GP Discussion'" :reference_name="postId" :show_label="false"></CommentListDiscussion>
+        <CommentListDiscussion :doctype="'GP Discussion'" :reference_name="postId" :show_label="false" :enable_add_comment="!discussion.closed_at"></CommentListDiscussion>
         
         <!-- <CommentsArea
           doctype="GP Discussion"

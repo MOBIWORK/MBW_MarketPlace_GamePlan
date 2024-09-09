@@ -69,7 +69,7 @@
               label: __('Delete'),
               onClick: ({ close }) => {
                 showDeleteDialog = false
-                return $resources.pages_source.delete.submit(pageSource.name)
+                return $resources.delete_source.submit({'name': pageSource.name})
               },
               variant: 'solid',
               theme: 'red',
@@ -86,6 +86,7 @@
 import { projectTitle } from '@/utils/formatters'
 import { Dropdown } from 'frappe-ui'
 import { getUser } from '@/data/users'
+import { createToast } from '@/utils'
 
 export default {
   name: 'PageGrid',
@@ -127,6 +128,22 @@ export default {
         delete:{
           onSuccess(){
             this.$resources.pages.fetch()
+          }
+        }
+      }
+    },
+    delete_source(){
+      return {
+        url: "gameplan.api.pages",
+        method: "DELETE",
+        onSuccess(data){
+          if(data.status == "ok") this.$resources.pages.fetch()
+          else{
+            createToast({
+              title: __('Error while deleting record'),
+              icon: 'x',
+              iconClasses: 'text-red-600',
+            })
           }
         }
       }

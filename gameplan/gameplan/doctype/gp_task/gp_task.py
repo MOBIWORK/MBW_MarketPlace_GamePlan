@@ -79,6 +79,8 @@ class GPTask(HasMentions, HasActivity, Document):
 				reminder.reminder_doctype = "GP Task"
 				reminder.reminder_docname = self.name
 				reminder.notified = 0
+				reminder.reminder_times = config_reminder_task.remind_times
+				reminder.reminder_unit = unit
 				reminder.insert()
 				frappe.db.set_value('GP Config Reminder Task', config_reminder_task.name, 'id_reminder', reminder.name)
 				frappe.db.commit()
@@ -117,6 +119,8 @@ class GPTask(HasMentions, HasActivity, Document):
 					doc_reminder.reminder_doctype = "GP Task"
 					doc_reminder.reminder_docname = self.name
 					doc_reminder.notified = 0
+					doc_reminder.reminder_times = reminder_config.remind_times
+					doc_reminder.reminder_unit = unit
 					doc_reminder.save()
 					frappe.db.commit()
 				elif is_exist_remind == False and date_due_date > datetime.now():

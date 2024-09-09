@@ -2,7 +2,7 @@
     <div class="w-full relative max-h-[627px]">
         <div class="flex items-center" :class="[show_label ? 'justify-between' : 'justify-end']">
             <div class="text-lg font-semibold" v-if="show_label">{{ __('Comment') }}</div>
-            <Button variant="solid" theme="gray" @click="onShowNewComment()">
+            <Button variant="solid" theme="gray" @click="onShowNewComment()" v-if="enable_add_comment">
                 <template #prefix>
                     <LucidePlus class="h-4 w-4" />
                 </template>
@@ -66,6 +66,10 @@ export default {
             type: String
         },
         show_label: {
+            type: Boolean,
+            default: true
+        },
+        enable_add_comment:{
             type: Boolean,
             default: true
         }

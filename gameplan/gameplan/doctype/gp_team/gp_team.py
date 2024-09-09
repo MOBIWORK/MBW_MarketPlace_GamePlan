@@ -18,10 +18,21 @@ class GPTeam(Archivable, Document):
 	on_delete_set_null = ["GP Notification"]
 
 	def as_dict(self, *args, **kwargs) -> dict:
-		members = [m.user for m in self.members]
-		if self.is_private and frappe.session.user not in members:
-			frappe.throw("Not permitted", frappe.PermissionError)
-
+		is_guest = gameplan.is_guest()
+		if is_guest:
+			guests_access = frappe.get_list('GP Guest Access',
+				filters={
+					'user': frappe.session.user
+				},
+				fields=['team']
+			)
+			team_access = [guest_access.team for guest_access in guests_access]
+			if self.name not in team_access:
+				frappe.throw("Not permitted", frappe.PermissionError)
+		else:
+			members = [m.user for m in self.members]
+			if self.is_private and frappe.session.user not in members:
+				frappe.throw("Not permitted", frappe.PermissionError)
 		d = super().as_dict(*args, **kwargs)
 		return d
 

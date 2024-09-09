@@ -27,7 +27,7 @@
             ]" variant="outline" v-model="reference_doctype_select" size="sm" class="mr-2" style="width: 8rem !important;">
             </Select>
             <div class="w-full">
-                <Select :options="datas_reference_name" variant="outline" v-model="reference_name_select" size="sm"></Select>
+                <Autocomplete :options="datas_reference_name" variant="outline" v-model="reference_name_select" size="sm"></Autocomplete>
             </div>
         </div>
         <div class="flex items-center justify-end">
@@ -87,7 +87,7 @@
     />
 </template>
 <script>
-import { Button, TextInput, Tooltip, Select, Dialog, Badge } from 'frappe-ui'
+import { Button, TextInput, Tooltip, Autocomplete, Dialog, Badge, Select } from 'frappe-ui'
 import { createToast } from '@/utils'
 
 export default {
@@ -123,9 +123,10 @@ export default {
         Button,
         TextInput,
         Tooltip,
-        Select,
+        Autocomplete,
         Dialog,
-        Badge
+        Badge,
+        Select
     },
     resources: {
         connections() {
@@ -156,6 +157,7 @@ export default {
                 insert: {
                     onSuccess(){
                         this.$resources.lst_connection.fetch()
+                        this.reference_name_select = null
                     }
                 }
             }
@@ -291,14 +293,14 @@ export default {
         onCancelAddingConnection(){
             this.show_adding_connection = false
             this.reference_doctype_select = "GP Task"
-            this.reference_name_select = ""
+            this.reference_name_select = null
         },
         onSaveAddingConnection(){
             this.$resources.connections.insert.submit({
                 reference_type_source: this.reference_doctype,
                 reference_name_source: this.reference_name,
                 reference_type_destination: this.reference_doctype_select,
-                reference_name_destination: this.reference_name_select
+                reference_name_destination: this.reference_name_select.value
             })
             this.reference_doctype_select = "GP Task"
             this.show_adding_connection = false
@@ -310,7 +312,7 @@ export default {
     },
     watch: {
         reference_doctype_select(newVal, oldVal){
-            this.reference_name_select = ""
+            this.reference_name_select = null
             this.$resources.values_by_reference.params = {
                 reference_doctype: newVal,
                 project: this.project != null && this.project != ""? this.project : ""

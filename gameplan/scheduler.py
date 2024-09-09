@@ -75,7 +75,7 @@ def send_notify_for_reminder(name):
 			<div class="mb-2 leading-5 text-gray-600 text-sm">
 				<span>Nhiệm vụ </span>
 				<span class="font-medium text-gray-900"> {doc_task.title} </span>
-				<span>sẽ đến hạn trong {doc_task.remind_times} {unit} nữa</span>
+				<span>sẽ đến hạn trong {reminder_info.reminder_times} {reminder_info.reminder_unit} nữa</span>
 			</div>
 		"""
 		values_notify = frappe._dict(
@@ -104,14 +104,14 @@ def send_notify_for_reminder(name):
 				<span>Dự án </span>
 				<span>{project_info.title}</span>
 				</div>
-				<div>Nhiệm vụ {doc_task.title} sẽ đến hạn trong {doc_task.remind_times} {unit} nữa</div>
+				<div>Nhiệm vụ {doc_task.title} sẽ đến hạn trong {reminder_info.reminder_times} {reminder_info.reminder_unit} nữa</div>
 				</div>
 				"""
 			else:
 				link_btn = frappe.utils.get_url(f'/g/task/{doc_task.name}')
 				content_email = f"""
 				<div class="mb-2 leading-5 text-gray-600">
-				<div>Nhiệm vụ {doc_task.title} sẽ đến hạn trong {doc_task.remind_times} {unit} nữa</div>
+				<div>Nhiệm vụ {doc_task.title} sẽ đến hạn trong {reminder_info.reminder_times} {reminder_info.reminder_unit} nữa</div>
 				</div>
 				"""
 			make(
