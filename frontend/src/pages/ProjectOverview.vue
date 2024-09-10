@@ -76,6 +76,7 @@ export default {
         filters: {
           project: this.project.doc.name,
           status: ['in', ['Backlog', 'Todo', 'In Progress']],
+          search_by_project_team: true
         },
         pageLength: 4,
       },

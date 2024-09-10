@@ -72,14 +72,44 @@
                                             />
                                         </div>
                                         <div class="flex justify-start" v-if="fields['priority'] != null && fields['priority'] != ''">
-                                            <div
-                                                class="rounded-full p-1 text-sm"
-                                                :class="{
-                                                    'bg-red-500 text-white': fields['priority'] === 'High',
-                                                    'bg-yellow-500 text-black': fields['priority'] === 'Medium',
-                                                    'bg-gray-300 text-black': fields['priority'] === 'Low',
-                                                }"
-                                            >{{fields['priority']}}</div>
+                                            <Popover>
+                                                <template #target="{ togglePopover }">
+                                                    <div
+                                                        class="rounded-full py-1 px-2 text-sm cursor-pointer"
+                                                        :class="{
+                                                            'bg-red-500 text-white': fields['priority'] === 'High',
+                                                            'bg-yellow-500 text-black': fields['priority'] === 'Medium',
+                                                            'bg-gray-300 text-black': fields['priority'] === 'Low',
+                                                        }"
+                                                        @click="togglePopover()"
+                                                    >{{fields['priority']}}</div>
+                                                </template>
+                                                <template #body-main="{ togglePopover }">
+                                                    <div class="p-2">
+                                                        <div class="text-gray-800 group flex h-7 w-full items-center rounded px-2 text-base hover:bg-gray-100" 
+                                                            @click="() => {fields['priority']='Low'; onChangePriority(fields.name, 'Low'); togglePopover();}">
+                                                            <div class="grid place-items-center mr-2 h-4 w-4 flex-shrink-0 text-gray-700">
+                                                                <div class="h-3 w-3 rounded-full bg-gray-300"></div>
+                                                            </div>
+                                                            <span class="whitespace-nowrap">{{__('Low')}}</span>
+                                                        </div>
+                                                        <div class="text-gray-800 group flex h-7 w-full items-center rounded px-2 text-base hover:bg-gray-100" 
+                                                            @click="() => {fields['priority']='Medium'; onChangePriority(fields.name, 'Medium'); togglePopover();}">
+                                                            <div class="grid place-items-center mr-2 h-4 w-4 flex-shrink-0 text-gray-700">
+                                                                <div class="h-3 w-3 rounded-full bg-yellow-500"></div>
+                                                            </div>
+                                                            <span class="whitespace-nowrap">{{__('Medium')}}</span>
+                                                        </div>
+                                                        <div class="text-gray-800 group flex h-7 w-full items-center rounded px-2 text-base hover:bg-gray-100" 
+                                                            @click="() => {fields['priority']='High'; onChangePriority(fields.name, 'High'); togglePopover();}">
+                                                            <div class="grid place-items-center mr-2 h-4 w-4 flex-shrink-0 text-gray-700">
+                                                                <div class="h-3 w-3 rounded-full bg-red-500"></div>
+                                                            </div>
+                                                            <span class="whitespace-nowrap">{{__('High')}}</span>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </Popover>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <div class="flex items-center" :class="{'text-red-600': checkDeadLine(fields['due_date'], fields['status']) == true}">
@@ -132,7 +162,7 @@ import NestedPopover from '@/components/NestedPopover.vue'
 import IndicatorIcon from '@/components/icons/IndicatorIcon.vue'
 import { isTouchScreenDevice } from '@/utils'
 import Draggable from 'vuedraggable'
-import { Dropdown, FeatherIcon, Avatar } from 'frappe-ui'
+import { Dropdown, FeatherIcon, Avatar, Popover } from 'frappe-ui'
 import { computed, ref } from 'vue'
 import router from '@/router'
 import { activeUsers } from '@/data/users'
@@ -150,7 +180,7 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['update', 'loadMore', 'update_assign_task'])
+const emit = defineEmits(['update', 'loadMore', 'update_assign_task', 'update_property'])
 
 const titleField = computed(() => {
     return props.kanban.data?.title_field
@@ -315,6 +345,14 @@ const colors = [
     'purple',
     'black',
 ]
+
+function onChangePriority(name, priority){
+    let property_update = {
+        'name': name,
+        'priority': priority
+    }
+    emit('update_property', property_update)
+}
 
 </script>
 <style scoped>

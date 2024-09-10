@@ -95,6 +95,7 @@
           }"
           @update="(data) => updateKanban(data)"
           @update_assign_task="(data) => onUpdateAssign(data)"
+          @update_property="(data) => onUpdateProperty(data)"
         >
           <template #title="{ titleField, itemName }">
             <div class="flex items-center justify-between w-full">
@@ -316,7 +317,7 @@ function parseRows(rows) {
 }
 
 let listOptions = computed(() => ({
-  filters: { assigned_or_owner: getUser('sessionUser').name, search_by_project_team: true },
+  filters: { assigned_or_owner: getUser('sessionUser').name, search_by_project_team: false },
   orderBy: "creation desc",
   txt_search: "",
   is_my_task: "true"
@@ -419,6 +420,10 @@ function onUpdateAssign(data){
   tasksListResource.setValue.submit(objSubmit)
 }
 
+async function onUpdateProperty(data){
+  tasksListResource.setValue.submit(data)
+}
+
 function actions(name) {
   return [
     {
@@ -446,7 +451,7 @@ function readOnlyByRole(){
 watch(txtSearch, async(newSearch, oldSearch) => {
   defaultParamsKanban.value.text_search = txtSearch.value
   listOptions.value.filters['title'] = txtSearch.value
-  listOptions.value.filters['search_by_project_team'] = true
+  listOptions.value.filters['search_by_project_team'] = false
   //Đưa thêm thông tin tìm kiếm theo project và team
   if(viewTask.value == "list"){
     lstTask.value.onReloadTasks()

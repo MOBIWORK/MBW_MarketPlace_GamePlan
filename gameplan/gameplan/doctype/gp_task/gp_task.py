@@ -171,10 +171,12 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 	search_by_project_team = filters.pop('search_by_project_team', None)
 	Task = frappe.qb.DocType(doctype)
 	if search_by_project_team is not None and search_by_project_team == True:
+		project_id = filters.pop('project', None)
 		if title_pop is not None and title_pop != "":
 			Team = frappe.qb.DocType('GP Team')
 			Project = frappe.qb.DocType('GP Project')
 			query = frappe.qb.from_(Task).inner_join(Team).on(Task.team == Team.name).inner_join(Project).on(Task.project == Project.name).select(Task.name,Task.title,Task.description,Task.start_date,Task.due_date,Task.status,Task.priority,Task.is_completed,Task.completed_at,Task.completed_by,Task.project,Task.team,Task.assigned_to,Task.comments_count,Task.owner,Task.creation,Project.title.as_("project_title"),Team.title.as_("team_title"))
+			query = query.where(Task.project == project_id)
 			if assigned_or_owner:
 				query = query.where(
 					(Task.assigned_to == assigned_or_owner) | (Task.owner == assigned_or_owner)
@@ -191,13 +193,13 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 				limit=limit,
 				group_by=group_by,
 			)
+			query = query.where(Task.project == project_id)
 			if assigned_or_owner:
 				query = query.where(
 					(Task.assigned_to == assigned_or_owner) | (Task.owner == assigned_or_owner)
 				)
 			return query.run(as_dict=True, debug=debug)
 	else:
-		project_id = filters.pop('project', None)
 		assigns_task = filters.pop('assign_task', None)
 		query = frappe.qb.get_query(
 			table=doctype,
@@ -207,9 +209,9 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 			limit=limit,
 			group_by=group_by,
 		)
-		query = query.where(Task.project == project_id)
 		if title_pop is not None and title_pop != "":
 			query = query.where(Task.title.like(f'%{title_pop}%'))
 		if assigns_task is not None and len(assigns_task) > 0:
 			query = query.where(Task.assigned_to.isin(assigns_task))
+		print("Dòng 215 ", query)
 		return query.run(as_dict=True, debug=debug)

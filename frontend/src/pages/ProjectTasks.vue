@@ -61,7 +61,7 @@
   <div class="pt-3 pl-2" style="height: calc(100% - 90px);" v-if="typeView == 'kanban_by_status' || typeView == 'kanban_by_priority'">
     <KanbanView :kanban="dataByKanban" :options="{
       onNewClick: (column) => createTask(column),
-    }" @update="(data) => updateKanban(data)" @update_assign_task="(data) => onUpdateAssign(data)">
+    }" @update="(data) => updateKanban(data)" @update_assign_task="(data) => onUpdateAssign(data)" @update_property="(data) => onUpdateProperty(data)">
       <template #title="{ titleField, itemName }">
         <div class="flex items-center justify-between w-full">
               <div class="truncate cursor-pointer" style="width: calc(100% - 28px);" @click="onShowTaskDetail(itemName, titleField)">
@@ -214,7 +214,8 @@ let tasksListResource = createListResource({
 let listOptions = computed(() => ({
   filters: {
     project: props.project.name,
-    assign_task: []
+    assign_task: [],
+    search_by_project_team: true
   },
   orderBy: "creation desc"
 }))
@@ -334,6 +335,10 @@ function createTask(column) {
 function onUpdateAssign(data){
   let objSubmit = { name: data.id_task, assigned_to: data.user_id }
   tasksListResource.setValue.submit(objSubmit)
+}
+
+function onUpdateProperty(data){
+  tasksListResource.setValue.submit(data)
 }
 
 function updateKanban(data) {
