@@ -14,6 +14,7 @@ from frappe.model import no_value_fields
 from frappe import _
 import json
 from gameplan.fcm_manager import send_notification_to_user
+from frappe.utils.password import update_password
 
 @frappe.whitelist(allow_guest=True)
 def get_user_info(user=None):
@@ -1056,9 +1057,16 @@ def accept_invitation(key: str = None):
 			#send_manager_by_invite_guest(type_notify, user_info.name, objProject[0])
 			frappe.local.login_manager.login_as(invitation.email)
 			frappe.local.response["type"] = "redirect"
-			frappe.local.response["location"] = "/g"
+			frappe.local.response["location"] = "/g#change_password"
 
-	
+@frappe.whitelist(methods=["POST"])
+def change_password(new_pass):
+	try:
+		user_doc = frappe.get_doc('User', frappe.session.user)
+		update_password(user_doc.name, new_pass)
+		return {'status': "ok"}
+	except Exception as e:
+		return {'status': "error", 'message': str(e)}
 
 @frappe.whitelist()
 def get_unsplash_photos(keyword=None):

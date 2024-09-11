@@ -86,6 +86,8 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SettingsDialog: typeof import('./src/components/Settings/SettingsDialog.vue')['default']
+    ChangingPasswordDialog: typeof import('./src/components/InfoUser/Modal/ChangingPassword.vue')['default']
+    ChangingPasswordFirstlyLoginDialog: typeof import('./src/components/InfoUser/Modal/ChangingPassFirstlyLogin.vue')['default']
     Tabs: typeof import('./src/components/Tabs.vue')['default']
     TaskDetail: typeof import('./src/components/TaskDetail.vue')['default']
     TaskList: typeof import('./src/components/TaskList.vue')['default']

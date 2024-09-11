@@ -24,10 +24,23 @@
     </div>
     <CommandPalette />
     <SettingsDialog />
+    <ChangingPasswordDialog />
+    <ChangingPasswordFirstlyLoginDialog />
   </div>
 </template>
 <script setup>
 import AppSidebar from './AppSidebar.vue'
 import CommandPalette from './CommandPalette/CommandPalette.vue'
 import SettingsDialog from './Settings/SettingsDialog.vue'
+import ChangingPasswordDialog from './InfoUser/Modal/ChangingPassword.vue'
+import ChangingPasswordFirstlyLoginDialog from './InfoUser/Modal/ChangingPassFirstlyLogin.vue'
+import {showChangingPasswordFirstlyLoginDialog} from './InfoUser/Modal/ChangingPassFirstlyLogin.vue'
+import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+
+const route = useRoute();
+const hasChangePassword = computed(() => route.hash.includes('change_password'))
+if(hasChangePassword.value){
+  showChangingPasswordFirstlyLoginDialog()
+}
 </script>

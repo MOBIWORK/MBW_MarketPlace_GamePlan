@@ -21,16 +21,18 @@
 </template>
 <script>
 import { h } from 'vue'
-import { Dropdown } from 'frappe-ui'
+import { Dropdown, Dialog } from 'frappe-ui'
 import { showSettingsDialog } from '@/components/Settings/SettingsDialog.vue'
 import LucideCreditCard from '~icons/lucide/credit-card'
 import GameplanLogo from './GameplanLogo.vue'
+import { showChangingPasswordDialog } from '@/components/InfoUser/Modal/ChangingPassword.vue'
 
 export default {
   name: 'UserDropdown',
   components: {
     Dropdown,
     GameplanLogo,
+    Dialog
   },
   computed: {
     dropdownItems() {
@@ -48,6 +50,12 @@ export default {
           label: __('Settings & Members'),
           onClick: () => showSettingsDialog(),
           condition: () => this.$user().isNotGuest,
+        },
+        {
+          icon: 'edit',
+          label: __('Changing Password'),
+          onClick: () => showChangingPasswordDialog()
+
         },
         {
           icon: () => h(LucideCreditCard),

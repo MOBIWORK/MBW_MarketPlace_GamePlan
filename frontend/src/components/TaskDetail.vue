@@ -203,7 +203,7 @@
         <div class="w-full flex items-center mb-5">
           <div class="w-24 mr-8">{{ __('Project') }}</div>
           <div class="w-full truncate">
-            <TextInput type="text" v-model="$resources.task.doc.project" :disabled="true" />
+            <TextInput type="text" :value="getProjectById($resources.task.doc.project)" :disabled="true" />
           </div>
         </div>
         <div class="w-full flex items-center mb-5">
@@ -356,6 +356,14 @@ export default {
           },
         }
       )
+    },
+    getProjectById(projectId){
+      for(let i = 0; i < this.projectOptions.length; i++){
+        let items = this.projectOptions[i].items
+        let itemFilter = items.filter(x => x.value == projectId)
+        if(itemFilter.length > 0) return itemFilter[0].label
+      }
+      return ""
     }
   },
   computed: {

@@ -200,7 +200,6 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 				)
 			return query.run(as_dict=True, debug=debug)
 	else:
-		assigns_task = filters.pop('assign_task', None)
 		query = frappe.qb.get_query(
 			table=doctype,
 			fields=fields,
@@ -211,7 +210,8 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 		)
 		if title_pop is not None and title_pop != "":
 			query = query.where(Task.title.like(f'%{title_pop}%'))
-		if assigns_task is not None and len(assigns_task) > 0:
-			query = query.where(Task.assigned_to.isin(assigns_task))
-		print("Dòng 215 ", query)
+		if assigned_or_owner:
+			query = query.where(
+				(Task.assigned_to == assigned_or_owner) | (Task.owner == assigned_or_owner)
+			)
 		return query.run(as_dict=True, debug=debug)
