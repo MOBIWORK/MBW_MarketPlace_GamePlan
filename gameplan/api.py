@@ -962,11 +962,11 @@ def permission_discussion(discussion):
 		if "Gameplan Admin" in arr_role:
 			return "write"
 		if "Gameplan Member" in arr_role:
-			project_doc = frappe.get_doc('GP Project', task_doc.project)
+			project_doc = frappe.get_doc('GP Project', discussion_doc.project)
 			if project_doc.is_private == 0:
 				return "read"
 			else:
-				team_doc = frappe.get_doc('GP Team', task_doc.team)
+				team_doc = frappe.get_doc('GP Team', discussion_doc.team)
 				members = team_doc.members
 				for member in members:
 					if member.user == frappe.session.user:

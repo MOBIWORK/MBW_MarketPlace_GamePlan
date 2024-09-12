@@ -55,6 +55,8 @@ import CommentReplyEditor from '@/components/Comment/CommentReplyEditor.vue'
 import PollEditor from '@/components/PollEditor.vue'
 import TabButtons from '@/components/frappe-ui/TabButtons.vue'
 import PollDiscussion from './PollDiscussion.vue'
+import { nextTick } from 'vue'
+import { getScrollContainer } from '@/utils/scrollContainer'
 
 export default {
     name: "CommentListDiscussion",
