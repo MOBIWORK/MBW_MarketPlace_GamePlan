@@ -38,7 +38,7 @@
               type="password"
             />
           </div>
-          <ErrorMessage class="mt-2" :message="session.login.error" />
+          <ErrorMessage class="mt-2" :message="__('Invalid email or password')" v-if="session.login.error" />
           <Button
             variant="solid"
             class="mt-6 w-full"

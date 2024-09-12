@@ -31,6 +31,7 @@ import LucideInbox from '~icons/lucide/inbox'
 import LucideLayoutGrid from '~icons/lucide/layout-grid'
 import LucideListTodo from '~icons/lucide/list-todo'
 import LucideNewspaper from '~icons/lucide/newspaper'
+import { users } from '@/data/users'
 
 export default {
   name: 'MobileLayout',
@@ -96,5 +97,8 @@ export default {
       this.$router.push(tab.route)
     },
   },
+  mounted(){
+    users.fetch()
+  }
 }
 </script>

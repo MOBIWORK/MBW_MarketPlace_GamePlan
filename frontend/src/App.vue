@@ -11,12 +11,11 @@
 import { computed, defineAsyncComponent } from 'vue'
 import { Dialogs } from '@/utils/dialogs'
 import { Toasts } from 'frappe-ui'
-import { users } from '@/data/users'
+
 import { useScreenSize } from './utils/composables'
-import { initMessageFireBase } from './utils/messaging_firebase'
+
 
 const screenSize = useScreenSize()
-initMessageFireBase()
 const MobileLayout = defineAsyncComponent(() =>
   import('./components/MobileLayout.vue')
 )
@@ -31,6 +30,4 @@ const Layout = computed(() => {
     return DesktopLayout
   }
 })
-
-users.fetch()
 </script>

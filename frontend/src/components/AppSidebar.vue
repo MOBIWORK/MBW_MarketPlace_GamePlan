@@ -119,8 +119,8 @@
           <template #icon><LucidePlus class="h-4 w-4" /></template>
         </Button>
       </div>
-      <nav class="mt-1 space-y-0.5 px-2">
-        <div v-for="team in activeTeams" :key="team.name">
+      <nav class="mt-1 space-y-0.5 px-2" id="lst_teams">
+        <div v-for="team in activeTeams" :key="team.name" :id="team.name">
           <Link
             :link="team"
             class="flex items-center rounded px-2 py-1 transition"
@@ -218,6 +218,7 @@ import LucideNewspaper from '~icons/lucide/newspaper'
 import LucideFiles from '~icons/lucide/files'
 import { getUser } from '@/data/users'
 import NotificationsSidebar from '@/components/NotificationsSidebar.vue'
+import Sortable from 'sortablejs';
 
 export default {
   name: 'AppSidebar',
@@ -243,9 +244,21 @@ export default {
     }
   },
   mounted() {
+    var me = this
     teams_by_role.fetch()
     let sidebarWidth = parseInt(localStorage.getItem('sidebarWidth') || 256)
     this.sidebarWidth = sidebarWidth
+    let el = document.getElementById("lst_teams")
+    var sortable = Sortable.create(el, {
+      onEnd: function(evt){
+        let elementChild = el.children
+        let arrOrderByTeam = []
+        for(let i = 0; i < elementChild.length; i++){
+          arrOrderByTeam.push(elementChild[i].id)
+        }
+        localStorage.setItem(`orderByTeamCache_${getUser('sessionUser').name}`, JSON.stringify(arrOrderByTeam))
+      }
+    });
   },
   computed: {
     notification(){
@@ -292,10 +305,33 @@ export default {
       ].filter((nav) => (nav.condition ? nav.condition() : true))
     },
     activeTeams() {
-      let strActiveTeamCache = localStorage.getItem(`activeTeamCache_${getUser('sessionUser').name}`);
-      let objActiveTeamCache = {};
-      if(strActiveTeamCache != null && strActiveTeamCache != "") objActiveTeamCache = JSON.parse(strActiveTeamCache);
-      let activeTeamsNew = activeTeams.value.map((team) => {
+      let strActiveTeamCache = localStorage.getItem(`activeTeamCache_${getUser('sessionUser').name}`)
+      let objActiveTeamCache = {}
+      if(strActiveTeamCache != null && strActiveTeamCache != "") objActiveTeamCache = JSON.parse(strActiveTeamCache)
+      let strOrderByTeamCache = localStorage.getItem(`orderByTeamCache_${getUser('sessionUser').name}`)
+      let arrOrderByTeamCache = []
+      if(strOrderByTeamCache != null && strOrderByTeamCache != "") arrOrderByTeamCache = JSON.parse(strOrderByTeamCache)
+      let activeSortedTeams = []
+      if(arrOrderByTeamCache.length > 0){
+        let arrTeamTemp = []
+        for(let i = 0; i < activeTeams.value.length; i++){
+          if(arrOrderByTeamCache.indexOf(activeTeams.value[i].name) < 0) arrTeamTemp.push(activeTeams.value[i]) //Đưa những nhóm chưa được lưu trữ sắp xếp vào mảng tạm
+        }
+        //Từ mảng team lưu trữ localstorage ánh xạ sang danh sách team theo mã lưu trữ
+        for(let i = 0; i < arrOrderByTeamCache.length; i++){
+          let activeTeamFilter = activeTeams.value.filter(x => x.name == arrOrderByTeamCache[i])
+          if(activeTeamFilter.length > 0){
+            activeSortedTeams.push(activeTeamFilter[0])
+          }
+        }
+        //Bổ sung những team chưa được lưu trong localstorage
+        for(let i = 0; i < arrTeamTemp.length; i++){
+          activeSortedTeams.push(arrTeamTemp[i])
+        }
+      }else{
+        activeSortedTeams = activeTeams.value
+      }
+      let activeTeamsNew = activeSortedTeams.map((team) => {
         team.class = function ($route, link) {
           if (
             ['TeamLayout', 'Team', 'TeamOverview'].includes($route.name) &&
