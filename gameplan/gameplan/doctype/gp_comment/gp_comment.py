@@ -80,7 +80,6 @@ class GPComment(HasMentions, HasReactions, Document):
 	
 	@frappe.whitelist()
 	def delete_comment(self):
-		print("Dòng 83 delete comment ", self.name)
 		if self.doc_parent is None or self.doc_parent == "":
 			#Remove all comment contain parent
 			comments_child = frappe.db.get_list('GP Comment',

@@ -1059,6 +1059,43 @@ def accept_invitation(key: str = None):
 			frappe.local.response["type"] = "redirect"
 			frappe.local.response["location"] = "/g#change_password"
 
+@frappe.whitelist(allow_guest=True)
+@validate_type
+def accept_invitation_member(key: str = None):
+	if not key:
+		frappe.throw("Invalid or expired key")
+	
+	result = frappe.db.get_all("GP Invitation", filters={"key": key}, pluck="name")
+	if not result:
+		frappe.throw("Invalid or expired key")
+	
+	invitation = frappe.get_doc("GP Invitation", result[0])
+	teams = None
+	projects = None
+	if invitation.projects != None and invitation.projects != "":
+		projects = frappe.parse_json(invitation.projects)
+	if invitation.teams != None and invitation.teams != "":
+		teams = frappe.parse_json(invitation.teams)
+	if invitation.status == "Accepted":
+		frappe.local.login_manager.login_as(invitation.email)
+		frappe.local.response["type"] = "redirect"
+		if teams != None and projects != None:
+			frappe.local.response["location"] = f"/g/{teams[0]}/projects/{projects[0]}"
+		if teams != None and projects == None:
+			frappe.local.response["location"] = f"/g/{teams[0]}"
+		frappe.local.response["location"] = f"/g"
+	else:
+		invitation.accept()
+		invitation.reload()
+		if invitation.status == "Accepted":
+			frappe.local.login_manager.login_as(invitation.email)
+			frappe.local.response["type"] = "redirect"
+			if teams != None and projects != None:
+				frappe.local.response["location"] = f"/g/{teams[0]}/projects/{projects[0]}#change_password"
+			if teams != None and projects == None:
+				frappe.local.response["location"] = f"/g/{teams[0]}#change_password"
+			frappe.local.response["location"] = f"/g#change_password"
+
 @frappe.whitelist(methods=["POST"])
 def change_password(new_pass):
 	try:

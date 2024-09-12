@@ -144,13 +144,24 @@ def send_guest_by_invite_guest(type_notifys, idGuest, type_reference, name_refer
         if "email" in type_notifys:
             link_btn = ""
             if type_reference == "team":
-                link_btn = frappe.utils.get_url(f'/g/{name_reference}')
+                teams = frappe.as_json([values_notify.team], indent=None)
+                invitation_doc = frappe.get_doc(doctype="GP Invitation", email=user_received.email, role=f"Gameplan {role_of_received}", teams=teams)
+                invitation_doc.insert(ignore_permissions=True)
+                link_btn = frappe.utils.get_url(f"/api/method/gameplan.api.accept_invitation_member?key={invitation_doc.key}")
             elif type_reference == "project":
-                link_btn = frappe.utils.get_url(f'/g/{values_notify.team}/projects/{values_notify.project}')
+                teams = frappe.as_json([values_notify.team], indent=None)
+                projects = frappe.as_json([values_notify.project], indent=None)
+                invitation_doc = frappe.get_doc(doctype="GP Invitation", email=user_received.email, role=f"Gameplan {role_of_received}", teams=teams, projects=projects)
+                invitation_doc.insert(ignore_permissions=True)
+                link_btn = frappe.utils.get_url(f"/api/method/gameplan.api.accept_invitation_member?key={invitation_doc.key}")
+            
             content_email = f"""
                 <div class="mb-2 leading-5 text-gray-600">
                     <span class="font-medium">{ get_fullname(frappe.session.user) }</span>
                     <span> đã thêm bạn vào {type_joining} {name_joining} với vai trò {role_of_received}</span>
+                    <p>
+                        <a class="btn btn-primary" href="{ link_btn }">Accept Invitation</a>
+                    </p>
                 </div>
             """
             make(

@@ -308,6 +308,14 @@ export default {
         onConfirmDeleteConnections(){
             this.$resources.delete_connections.fetch()
             this.show_confirm_deleteing = false
+        },
+        onCreateConnectionByTask(task_id){
+            this.$resources.connections.insert.submit({
+                reference_type_source: this.reference_doctype,
+                reference_name_source: this.reference_name,
+                reference_type_destination: "GP Task",
+                reference_name_destination: task_id
+            })
         }
     },
     watch: {

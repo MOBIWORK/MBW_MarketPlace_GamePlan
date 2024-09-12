@@ -157,8 +157,23 @@ class GPProject(ManageMembersMixin, Archivable, Document):
 
 	@frappe.whitelist()
 	def invite_guest(self, email):
-		invite_by_email(email, role='Gameplan Guest', projects=[self.name])
-		send_invite_guest(email, "project", self.name)
+		guests = frappe.db.get_list('User',
+			filters={
+				'email': email
+			},
+			fields=['name']
+		)
+		if len(guests) > 0:
+			user_id = guests[0].name
+			guest_access_doc = frappe.new_doc('GP Guest Access')
+			guest_access_doc.user = user_id
+			guest_access_doc.project = self.name
+			guest_access_doc.team = self.team
+			guest_access_doc.insert()
+			frappe.db.commit()
+		else:
+			invite_by_email(email, role='Gameplan Guest', projects=[self.name])
+			send_invite_guest(email, "project", self.name)
 
 	@frappe.whitelist()
 	def remove_guest(self, email):

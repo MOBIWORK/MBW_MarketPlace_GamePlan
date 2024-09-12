@@ -8,7 +8,7 @@ from frappe.model.base_document import get_controller
 
 @frappe.whitelist()
 def get_list(doctype=None, fields=None, filters=None, order_by=None, start=0, limit=20, group_by=None, parent=None, debug=False):
-	check_permissions(doctype, parent)
+	#check_permissions(doctype, parent)
 	query = frappe.qb.get_query(
 		table=doctype,
 		fields=fields,
@@ -23,10 +23,6 @@ def get_list(doctype=None, fields=None, filters=None, order_by=None, start=0, li
 
 def check_permissions(doctype, parent):
 	user = frappe.session.user
-	print("Dòng 26 ", frappe.has_permission(doctype, "select", user=user, parent_doctype=parent))
-	print("Dòng 27 ", frappe.has_permission(doctype, "read", user=user, parent_doctype=parent))
-	print("Dòng 28 ", doctype)
-	print("Dòng 29 ", parent)
 	if (
 		not frappe.has_permission(doctype, "select", user=user, parent_doctype=parent)
 		and not frappe.has_permission(doctype, "read", user=user, parent_doctype=parent)

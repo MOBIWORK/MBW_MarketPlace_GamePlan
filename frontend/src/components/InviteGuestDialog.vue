@@ -91,6 +91,7 @@ function invite() {
       onSuccess() {
         email.value = ''
         pending.reload()
+        guests.reload()
       },
     }
   )

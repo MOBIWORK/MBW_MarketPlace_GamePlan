@@ -11,16 +11,17 @@ class GPInvitation(Document):
 		if self.role == "Gameplan Guest" and not (self.teams or self.projects):
 			frappe.throw("Project is required to invite as Guest")
 
-		if self.role != "Gameplan Guest":
-			self.teams = None
-			self.projects = None
+		# if self.role != "Gameplan Guest":
+		# 	self.teams = None
+		# 	self.projects = None
 
 		self.key = frappe.generate_hash(length=12)
 		self.invited_by = frappe.session.user
 		self.status = "Pending"
 
 	def after_insert(self):
-		self.invite_via_email()
+		if self.role == "Gameplan Guest":
+			self.invite_via_email()
 
 	def invite_via_email(self):
 		invite_link = frappe.utils.get_url(f"/api/method/gameplan.api.accept_invitation?key={self.key}")

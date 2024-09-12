@@ -129,7 +129,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-16 15:57:20.695524",
+ "modified": "2024-09-12 09:14:29.059976",
  "modified_by": "Administrator",
  "module": "Gameplan",
  "name": "GP Task",
@@ -180,6 +180,7 @@
    "read": 1,
    "report": 1,
    "role": "Gameplan Guest",
+   "select": 1,
    "share": 1,
    "write": 1
   }

@@ -172,7 +172,7 @@
         </div>
 
         <div class="w-full mb-6 mt-1">
-          <Connection :reference_doctype="'GP Discussion'" :reference_name="discussion.name" :project="discussion.project"
+          <Connection ref="lst_connection" :reference_doctype="'GP Discussion'" :reference_name="discussion.name" :project="discussion.project"
             :readOnly="readOnlyMode">
           </Connection>
         </div>
@@ -404,6 +404,7 @@
         }"
         v-model="showDeleteConclusionDialog"
       />
+      <NewTaskDialog ref="newTaskDialog" />
     </div>
   </div>
 </template>
@@ -525,7 +526,9 @@ export default {
       fullNameSessionUser: getUser('sessionUser').full_name,
       content: '',
       showDeleteConclusionDialog: false,
-      activeActivity: 'comment'
+      activeActivity: 'comment',
+      newTaskDialog: null,
+      lst_connection: null
     }
   },
   methods: {
@@ -673,6 +676,23 @@ export default {
           condition: () => !this.readOnlyMode,
           onClick: () => {
             this.discussionMoveDialog.show = true
+          },
+        },
+        {
+          label: __('Add task'),
+          icon: 'activity',
+          condition: () => !this.readOnlyMode,
+          onClick: () => {
+            let me = this;
+            this.$refs.newTaskDialog.show({
+              defaults: {
+                project: this.discussion.project,
+                assigned_to: getUser('sessionUser').name,
+              },
+              onSuccess: (data) => {
+                me.$refs.lst_connection.onCreateConnectionByTask(data.name)
+              },
+            })
           },
         },
         {
