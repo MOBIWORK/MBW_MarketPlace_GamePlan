@@ -25,19 +25,18 @@
                   <LucideSearch class="w-4 text-gray-600" />
                 </template>
               </TextInput>
-              <Select
-                :options="[
-                  { label: __('Full name'), value: 'full_name asc' },
-                  { label: __('Last updated'), value: 'modified desc' },
-                  { label: __('Posts'), value: 'posts' },
-                  { label: __('Replies'), value: 'replies' },
-                ]"
-                v-model="orderBy"
-              >
-                <template #prefix>
-                  <LucideArrowDownUp class="w-4 text-gray-600" />
-                </template>
-              </Select>
+              <div class="w-32">
+                <Select
+                  :options="[
+                    { label: __('Full name'), value: 'full_name asc' },
+                    { label: __('Last updated'), value: 'modified desc' },
+                    { label: __('Posts'), value: 'posts' },
+                    { label: __('Replies'), value: 'replies' },
+                  ]"
+                  v-model="orderBy"
+                >
+                </Select>
+              </div>
               <Button variant="solid" @click="showSettingsDialog('Invites')">
                 <template #prefix><LucideUserPlus2 class="w-4" /></template>
                 {{ __('Invite') }}

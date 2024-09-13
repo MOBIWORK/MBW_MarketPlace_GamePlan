@@ -199,7 +199,7 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 					(Task.assigned_to == assigned_or_owner) | (Task.owner == assigned_or_owner)
 				)
 			tasks = query.run(as_dict=True, debug=debug)
-			if ',' not in order_by:
+			if order_by is not None and ',' not in order_by:
 				for task in tasks:
 					if task.priority == "":
 						task["code_priority"] = 0
@@ -232,7 +232,7 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 				(Task.assigned_to == assigned_or_owner) | (Task.owner == assigned_or_owner)
 			)
 		tasks = query.run(as_dict=True, debug=debug)
-		if ',' not in order_by:
+		if order_by is not None and ',' not in order_by:
 			for task in tasks:
 				if task.priority == "":
 					task["code_priority"] = 0

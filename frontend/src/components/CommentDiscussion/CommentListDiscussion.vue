@@ -13,8 +13,8 @@
             <div class="mb-3" v-for="comment in comments">
                 <PollDiscussion v-if="comment.doctype == 'GP Poll'" class="border-b"
                     :ref="($poll) => setItemRef($poll, comment)" :poll="comment" :readOnlyMode="true" />
-                <CommentItem v-else :comment_info="comment" @replyCommentParent="(evt) => onReplyCommentParent(evt)"
-                    @replyCommentChild="(evt) => onReplyCommentChild(evt)"
+                <CommentItem v-else :comment_info="comment" :enable_add_comment="enable_add_comment"
+                    @replyCommentChild="(evt) => onReplyCommentChild(evt)" @replyCommentParent="(evt) => onReplyCommentParent(evt)"
                     @deleteComment="(evt) => onDeleteComment(evt)" @updateComment="(evt) => onUpdateComment(evt)">
                 </CommentItem>
             </div>
