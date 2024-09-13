@@ -198,7 +198,24 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 				query = query.where(
 					(Task.assigned_to == assigned_or_owner) | (Task.owner == assigned_or_owner)
 				)
-			return query.run(as_dict=True, debug=debug)
+			tasks = query.run(as_dict=True, debug=debug)
+			if ',' not in order_by:
+				for task in tasks:
+					if task.priority == "":
+						task["code_priority"] = 0
+					elif task.priority == "Low":
+						task["code_priority"] = 1
+					elif task.priority == "Medium":
+						task["code_priority"] = 2
+					elif task.priority == "High":
+						task["code_priority"] = 3
+					elif task.priority == "Urgent":
+						task["code_priority"] = 4
+				if 'priority' in order_by and 'asc' in order_by:
+					tasks.sort(key=myFuncSortedPriority)
+				if 'priority' in order_by and 'desc' in order_by:
+					tasks.sort(key=myFuncSortedPriority, reverse=True)
+			return tasks
 	else:
 		query = frappe.qb.get_query(
 			table=doctype,
@@ -214,4 +231,24 @@ def get_list(fields=None, filters: dict|None=None, order_by=None, start=0, limit
 			query = query.where(
 				(Task.assigned_to == assigned_or_owner) | (Task.owner == assigned_or_owner)
 			)
-		return query.run(as_dict=True, debug=debug)
+		tasks = query.run(as_dict=True, debug=debug)
+		if ',' not in order_by:
+			for task in tasks:
+				if task.priority == "":
+					task["code_priority"] = 0
+				elif task.priority == "Low":
+					task["code_priority"] = 1
+				elif task.priority == "Medium":
+					task["code_priority"] = 2
+				elif task.priority == "High":
+					task["code_priority"] = 3
+				elif task.priority == "Urgent":
+					task["code_priority"] = 4
+			if 'priority' in order_by and 'asc' in order_by:
+				tasks.sort(key=myFuncSortedPriority)
+			if 'priority' in order_by and 'desc' in order_by:
+				tasks.sort(key=myFuncSortedPriority, reverse=True)
+		return tasks
+
+def myFuncSortedPriority(e):
+	return e["code_priority"]
