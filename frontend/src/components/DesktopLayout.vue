@@ -44,6 +44,8 @@ initMessageFireBase()
 users.fetch()
 const route = useRoute();
 const hasChangePassword = computed(() => route.hash.includes('change_password'))
+console.log("Dòng 47 ", hasChangePassword.value)
+console.log("Dòng 48 ", route)
 if(hasChangePassword.value){
   showChangingPasswordFirstlyLoginDialog()
 }
