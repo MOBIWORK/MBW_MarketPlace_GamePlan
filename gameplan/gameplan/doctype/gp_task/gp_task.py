@@ -60,21 +60,9 @@ class GPTask(HasMentions, HasActivity, Document):
 		for config_reminder_task in self.reminders_config:
 			if config_reminder_task.remind_times is not None and config_reminder_task.remind_times != "" and config_reminder_task.remind_times != 0:
 				reminder = frappe.new_doc("GP Reminder")
-				unit = "phút"
-				remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S')
-				if config_reminder_task.remind_unit == "minute":
-					delta_minutes = timedelta(minutes=int(config_reminder_task.remind_times))
-					remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_minutes
-				elif config_reminder_task.remind_unit == "hour":
-					unit = "giờ"
-					delta_hours = timedelta(hours=int(config_reminder_task.remind_times))
-					remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_hours
-				elif config_reminder_task.remind_unit == "day":
-					unit = "ngày"
-					delta_days = timedelta(days=int(config_reminder_task.remind_times))
-					remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_days
+				reminder_at, unit = self.render_reminder_at(self.due_date, config_reminder_task.remind_times, config_reminder_task.remind_unit)
 				reminder.description = f"Nhiệm vụ {self.title} sẽ đến hạn trong {config_reminder_task.remind_times} {unit} nữa"
-				reminder.remind_at = remind_at
+				reminder.remind_at = reminder_at
 				reminder.user = self.assigned_to
 				reminder.reminder_doctype = "GP Task"
 				reminder.reminder_docname = self.name
@@ -100,21 +88,9 @@ class GPTask(HasMentions, HasActivity, Document):
 				if is_exist_remind == True and date_due_date > datetime.now():
 					id_reminder = reminder_config.id_reminder
 					doc_reminder = frappe.get_doc('GP Reminder', id_reminder)
-					unit = "phút"
-					remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S')
-					if reminder_config.remind_unit == "minute":
-						delta_minutes = timedelta(minutes=int(reminder_config.remind_times))
-						remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_minutes
-					elif reminder_config.remind_unit == "hour":
-						unit = "giờ"
-						delta_hours = timedelta(hours=int(reminder_config.remind_times))
-						remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_hours
-					elif reminder_config.remind_unit == "day":
-						unit = "ngày"
-						delta_days = timedelta(days=int(reminder_config.remind_times))
-						remind_at = datetime.strptime(self.due_date, '%Y-%m-%d %H:%M:%S') - delta_days
+					reminder_at, unit = self.render_reminder_at(self.due_date, reminder_config.remind_times, reminder_config.remind_unit)
 					doc_reminder.description = f"Nhiệm vụ {self.title} sẽ đến hạn trong {reminder_config.remind_times} {unit} nữa"
-					doc_reminder.remind_at = remind_at
+					doc_reminder.remind_at = reminder_at
 					doc_reminder.user = self.assigned_to
 					doc_reminder.reminder_doctype = "GP Task"
 					doc_reminder.reminder_docname = self.name
@@ -125,6 +101,38 @@ class GPTask(HasMentions, HasActivity, Document):
 					frappe.db.commit()
 				elif is_exist_remind == False and date_due_date > datetime.now():
 					self.insert_reminder()
+	
+	def render_reminder_at(self, due_date, remind_times, remind_unit):
+		reminder_at = datetime.strptime(due_date, '%Y-%m-%d %H:%M:%S')
+		unit = "phút"
+		if remind_unit == "minute":
+			remind_times = int(remind_times)
+			new_minute = reminder_at.minute - remind_times
+			# Điều chỉnh nếu phút âm
+			while new_minute < 0:
+				reminder_at = reminder_at.replace(hour=reminder_at.hour - 1)
+				new_minute += 60
+			reminder_at = reminder_at.replace(minute=new_minute)
+		elif remind_unit == "hour":
+			unit = "giờ"
+			remind_times = int(remind_times)
+			new_hour = reminder_at.hour - remind_times
+			# Điều chỉnh nếu giờ âm
+			while new_hour < 0:
+				reminder_at = reminder_at.replace(day=reminder_at.day - 1)
+				new_hour += 24
+			reminder_at = reminder_at.replace(hour=new_hour)
+		elif remind_unit == "day":
+			unit = "ngày"
+			remind_times = int(remind_times)
+			new_day = reminder_at.day - remind_times
+			# Điều chỉnh nếu ngày âm
+			while new_day < 1:
+				previous_month = reminder_at.replace(day=1) - timedelta(days=1)
+				reminder_at = reminder_at.replace(month=previous_month.month, day=previous_month.day)
+				new_day += previous_month.day
+			reminder_at = reminder_at.replace(day=new_day)
+		return reminder_at, unit
 
 	def log_value_updates(self):
 		fields = ['title', 'description', 'status', 'priority', 'assigned_to', 'due_date', 'project']

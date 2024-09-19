@@ -160,7 +160,11 @@ def invite_by_email(emails: str, role: str, projects: list = None):
 	if projects:
 		projects = frappe.as_json(projects, indent=None)
 	for email in to_invite:
-		frappe.get_doc(doctype="GP Invitation", email=email, role=role, projects=projects).insert(ignore_permissions=True)
+		invitation_doc = frappe.get_doc(doctype="GP Invitation", email=email, role=role, projects=projects)
+		if role != "Gameplan Guest":
+			invitation_doc.teams = None
+			invitation_doc.projects = None
+		invitation_doc.insert(ignore_permissions=True)
 
 @frappe.whitelist()
 def unread_notifications():

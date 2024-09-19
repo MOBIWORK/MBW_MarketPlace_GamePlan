@@ -100,7 +100,7 @@ def send_guest_by_invite_guest(type_notifys, idGuest, type_reference, name_refer
     type_joining = ""
     name_joining = ""
     doctype_reference = ""
-    role_of_received = ""
+    role_of_received = "Member"
     if "Gameplan Admin" in roles_of_received:
         role_of_received = "Admin"
     elif "Gameplan Member" in roles_of_received:

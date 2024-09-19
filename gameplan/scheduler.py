@@ -51,7 +51,6 @@ def send_reminders():
 		],
 		pluck="name",
 	)
-    
 	for reminder_name in pending_reminders:
 		send_notify_for_reminder(reminder_name)
 
