@@ -88,10 +88,11 @@ function invite() {
   props.project.inviteGuest.submit(
     { email: email.value },
     {
-      onSuccess() {
+      onSuccess(data) {
+        console.log("Dòng 93 ", data)
         email.value = ''
-        pending.reload()
-        guests.reload()
+        pending.fetch()
+        guests.fetch()
       },
     }
   )

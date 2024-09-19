@@ -35,8 +35,7 @@ import SettingsDialog from './Settings/SettingsDialog.vue'
 import ChangingPasswordDialog from './InfoUser/Modal/ChangingPassword.vue'
 import ChangingPasswordFirstlyLoginDialog from './InfoUser/Modal/ChangingPassFirstlyLogin.vue'
 import {showChangingPasswordFirstlyLoginDialog} from './InfoUser/Modal/ChangingPassFirstlyLogin.vue'
-import { useRoute } from 'vue-router'
-import { onMounted, computed } from 'vue'
+import { onMounted } from 'vue'
 import { initMessageFireBase } from '@/utils/messaging_firebase'
 import { users } from '@/data/users'
 
@@ -44,13 +43,13 @@ initMessageFireBase()
 users.fetch()
 
 onMounted(() => {
-  const route = useRoute();
-  const hasChangePassword = computed(() => route.hash.includes('change_password'))
-  console.log("Dòng 47 ", hasChangePassword.value)
-  console.log("Dòng 48 ", route)
-  if(hasChangePassword.value){
-    showChangingPasswordFirstlyLoginDialog()
-  }
+  setTimeout(() => {
+    let hashs = window.location.hash
+    console.log("Dòng 53 ", hashs)
+    if(hashs.includes("change_password")){
+      showChangingPasswordFirstlyLoginDialog()
+    }
+  }, 1000)
 })
 
 </script>
