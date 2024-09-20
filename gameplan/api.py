@@ -344,6 +344,8 @@ def get_teams_by_role():
 		page_length=999
 	)
 	arr_team_res = []
+	print("347 arr_role: ", arr_role)
+	print("348 teams: ", teams)
 	if "Gameplan Admin" in arr_role:
 		arr_team_res = teams
 	if "Gameplan Member" in arr_role:
