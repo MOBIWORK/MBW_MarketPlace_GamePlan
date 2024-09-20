@@ -344,8 +344,6 @@ def get_teams_by_role():
 		page_length=999
 	)
 	arr_team_res = []
-	print("347 arr_role: ", arr_role)
-	print("348 teams: ", teams)
 	if "Gameplan Admin" in arr_role:
 		arr_team_res = teams
 	if "Gameplan Member" in arr_role:
@@ -426,17 +424,16 @@ def get_projects_by_role():
 								arr_project_res.append(project)
 	if "Gameplan Guest" in arr_role:
 		for project in projects:
-			if project.is_private == 1:
-				guest_access = frappe.get_all('GP Guest Access',
-					filters={
-						'project': project.name,
-						'user': frappe.session.user
-					}
-				)
-				if len(guest_access) > 0:
-					project_filter = [project_fil.name for project_fil in arr_project_res if project_fil.name == project.name]
-					if len(project_filter) == 0:
-						arr_project_res.append(project)
+			guest_access = frappe.get_all('GP Guest Access',
+				filters={
+					'project': project.name,
+					'user': frappe.session.user
+				}
+			)
+			if len(guest_access) > 0:
+				project_filter = [project_fil.name for project_fil in arr_project_res if project_fil.name == project.name]
+				if len(project_filter) == 0:
+					arr_project_res.append(project)
 	return arr_project_res
 
 @frappe.whitelist(methods=["POST"])
