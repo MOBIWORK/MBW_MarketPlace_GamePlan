@@ -45,7 +45,6 @@ users.fetch()
 onMounted(() => {
   setTimeout(() => {
     let hashs = window.location.hash
-    console.log("Dòng 53 ", hashs)
     if(hashs.includes("change_password")){
       showChangingPasswordFirstlyLoginDialog()
     }

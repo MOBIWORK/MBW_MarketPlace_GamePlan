@@ -89,7 +89,6 @@ function invite() {
     { email: email.value },
     {
       onSuccess(data) {
-        console.log("Dòng 93 ", data)
         email.value = ''
         pending.fetch()
         guests.fetch()

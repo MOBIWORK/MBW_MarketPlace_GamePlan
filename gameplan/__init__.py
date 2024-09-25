@@ -10,6 +10,12 @@ def is_guest():
 		return False
 	return 'Gameplan Guest' in roles
 
+def is_admin():
+	if frappe.session.user == "Administrator":
+		return True
+	roles = frappe.get_roles()
+	return 'Gameplan Admin' in roles
+
 def refetch_resource(cache_key: str | list, user=None):
 	frappe.publish_realtime(
 		'refetch_resource',
