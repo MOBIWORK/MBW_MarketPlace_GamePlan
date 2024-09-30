@@ -25,11 +25,12 @@ from gameplan.utils import init_config_fcm_admin
 # else:
 #     config_service_account_key = init_config_fcm_admin()
 
-config_service_account_key = init_config_fcm_admin()
+if not firebase_admin._apps:
+    config_service_account_key = init_config_fcm_admin()
 
-# Khởi tạo Firebase Admin SDK với chứng chỉ
-cred = credentials.Certificate(config_service_account_key)
-firebase_admin.initialize_app(cred)
+    # Khởi tạo Firebase Admin SDK với chứng chỉ
+    cred = credentials.Certificate(config_service_account_key)
+    firebase_admin.initialize_app(cred)
 
 def send_notification_to_user(title, body):
     tokens = frappe.db.get_list('GP FCM Token', filters={'owner': frappe.session.user}, fields=['token'])
