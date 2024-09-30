@@ -1026,14 +1026,15 @@ def accept_invitation(key: str = None):
 		invitation.accept()
 		invitation.reload()
 		if invitation.status == "Accepted":
-			objProject = json.loads(invitation.projects)
-			strGuest = frappe.db.get_value('GP Project', objProject[0], "guests")
-			objGuest = []
-			if strGuest is not None and strGuest != "":
-				objGuest = json.loads(strGuest)
-			if invitation.email not in objGuest:
-				objGuest.append(invitation.email)
-			frappe.db.set_value('GP Project', objProject[0], "guests", json.dumps(objGuest))
+			if invitation.projects is not None:
+				objProject = json.loads(invitation.projects)
+				strGuest = frappe.db.get_value('GP Project', objProject[0], "guests")
+				objGuest = []
+				if strGuest is not None and strGuest != "":
+					objGuest = json.loads(strGuest)
+				if invitation.email not in objGuest:
+					objGuest.append(invitation.email)
+				frappe.db.set_value('GP Project', objProject[0], "guests", json.dumps(objGuest))
 			#Gửi thông báo tới manage,admin
 			user_info = frappe.db.get_value('User', {'email': invitation.email}, ['name'], as_dict=1)
 			config_notifications = frappe.db.get_all(
