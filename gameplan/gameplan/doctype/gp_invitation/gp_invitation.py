@@ -20,9 +20,9 @@ class GPInvitation(Document):
 		self.status = "Pending"
 
 	def after_insert(self):
-		self.invite_via_email()
-		# if self.role == "Gameplan Guest":
-		# 	self.invite_via_email()
+		# self.invite_via_email()
+		if self.role == "Gameplan Guest" or self.role == "Gameplan Member" or self.role == "Gameplan Admin":
+			self.invite_via_email()
 
 	def invite_via_email(self):
 		invite_link = frappe.utils.get_url(f"/api/method/gameplan.api.accept_invitation?key={self.key}")
