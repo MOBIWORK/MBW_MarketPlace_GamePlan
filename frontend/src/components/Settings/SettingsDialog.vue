@@ -3,7 +3,7 @@
     <template #body>
       <div class="flex" :style="{ height: 'calc(100vh - 8rem)' }">
         <div class="flex w-52 shrink-0 flex-col bg-surface-menu-bar p-2">
-          <h1 class="px-2 pt-2 text-lg font-semibold">Settings</h1>
+          <h1 class="px-2 pt-2 text-lg font-semibold">{{ __('Settings') }}</h1>
           <div class="mt-3">
             <button
               class="flex h-7 w-full items-center gap-2 rounded px-2 py-1"
@@ -44,22 +44,22 @@ import LucideSettings from '~icons/lucide/settings'
 
 let tabs = [
   {
-    label: 'Members',
+    label: __('Members'),
     icon: LucideUsers,
     component: markRaw(Members),
   },
   {
-    label: 'Invites',
+    label: __('Invites'),
     icon: LucideUsersPlus,
     component: markRaw(InvitePeople),
   },
   {
-    label: 'Archive',
+    label: __('Archive'),
     icon: LucideFolderMinus,
     component: markRaw(ArchivedTeams),
   },
   {
-    label: 'Settings',
+    label: __('Settings'),
     icon: LucideSettings,
     component: markRaw(SettingsTabDialog),
   },

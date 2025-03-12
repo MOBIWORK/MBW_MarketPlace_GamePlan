@@ -1,9 +1,9 @@
 <template>
   <div class="flex min-h-0 flex-col">
     <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold leading-none">Members</h2>
+      <h2 class="text-xl font-semibold leading-none">{{ __('Members') }}</h2>
       <div class="flex items-center gap-4">
-        <FormControl placeholder="Search" @input="search = $event.target.value" :debounce="300">
+        <FormControl :placeholder="__('Search')" @input="search = $event.target.value" :debounce="300">
           <template #prefix>
             <LucideSearch class="h-4 w-4 text-ink-gray-4" />
           </template>
@@ -29,7 +29,7 @@
         </div>
         <div class="flex w-1/5">
           <Dropdown
-            :options="getDropdownOptions(user)"
+            :options="__(getDropdownOptions(user))"
             :button="{
               label: getUserRole(user),
               iconRight: 'chevron-down',
@@ -95,12 +95,12 @@ export default {
   methods: {
     changeUserRole({ user, role }) {
       this.$dialog({
-        title: 'Change Role',
-        message: `Are you sure you want to change ${user.full_name}'s role to ${role}?`,
+        title: __('Change Role'),
+        message: `${__("Are you sure you want to change")} ${user.full_name}'s ${__("role to")} ${role}?`,
         error: computed(() => this.$resources.changeUserRole.error),
         actions: [
           {
-            label: 'Change Role',
+            label: __('Change Role'),
             variant: 'solid',
             onClick: (close) => {
               return this.$resources.changeUserRole.submit(
@@ -110,19 +110,19 @@ export default {
             },
           },
           {
-            label: 'Cancel',
+            label: __('Cancel'),
           },
         ],
       })
     },
     removeUser(user) {
       this.$dialog({
-        title: 'Remove User',
-        message: `Are you sure you want to remove ${user.full_name} (${user.email})?`,
+        title: __('Remove User'),
+        message: `${__("Are you sure you want to remove")} ${user.full_name} (${user.email})?`,
         error: computed(() => this.$resources.removeUser.error),
         actions: [
           {
-            label: 'Remove User',
+            label: __('Remove User'),
             variant: 'solid',
             theme: 'red',
             onClick: (close) => {
@@ -130,18 +130,18 @@ export default {
             },
           },
           {
-            label: 'Cancel',
+            label: __('Cancel'),
           },
         ],
       })
     },
     getUserRole(user) {
-      return (user.role || '').replace('Gameplan', '')
+      return __(user.role || '').replace('Gameplan', '')
     },
     getDropdownOptions(user) {
       return [
         {
-          label: 'Admin',
+          label: __('Admin'),
           component: (props) =>
             RoleOption({
               role: 'Admin',
@@ -155,7 +155,7 @@ export default {
             }),
         },
         {
-          label: 'Member',
+          label: __('Member'),
           component: (props) =>
             RoleOption({
               role: 'Member',
@@ -169,7 +169,7 @@ export default {
             }),
         },
         {
-          label: 'Guest',
+          label: __('Guest'),
           component: (props) =>
             RoleOption({
               role: 'Guest',
@@ -183,7 +183,7 @@ export default {
             }),
         },
         {
-          label: 'Remove',
+          label: __('Remove'),
           component: (props) =>
             h(
               'button',

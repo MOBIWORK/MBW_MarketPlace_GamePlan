@@ -54,10 +54,10 @@ class GPTeam(Archivable, Document):
 			self.icon = get_random_gemoji().emoji
 
 		if not self.readme:
-			self.readme = f"""<h3>Welcome to the {self.title} team page!</h3>
-			<p>You can add a brief introduction about the team, important links, resources,
-			and other important information here.</p>
-			"""
+			self.readme = frappe._(
+				f"""<h3>Welcome to the {self.title} team page!</h3>
+				"""
+			)
 
 		self.add_member(frappe.session.user)
 

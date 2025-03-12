@@ -121,11 +121,11 @@ export default {
   computed: {
     title() {
       if (this.$resources.revisions.data) {
-        if (this.$resources.revisions.data.length === 0) return 'No Revisions'
-        if (this.$resources.revisions.data.length === 1) return '1 Revision'
+        if (this.$resources.revisions.data.length === 0) return __('No Revisions')
+        if (this.$resources.revisions.data.length === 1) return `1 ${__("Revision")}`
         return `${this.$resources.revisions.data.length} Revisions`
       } else {
-        return 'Loading...'
+        return __('Loading...')
       }
     },
     hasPrevious() {

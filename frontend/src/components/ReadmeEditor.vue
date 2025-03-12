@@ -36,7 +36,7 @@
           "
         >
           <template #prefix><LucideSave class="w-4" /></template>
-          Save
+          {{__('Save')}}
         </Button>
         <Button
           @click="
@@ -47,7 +47,7 @@
           "
         >
           <template #prefix><LucideRotateCcw class="w-4" /></template>
-          Discard
+          {{__('Discard')}}
         </Button>
       </template>
     </div>

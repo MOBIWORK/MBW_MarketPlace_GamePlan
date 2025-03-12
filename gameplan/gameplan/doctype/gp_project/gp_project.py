@@ -76,8 +76,6 @@ class GPProject(ManageMembersMixin, Archivable, Document):
 
 		if not self.readme:
 			self.readme = f"""<h3>Welcome to the {self.title} page!</h3>
-			<p>You can add a brief introduction about this project, links,
-			resources, and other important information here.</p>
 			"""
 
 		self.append(

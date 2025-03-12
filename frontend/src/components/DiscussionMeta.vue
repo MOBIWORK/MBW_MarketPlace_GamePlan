@@ -11,8 +11,8 @@
     <span class="text-base text-ink-gray-5">
       {{
         discussion.participants_count == 1
-          ? `1 participant`
-          : `${discussion.participants_count} participants`
+          ?  `1 ${__("participant")}`
+          : `${discussion.participants_count} ${__("participants")}`
       }}
     </span>
   </div>

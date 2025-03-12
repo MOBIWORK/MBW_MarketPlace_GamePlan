@@ -113,7 +113,7 @@
     </div>
     <div class="hidden w-[20rem] shrink-0 border-l sm:block">
       <div class="grid grid-cols-2 items-center gap-y-6 p-6 text-base text-ink-gray-7">
-        <div>Assignee</div>
+        <div>{{ __('Assignee') }}</div>
         <div>
           <Autocomplete
             placeholder="Assign a user"
@@ -122,7 +122,7 @@
             @update:modelValue="changeAssignee"
           />
         </div>
-        <div>Due Date</div>
+        <div>{{ __('Due Date') }}</div>
         <div>
           <DatePicker
             v-model="$resources.task.doc.due_date"
@@ -136,7 +136,7 @@
             "
           />
         </div>
-        <div>Project</div>
+        <div>{{ __('Project') }}</div>
         <div>
           <Autocomplete
             placeholder="Select project"
@@ -145,7 +145,7 @@
             @update:modelValue="changeProject"
           />
         </div>
-        <div>Status</div>
+        <div>{{ __('Status') }}</div>
         <div>
           <Dropdown :options="statusOptions">
             <Button>
@@ -156,7 +156,7 @@
             </Button>
           </Dropdown>
         </div>
-        <div>Priority</div>
+        <div>{{ __('Priority') }}</div>
         <div>
           <Dropdown :options="priorityOptions">
             <Button>

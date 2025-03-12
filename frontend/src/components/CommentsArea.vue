@@ -30,7 +30,7 @@
           <span
             class="absolute -top-2 left-1/2 -translate-x-1/2 bg-surface-white px-2 text-sm font-medium text-ink-blue-3"
           >
-            New comments
+            {{ __('New comments') }}
           </span>
         </div>
         <Comment
@@ -71,7 +71,7 @@
         v-show="!showCommentBox"
       >
         <UserAvatar class="mr-3" :user="$user().name" size="sm" />
-        Add a comment
+        {{ __('Add a comment') }}
       </button>
       <div
         v-show="showCommentBox"
@@ -86,13 +86,13 @@
           </span>
           <TabButtons
             class="ml-auto"
-            :buttons="[{ label: 'Comment' }, { label: 'Poll' }]"
+            :buttons="[{ label: __('Comment') }, { label: __('Poll') }]"
             v-model="newCommentType"
           />
         </div>
         <CommentEditor
           ref="newCommentEditor"
-          v-show="newCommentType == 'Comment'"
+          v-show="newCommentType == __('Comment')"
           :value="newComment"
           @change="onNewCommentChange"
           :submitButtonProps="{
@@ -105,10 +105,10 @@
             onClick: discardComment,
           }"
           :editable="showCommentBox"
-          placeholder="Add a comment..."
+          :placeholder="__('Add a comment...')"
         />
         <PollEditor
-          v-show="newCommentType == 'Poll'"
+          v-show="newCommentType == __('Poll')"
           v-model:poll="newPoll"
           :submitButtonProps="{
             onClick: submitPoll,
@@ -149,7 +149,7 @@ export default {
     return {
       commentMap: {},
       showCommentBox: false,
-      newCommentType: 'Comment',
+      newCommentType: __('Comment'),
       newComment: draftComment || '',
       newPoll: {
         title: '',
@@ -380,6 +380,7 @@ export default {
       }
     },
     onNewCommentChange(content) {
+      console.log("conte", content);
       this.newComment = content
 
       // save draft comment to local storage

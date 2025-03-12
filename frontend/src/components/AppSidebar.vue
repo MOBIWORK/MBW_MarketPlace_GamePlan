@@ -53,7 +53,7 @@
             <span class="grid h-5 w-6 place-items-center">
               <LucideSearch class="h-4 w-4 text-ink-gray-7" />
             </span>
-            <span class="ml-2 text-sm">Search</span>
+            <span class="ml-2 text-sm">{{__('Search')}}</span>
             <span class="ml-auto text-sm text-ink-gray-4">
               <template v-if="$platform === 'mac'">⌘K</template>
               <template v-else>Ctrl+K</template>
@@ -62,7 +62,7 @@
         </button>
       </nav>
       <div class="mt-6 flex items-center justify-between px-3">
-        <h3 class="text-sm font-medium text-ink-gray-5">Teams</h3>
+        <h3 class="text-sm font-medium text-ink-gray-5">{{__('Teams')}}</h3>
         <Button label="Create Team" variant="ghost" @click="showAddTeamDialog = true">
           <template #icon><LucidePlus class="h-4 w-4" /></template>
         </Button>
@@ -185,14 +185,14 @@ export default {
     navigation() {
       return [
         {
-          name: 'Discussions',
+          name: __('Discussions'),
           icon: LucideNewspaper,
           route: {
             name: 'Discussions',
           },
         },
         {
-          name: 'My Tasks',
+          name: __('My Tasks'),
           icon: LucideListTodo,
           route: {
             name: 'MyTasks',
@@ -200,7 +200,7 @@ export default {
           isActive: /MyTasks|Task/g.test(this.$route.name),
         },
         {
-          name: 'My Pages',
+          name: __('My Pages'),
           icon: LucideFiles,
           route: {
             name: 'MyPages',
@@ -208,7 +208,7 @@ export default {
           isActive: /MyPages|Page/g.test(this.$route.name),
         },
         {
-          name: 'People',
+          name: __('People'),
           icon: LucideUsers2,
           route: {
             name: 'People',
@@ -217,7 +217,7 @@ export default {
           condition: () => this.$user().isNotGuest,
         },
         {
-          name: 'Notifications',
+          name: __('Notifications'),
           icon: LucideInbox,
           route: {
             name: 'Notifications',

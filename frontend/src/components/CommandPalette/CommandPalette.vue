@@ -266,22 +266,22 @@ export default {
     },
     navigationItems() {
       return {
-        title: 'Jump to',
+        title: __('Jump to'),
         component: 'Item',
         items: [
           {
-            title: 'Home',
+            title: __('Home'),
             icon: () => h(LucideHome),
             route: { name: 'Home' },
           },
           {
-            title: 'People',
+            title: __('People'),
             icon: () => h(LucideUsers),
             route: { name: 'People' },
             condition: () => this.$user().isNotGuest,
           },
           {
-            title: 'Notifications',
+            title: __('Notifications'),
             icon: () => h(LucideBell),
             route: { name: 'Notifications' },
             condition: () => this.$user().isNotGuest,

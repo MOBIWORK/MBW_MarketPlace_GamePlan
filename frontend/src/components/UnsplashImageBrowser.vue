@@ -12,7 +12,7 @@
             <div class="flex-1">
               <TextInput
                 type="text"
-                placeholder="search by keyword"
+                :placeholder="__('search by keyword')"
                 v-model="search"
                 :debounce="300"
               />
@@ -21,7 +21,7 @@
               <template v-slot="{ file, progress, uploading, openFileSelector }">
                 <div class="w-full text-center">
                   <Button @click="openFileSelector" :loading="uploading">
-                    {{ uploading ? `Uploading ${progress}%` : 'Upload Image' }}
+                    {{ uploading ? `${__("Uploading")} ${progress}%` : __('Upload Image') }}
                   </Button>
                 </div>
               </template>
@@ -38,8 +38,8 @@
             </button>
           </div>
           <div class="mt-2 text-center text-sm text-ink-gray-4">
-            Image search powered by
-            <a class="underline" target="_blank" href="https://unsplash.com"> Unsplash </a>
+            {{ __('Image search powered by') }}
+            <a class="underline" target="_blank" href="https://unsplash.com"> {{ __('Unsplash') }} </a>
           </div>
         </div>
       </div>

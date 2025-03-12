@@ -6,20 +6,20 @@
         <Dropdown
           :button="{
             icon: 'more-horizontal',
-            label: 'Page Options',
+            label: __('Page Options'),
             variant: 'ghost',
           }"
           :options="[
             {
-              label: 'Delete',
+              label: __('Delete'),
               icon: 'trash',
               onClick: () => {
                 $dialog({
-                  title: 'Delete Page',
-                  message: 'Are you sure you want to delete this page?',
+                  title: __('Delete Page'),
+                  message: __('Are you sure you want to delete this page?'),
                   actions: [
                     {
-                      label: 'Delete',
+                      label: __('Delete'),
                       onClick: (close) => {
                         close()
                         return $resources.pages.delete.submit(d.name)
@@ -55,7 +55,7 @@
             </h1>
             <div class="mt-1.5 flex items-center text-sm leading-none text-ink-gray-7">
               <div v-if="d.project">{{ projectTitle(d.project).value }} &middot;&nbsp;</div>
-              <div>Updated {{ $dayjs(d.modified).fromNow() }}</div>
+              <div>{{ __('Updated') }}&nbsp;{{ $dayjs(d.modified).fromNow() }}</div>
             </div>
             <hr class="my-2" />
             <div

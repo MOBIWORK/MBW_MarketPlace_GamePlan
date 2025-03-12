@@ -23,9 +23,9 @@
                 class="flex"
                 v-bind="
                   d.closed_at
-                    ? { text: 'This discussion is closed' }
+                    ? { text: __('This discussion is closed') }
                     : d.pinned_at
-                      ? { text: 'This discussion is pinned' }
+                      ? { text: __('This discussion is pinned') }
                       : null
                 "
               >
@@ -85,7 +85,7 @@
                 class="shrink-0 whitespace-nowrap text-sm text-ink-gray-5"
                 :title="discussionTimestampDescription(d)"
               >
-                {{ discussionTimestamp(d) }}
+                {{ __(discussionTimestamp(d)) }}
               </div>
               <div class="mt-1.5 flex items-center justify-end space-x-3">
                 <Tooltip text="Ongoing poll" v-if="d.ongoing_polls?.length">
@@ -108,7 +108,7 @@
         class="flex flex-col items-center rounded-lg border-2 border-dashed py-8 text-base text-ink-gray-5"
       >
         <LucideCoffee class="h-7 w-7 text-ink-gray-4" />
-        No discussions
+        {{ __('No discussions') }}
       </div>
       <div
         class="flex items-center justify-center p-3"
@@ -118,7 +118,7 @@
           <template #prefix>
             <LucideRefreshCw class="h-4 w-4" />
           </template>
-          {{ $resources.discussions.loading ? 'Loading...' : 'Load more' }}
+          {{ $resources.discussions.loading ? __('Loading...') : __('Load more') }}
         </Button>
       </div>
     </div>
@@ -126,6 +126,7 @@
 </template>
 <script>
 import { TextEditor, Tooltip } from 'frappe-ui'
+import dayjs from 'dayjs'
 
 export default {
   name: 'DiscussionList',
@@ -170,6 +171,7 @@ export default {
     },
     discussionTimestamp(d) {
       let timestamp = d.last_post_at || d.creation
+      
       if (this.$dayjs().diff(timestamp, 'day') < 25) {
         return this.$dayjs(timestamp).fromNow()
       }
@@ -180,8 +182,8 @@ export default {
     },
     discussionTimestampDescription(d) {
       return [
-        `First Post: ${this.$dayjs(d.creation)}`,
-        `Latest Post: ${this.$dayjs(d.last_post_at)}`,
+        __('First Post') + `: ${this.$dayjs(d.creation)}`,
+        __('Latest Post') + `: ${this.$dayjs(d.last_post_at)}`,
       ].join('\n')
     },
   },
