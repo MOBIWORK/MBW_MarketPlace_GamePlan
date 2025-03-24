@@ -69,7 +69,7 @@
         />
         <div class="mt-8 flex flex-wrap items-center gap-2 sm:hidden">
           <Autocomplete
-            placeholder="Assign a user"
+            :placeholder="__('Assign a user')"
             :options="assignableUsers"
             v-model="$resources.task.doc.assigned_to"
             @update:modelValue="changeAssignee"
@@ -102,7 +102,7 @@
             </Button>
           </Dropdown>
           <Autocomplete
-            placeholder="Select project"
+            :placeholder="__('Select project')"
             :options="projectOptions"
             v-model="$resources.task.doc.project"
             @update:modelValue="changeProject"
@@ -116,7 +116,7 @@
         <div>{{ __('Assignee') }}</div>
         <div>
           <Autocomplete
-            placeholder="Assign a user"
+            :placeholder="__('Assign a user')"
             :options="assignableUsers"
             v-model="$resources.task.doc.assigned_to"
             @update:modelValue="changeAssignee"
@@ -139,7 +139,7 @@
         <div>{{ __('Project') }}</div>
         <div>
           <Autocomplete
-            placeholder="Select project"
+            :placeholder="__('Select project')"
             :options="projectOptions"
             v-model="$resources.task.doc.project"
             @update:modelValue="changeProject"
@@ -152,7 +152,7 @@
               <template #prefix>
                 <TaskStatusIcon :status="$resources.task.doc.status" />
               </template>
-              {{ $resources.task.doc.status || 'Set status' }}
+              {{ $resources.task.doc.status || __('Set status') }}
             </Button>
           </Dropdown>
         </div>
@@ -163,7 +163,7 @@
               <template v-if="$resources.task.doc.priority" #prefix>
                 <TaskPriorityIcon :priority="$resources.task.doc.priority" />
               </template>
-              {{ $resources.task.doc.priority || 'Set priority' }}
+              {{ $resources.task.doc.priority || __('Set priority') }}
             </Button>
           </Dropdown>
         </div>
