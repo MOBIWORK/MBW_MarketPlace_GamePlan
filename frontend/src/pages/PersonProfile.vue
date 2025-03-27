@@ -74,10 +74,10 @@
         <TabButtons
           class="inline-block"
           :buttons="[
-            { label: ('About') },
-            { label: ('Posts') },
-            { label: ('Replies') },
-            { label: ('Bookmarks') },
+            { label: __('About'), value: 'About' },
+            { label: __('Posts'), value: 'Posts' },
+            { label: __('Replies'), value: 'Replies' },
+            { label: __('Bookmarks'), value: 'Bookmarks' },
           ]"
           v-model="activeTab"
         />

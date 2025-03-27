@@ -23,7 +23,7 @@
             </div>
             <span class="px-2 text-ink-gray-5">&middot;</span>
             <span class="text-base text-ink-gray-5">
-              {{__('Updated')}} {{ $dayjs(page.modified).fromNow() }}
+              {{__('Updated')}} {{ $timeAgo(page.modified) }}
             </span>
           </div>
         </div>

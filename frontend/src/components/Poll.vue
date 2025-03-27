@@ -16,7 +16,7 @@
               :datetime="_poll.creation"
               :title="$dayjs(_poll.creation)"
             >
-              {{ $dayjs(_poll.creation).fromNow() }}
+              {{ $timeAgo(_poll.creation) }}
             </time>
           </div>
         </div>
@@ -294,7 +294,7 @@ export default {
     stopTime() {
       let timestamp = this._poll.stopped_at
       if (this.$dayjs().diff(timestamp, 'day') < 7) {
-        return `Ended ${this.$dayjs(timestamp).fromNow()}`
+        return `Ended ${this.$timeAgo(timestamp)}`
       }
       if (this.$dayjs().diff(timestamp, 'year') < 1) {
         return `${__("Ended at")} ${this.$dayjs(timestamp).format('D MMM, h:mm A')}`

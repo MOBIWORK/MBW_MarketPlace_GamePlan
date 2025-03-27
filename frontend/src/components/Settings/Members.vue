@@ -136,7 +136,7 @@ export default {
       })
     },
     getUserRole(user) {
-      return __(user.role || '').replace('Gameplan', '')
+      return __((user.role || '').replace('Gameplan ', ''))
     },
     getDropdownOptions(user) {
       return [
@@ -194,7 +194,7 @@ export default {
                 ],
                 onClick: () => this.removeUser(user),
               },
-              'Remove',
+              __('Remove'),
             ),
         },
       ]
@@ -213,7 +213,7 @@ function RoleOption({ active, role, onClick, selected }) {
       onClick: !selected ? onClick : null,
     },
     [
-      h('span', { class: 'whitespace-nowrap' }, role),
+      h('span', { class: 'whitespace-nowrap' }, __(role)),
       selected
         ? h(LucideCheck, {
             class: ['h-4 w-4 shrink-0 text-ink-gray-7'],

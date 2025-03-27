@@ -173,7 +173,7 @@ export default {
       let timestamp = d.last_post_at || d.creation
       
       if (this.$dayjs().diff(timestamp, 'day') < 25) {
-        return this.$dayjs(timestamp).fromNow()
+        return this.$timeAgo(timestamp)
       }
       if (this.$dayjs().diff(timestamp, 'year') < 1) {
         return this.$dayjs(timestamp).format('D MMM')

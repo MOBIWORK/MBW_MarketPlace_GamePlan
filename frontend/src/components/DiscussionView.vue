@@ -19,7 +19,7 @@
               :datetime="discussion.creation"
               :title="$dayjs(discussion.creation)"
             >
-              {{ $dayjs(discussion.creation).fromNow() }}
+              {{ $timeAgo(discussion.creation) }}
             </time>
           </div>
           <div class="ml-auto flex space-x-2">
@@ -442,7 +442,7 @@ export default {
           label: __('Delete'),
           icon: 'trash',
           onClick: () => {
-            $dialog({
+            this.$dialog({
               title: __('Delete'),
               message: `${__("Are you sure you want to delete this post? This is irreversible!")}`,
               actions: [

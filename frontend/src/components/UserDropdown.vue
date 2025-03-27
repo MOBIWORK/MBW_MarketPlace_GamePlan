@@ -26,6 +26,7 @@ import LucideMoon from '~icons/lucide/moon'
 import GameplanLogo from './GameplanLogo.vue'
 import { getUser } from '@/data/users'
 import { session } from '@/data/session'
+import { showLanguage } from '@/composables/language.js'
 
 const user = getUser()
 
@@ -48,6 +49,11 @@ const dropdownItems = computed(() => [
     icon: LucideMoon,
     label: __('Toggle theme'),
     onClick: toggleTheme,
+  },
+  {
+    icon: 'globe',
+    label: __('Language'),
+    onClick: () => (showLanguage.value = true),
   },
   {
     icon: () => h(LucideCreditCard),

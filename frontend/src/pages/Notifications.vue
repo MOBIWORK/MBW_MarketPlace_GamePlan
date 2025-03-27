@@ -11,7 +11,7 @@
           {{__('Mark all as read')}}
         </Button>
         <TabButtons
-          :buttons="[{ label: ('Unread'), active: true }, { label: ('Read') }]"
+          :buttons="[{ label: __('Unread'), active: true, value: 'Unread' }, { label: __('Read'),value: 'Read' }]"
           v-model="activeTab"
         />
       </div>
@@ -26,7 +26,7 @@
             <LucideHeart class="h-4 w-4 text-ink-gray-7" />
           </div>
           <div class="text-base text-ink-gray-9">
-            {{ d.message }} {{ $dayjs(d.creation).fromNow() }}
+            {{ d.message }} {{ $timeAgo(d.creation) }}
           </div>
         </div>
         <div class="ml-2 flex shrink-0 items-center space-x-2">

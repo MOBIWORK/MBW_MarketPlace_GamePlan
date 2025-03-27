@@ -24,7 +24,7 @@
               :datetime="comment.creation"
               :title="$dayjs(comment.creation)"
             >
-              {{ $dayjs(comment.creation).fromNow() }}
+              {{ $timeAgo(comment.creation) }}
             </time>
             <span
               v-if="comment.modified > comment.creation"
@@ -73,7 +73,7 @@
               label: __('Delete'),
               icon: 'trash',
               onClick: () => {
-                $dialog({
+                this.$dialog({
                   title: __('Delete comment'),
                   message: __('Are you sure you want to delete this comment?'),
                   actions: [
@@ -124,7 +124,7 @@
               },
             }"
           />
-          <span class="text-base italic text-ink-gray-5" v-else> This message is deleted </span>
+          <span class="text-base italic text-ink-gray-5" v-else> {{ __('This message is deleted') }} </span>
           <div class="mt-3" v-if="!comment.deleted_at && !comment.editing && comment.reactions">
             <Reactions
               doctype="GP Comment"

@@ -18,7 +18,7 @@ import * as Sentry from '@sentry/vue'
 import router from './router'
 import App from './App.vue'
 import './index.css'
-import { dayjs, getPlatform } from '@/utils'
+import { dayjs, getPlatform, timeAgo } from '@/utils'
 import { createDialog } from './utils/dialogs'
 import { createToast } from './utils/toasts'
 import { getUser, users } from './data/users'
@@ -49,6 +49,7 @@ for (let key in globalComponents) {
   app.component(key, globalComponents[key])
 }
 app.config.globalProperties.$dayjs = dayjs
+app.config.globalProperties.$timeAgo = timeAgo
 app.config.globalProperties.$dialog = createDialog
 app.config.globalProperties.$toast = createToast
 app.config.globalProperties.$log = console.log.bind(console)

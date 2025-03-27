@@ -69,7 +69,7 @@
         :datetime="activity.creation"
         :title="$dayjs(activity.creation)"
       >
-        {{ $dayjs(activity.creation).fromNow() }}
+        {{ $timeAgo(activity.creation)}}
       </time>
     </p>
   </div>

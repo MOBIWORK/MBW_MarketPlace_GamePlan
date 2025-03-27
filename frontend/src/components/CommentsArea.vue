@@ -359,11 +359,11 @@ export default {
     discardComment() {
       if (!this.editorObject.isEmpty) {
         this.$dialog({
-          title: 'Discard comment',
-          message: 'Are you sure you want to discard your comment?',
+          title: __('Discard comment'),
+          message: __('Are you sure you want to discard your comment?'),
           actions: [
             {
-              label: 'Discard comment',
+              label: __('Discard comment'),
               onClick: (close) => {
                 this.resetCommentState()
                 close
@@ -371,7 +371,7 @@ export default {
               variant: 'solid',
             },
             {
-              label: 'Keep comment',
+              label: __('Keep comment'),
             },
           ],
         })
@@ -380,7 +380,6 @@ export default {
       }
     },
     onNewCommentChange(content) {
-      console.log("conte", content);
       this.newComment = content
 
       // save draft comment to local storage

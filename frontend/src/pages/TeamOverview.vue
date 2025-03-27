@@ -12,7 +12,7 @@
       <div class="mb-5 flex items-center justify-between space-x-2">
         <h2 class="text-2xl font-semibold text-ink-gray-9">{{__('Projects')}}</h2>
         <div class="flex items-stretch space-x-2">
-          <TabButtons :buttons="[{ label: 'Active' }, { label: 'Archived' }]" v-model="activeTab" />
+          <TabButtons :buttons="[{ label: __('Active'), value:'Active' }, { label: __('Archived'), value:'Archived'}]" v-model="activeTab" />
           <Button v-if="teamProjects.length" @click="createNewProjectDialog = true" variant="solid">
             <template #prefix>
               <LucidePlus class="h-4 w-4" />
@@ -64,7 +64,7 @@
                   class="text-ink-gray-7"
                   v-if="project.tasks_count + project.discussions_count == 0"
                 >
-                  {{ $dayjs(project.creation).fromNow() }}
+                  {{ $timeAgo(project.creation) }}
                 </span>
               </p>
             </div>

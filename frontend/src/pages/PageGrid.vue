@@ -14,7 +14,7 @@
               label: __('Delete'),
               icon: 'trash',
               onClick: () => {
-                $dialog({
+                this.$dialog({
                   title: __('Delete Page'),
                   message: __('Are you sure you want to delete this page?'),
                   actions: [
@@ -55,7 +55,7 @@
             </h1>
             <div class="mt-1.5 flex items-center text-sm leading-none text-ink-gray-7">
               <div v-if="d.project">{{ projectTitle(d.project).value }} &middot;&nbsp;</div>
-              <div>{{ __('Updated') }}&nbsp;{{ $dayjs(d.modified).fromNow() }}</div>
+              <div>{{ __('Updated') }}&nbsp;{{ $timeAgo(d.modified) }}</div>
             </div>
             <hr class="my-2" />
             <div

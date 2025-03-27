@@ -129,7 +129,7 @@ export default {
     timestamp(d) {
       let timestamp = d.modified
       if (this.$dayjs().diff(timestamp, 'day') < 25) {
-        return this.$dayjs(timestamp).fromNow()
+        return this.$timeAgo(timestamp)
       }
       return this.$dayjs(timestamp).format('D MMM YYYY')
     },

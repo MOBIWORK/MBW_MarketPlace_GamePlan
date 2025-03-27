@@ -53,7 +53,7 @@
             <span class="grid h-5 w-6 place-items-center">
               <LucideSearch class="h-4 w-4 text-ink-gray-7" />
             </span>
-            <span class="ml-2 text-sm">{{__('Search')}}</span>
+            <span class="ml-2 text-sm">{{ __('Search') }}</span>
             <span class="ml-auto text-sm text-ink-gray-4">
               <template v-if="$platform === 'mac'">⌘K</template>
               <template v-else>Ctrl+K</template>
@@ -62,8 +62,8 @@
         </button>
       </nav>
       <div class="mt-6 flex items-center justify-between px-3">
-        <h3 class="text-sm font-medium text-ink-gray-5">{{__('Teams')}}</h3>
-        <Button label="Create Team" variant="ghost" @click="showAddTeamDialog = true">
+        <h3 class="text-sm font-medium text-ink-gray-5">{{ __('Teams') }}</h3>
+        <Button :label="__('Create Team')" variant="ghost" @click="showAddTeamDialog = true">
           <template #icon><LucidePlus class="h-4 w-4" /></template>
         </Button>
       </div>
@@ -138,6 +138,7 @@
         }
       "
     />
+    <ChangeLanguage />
   </div>
 </template>
 <script>
@@ -156,6 +157,7 @@ import LucideInbox from '~icons/lucide/inbox'
 import LucideListTodo from '~icons/lucide/list-todo'
 import LucideNewspaper from '~icons/lucide/newspaper'
 import LucideFiles from '~icons/lucide/files'
+import ChangeLanguage from '@/components/Settings/ChangeLanguage.vue'
 
 export default {
   name: 'AppSidebar',

@@ -24,7 +24,7 @@
               {
                 label: 'Delete',
                 onClick: () => {
-                  $dialog({
+                  this.$dialog({
                     title: 'Delete task',
                     message: 'Are you sure you want to delete this task?',
                     actions: [
@@ -152,7 +152,7 @@
               <template #prefix>
                 <TaskStatusIcon :status="$resources.task.doc.status" />
               </template>
-              {{ $resources.task.doc.status || __('Set status') }}
+              {{ __($resources.task.doc.status) || __('Set status') }}
             </Button>
           </Dropdown>
         </div>
@@ -261,7 +261,7 @@ export default {
       return ['Backlog', 'Todo', 'In Progress', 'Done', 'Canceled'].map((status) => {
         return {
           icon: () => h(TaskStatusIcon, { status }),
-          label: status,
+          label: __(status),
           onClick: () => this.$resources.task.setValue.submit({ status }),
         }
       })

@@ -30,7 +30,7 @@
               <template #prefix>
                 <TaskStatusIcon :status="newTask.status" />
               </template>
-              {{ newTask.status }}
+              {{ __(newTask.status) }}
             </Button>
           </Dropdown>
           <TextInput type="date" :placeholder="__('Set due date')" v-model="newTask.due_date" />
@@ -79,7 +79,7 @@ function statusOptions({ onClick }) {
   return ['Backlog', 'Todo', 'In Progress', 'Done', 'Canceled'].map((status) => {
     return {
       icon: () => h(TaskStatusIcon, { status }),
-      label: status,
+      label: __(status),
       onClick: () => onClick(status),
     }
   })

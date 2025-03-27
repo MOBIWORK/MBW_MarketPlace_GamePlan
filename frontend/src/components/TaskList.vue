@@ -7,7 +7,7 @@
         @click="isOpen[group.title] = !isOpen[group.title]"
       >
         <span class="font-medium text-ink-gray-9">
-          {{ group.title }}
+          {{ __(group.title) }}
         </span>
         <span class="ml-2 text-sm text-ink-gray-5">{{ group.tasks.length }}</span>
         <span class="ml-auto hidden text-sm text-ink-gray-5 group-hover:inline">
@@ -57,7 +57,7 @@
                   {{ d.title }}
                 </div>
                 <div class="ml-auto shrink-0 whitespace-nowrap text-sm text-ink-gray-5">
-                  {{ $dayjs(d.modified).fromNow() }}
+                  {{ $timeAgo(d.modified) }}
                 </div>
               </div>
 
@@ -185,7 +185,7 @@ export default {
       return ['Backlog', 'Todo', 'In Progress', 'Done', 'Canceled'].map((status) => {
         return {
           icon: () => h(TaskStatusIcon, { status }),
-          label: status,
+          label: __(status),
           onClick: () => onClick(status),
         }
       })
