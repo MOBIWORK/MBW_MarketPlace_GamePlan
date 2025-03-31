@@ -1,13 +1,21 @@
 import { ref } from 'vue'
 import { createResource } from 'frappe-ui'
 
-export const defaultLanguage = ref()
-createResource({
+export const defaultLanguage = ref(localStorage.getItem('lang') || 'vi')
+
+export const fetchLanguage = createResource({
   url: 'gameplan.api_root.language.get_language',
   cache: 'Language',
-  auto: true,
   onSuccess: (data) => {
     defaultLanguage.value = data
   },
 })
+
+export const changeLanguage = createResource({
+  url: 'gameplan.api_root.language.change_language',
+  onError(err) {
+    console.log('Language not found')
+  },
+})
+
 export const showLanguage = ref(false)

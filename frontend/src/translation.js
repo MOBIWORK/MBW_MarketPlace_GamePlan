@@ -1,4 +1,5 @@
 import { createResource } from 'frappe-ui'
+import { defaultLanguage } from './composables/language'
 
 export default function translationPlugin(app) {
   app.config.globalProperties.__ = translate
@@ -36,8 +37,10 @@ function translate(message, replace, context = null) {
 }
 
 function fetchTranslations(lang) {
+  let language = lang || defaultLanguage.value || 'vi'
   createResource({
     url: 'gameplan.api.get_translations',
+    params: { lang: language },
     cache: 'translations',
     auto: true,
     transform: (data) => {

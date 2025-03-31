@@ -138,7 +138,7 @@
         }
       "
     />
-    <ChangeLanguage />
+    <ChangeLanguageDialog />
   </div>
 </template>
 <script>
@@ -157,7 +157,7 @@ import LucideInbox from '~icons/lucide/inbox'
 import LucideListTodo from '~icons/lucide/list-todo'
 import LucideNewspaper from '~icons/lucide/newspaper'
 import LucideFiles from '~icons/lucide/files'
-import ChangeLanguage from '@/components/Settings/ChangeLanguage.vue'
+import ChangeLanguageDialog from '@/components/Settings/ChangeLanguageDialog.vue'
 
 export default {
   name: 'AppSidebar',
